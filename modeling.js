@@ -8,6 +8,10 @@
 /* Converts any array-like object to actual array
    Used mostly with Arguments objects
  */
+
+var DEFAULT_LINEAR_TOLERANCE = 0.1;
+var DEFAULT_ANGULAR_SIZE     = 30.0;
+
 function toArray(obj) {
     return Array.prototype.slice.call(obj);
 }
@@ -1317,6 +1321,18 @@ module.exports.operations =
         r.args = toArray(arguments);
         return r;
     },
+    /** 'repr' operation
+     *  Produces Brep object in desired format.
+     *  "content" field, which contains actual data, is zip-packed and base64 encoded
+     *  Format identifiers supported:
+     *  - "x_b": Parasolid binary format
+     *  - "x_t": Parasolid textual format
+     *  @function
+     *  @param  {string} format identifier
+     *  @param  {Entity} entity which should be converted to BREP
+     *  @return {Entity} BREP
+     */
+    repr: op('repr', 2),
     /** 'raw' operation
      *  Accepts operation name and variadic list of its arguments directly
      *  Use with caution, only when you know what you do
@@ -1459,20 +1475,14 @@ module.exports.operations =
     /** 'tessellate' operation
      *  Converts BREP body to a polygonal mesh
      *  @function
-     *  @param  {Solid}       body             - body being tessellated
-     *  @param  {number}     [curveChordAng]   - the maximum angle which is permitted between a facet chord and its original edge entity
-     *  @param  {number}     [curveChordTol]   - the maximum chordal distance between a facet edge and its original edge entity
-     *  @param  {number}     [surfacePlaneAng] - the maximum angle which is permitted between the surface normals at any two positions
-     *  @param  {number}     [surfacePlaneTol] - the maximum distance between the mid-plane of a facet and its original face entity
+     *  @param  {Solid}    body              - body being tessellated
+     *  @param  {number}  [linearTolearance] - the minimum linear size of any detail to be visible
+     *  @param  {number}  [angularSize]      - the angle, in degrees, which provided body occupies in field of view
      *  @return {Mesh}
      */
     tesselate: function() {
         var r = new Operation('tessellate');
-        r.args = [ arguments[0] ];
-        // allow default values for tolerances
-        var defaults = [ 5.72957795, 1, 5.72957795, 1 ];
-        for (var i = 1; i < 5; ++i)
-            r.args.push(arguments[i] || defaults[i - 1]);
+        r.args = [ arguments[0], arguments[1] || DEFAULT_LINEAR_TOLERANCE, arguments[2] || DEFAULT_ANGULAR_SIZE ];
         return r;
     },
     /** 'createPolylineApprox' operation
