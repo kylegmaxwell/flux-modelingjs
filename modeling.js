@@ -6,7 +6,7 @@
 /* jslint node:true */
 'use strict';
 
-var uuid = require('node-uuid');
+var uuid = require('./uuid');
 
 var eps = 1e-8;
 
