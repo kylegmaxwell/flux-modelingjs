@@ -1526,13 +1526,22 @@ var entities = module.exports.entities =
      *
      *  @function
      *  @param  {number[]|Point}  center
-     *  @param  {number[]|Vector} dir    - major direction
      *  @param  {number}          rMajor - major radius
      *  @param  {number}          rMinor - minor radius
+     *  @param  {number[]|Vector} dir    - major direction
+     *  @param  {string}          name   - optional, entity id
      *  @return {Wire}
      */
-    ellipse: function (center, rMajor, rMinor) {
-        return primitive('ellipse', { origin: coords(center), majorRadius: rMajor, minorRadius: rMinor }, Wire);
+    ellipse: function (center, rMajor, rMinor, dir, name) {
+        return primitive('ellipse', {
+            origin: coords(center),
+            originId: getId(center) || guid(),
+            majorRadius: rMajor,
+            minorRadius: rMinor,
+            direction: vecCoords(dir),
+            id: name || guid()
+        },
+        Wire);
     },
     /** Constructs rectangle entity
      *
