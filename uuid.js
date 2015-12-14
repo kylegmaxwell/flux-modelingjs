@@ -139,6 +139,11 @@
 
     options = options || {};
 
+    // NOTE(Andrew): In the below block, we need to make several comparisons to
+    // catch null/undefined. With these comparisons in place, stock uuid.js
+    // fails jshint, and so we're ignoring it for this block.
+    //
+    /* jshint ignore:start */
     var clockseq = (options.clockseq != null) ? options.clockseq : _clockseq;
 
     // UUID timestamps are 100 nano-second units since the Gregorian epoch,
@@ -164,6 +169,8 @@
     if ((dt < 0 || msecs > _lastMSecs) && options.nsecs == null) {
       nsecs = 0;
     }
+
+    /* jshint ignore:end */
 
     // Per 4.2.1.2 Throw error if too many uuids are requested
     if (nsecs >= 10000) {

@@ -29,7 +29,7 @@ function getId(e) {
     } else if (e.__data__) {
         return e.__data__.id;
     }
-    throw Error("Object without id provided");
+    return null;
 }
 /* Converts any array-like object to actual array
    Used mostly with Arguments objects
