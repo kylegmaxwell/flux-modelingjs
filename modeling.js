@@ -388,12 +388,15 @@ DCMScene.prototype.hasEquation = function (name) {
 function updateEntityIds (elem) {
     if (elem && elem.__data__) {
         var data = elem.__data__;
-        var idFields = ['id', 'startId', 'endId', 'originId'];
+        var idFields = ['startId', 'endId', 'originId'];
         idFields.forEach(function(field){
             if (data.hasOwnProperty(field)) {
                 data[field] = guid();
             }
         });
+
+        // 'id' field is obligatory
+        data.id = guid();
     }
 
     return elem;
@@ -506,10 +509,12 @@ DCMScene.prototype.add = function(obj, name) {
             this.addEntity(entities.raw(obj), name);
     }
     else if (obj.type !== undefined) {
-        throw Error('Adding raw constraint is not supported');
+        if (this.hasConstraint(name))
+            throw Error('constraint "' + name + '" already defined');
+        this.__constraints__[name] = constraints.raw(obj);
     }
     else if (obj.name !== undefined && obj.value !== undefined) {
-        throw Error('Adding raw variable in not supported');
+        throw Error('Adding raw variable is not supported');
     }
     else if (obj.equation !== undefined) {
         throw Error('Adding raw equation is not supported');
@@ -1176,7 +1181,7 @@ Equation.prototype.toJSON = function () {
 //******************************************************************************
 /** Use functions from {@link operations} to construct
  *  @class
- *  @classdesc Encapsulates info about operation in Parasolid Worker protocol
+ *  @classdesc Encapsulates info about operation in DCM/Parasolid Worker protocol
  */
 function Operation(id) {
     this.opcode = id;
@@ -1723,6 +1728,89 @@ var entities = module.exports.entities =
 };
 
 //******************************************************************************
+// Constraints
+//******************************************************************************
+// Helper functions to create json constraints
+function constr1(e) {
+    return { entity1: getId(e) };
+}
+function valueConstr1(val, e) {
+    return { value: val, entity1: getId(e) };
+}
+function constr2(e1, e2) {
+    return { entity1: getId(e1), entity2: getId(e2) };
+}
+function valueConstr2(val, e1, e2) {
+    return { value: val, entity1: getId(e1), entity2: getId(e2) };
+}
+function helpConstr2(e1, e2, h1, h2) {
+    return { entity1: getId(e1), entity2: getId(e2), help1: h1, help2: h2 };
+}
+function helpParamsConstr2(e1, e2, p1, p2) {
+    return { entity1: getId(e1), entity2: getId(e2), helpParam1: p1, helpParam2: p2 };
+}
+function valueHelpConstr2(val, e1, e2, h1, h2) {
+    return { value: val, entity1: getId(e1), entity2: getId(e2), help1: h1, help2: h2 };
+}
+function constr3(e1, e2, e3) {
+    return { entity1: getId(e1), entity2: getId(e2), entity3: getId(e3) };
+}
+function help(param) {
+    if (arguments.length !== 1)
+        throw Error("Invalid help parameter " + JSON.stringify(arguments));
+    if (Array.isArray(param)) {
+        if(param.length !== 0 && param.length !== 3) {
+            throw Error("Invalid help point " + JSON.stringify(param));
+        }
+        return param;
+    }
+    if (typeof param !== 'number')
+        throw Error("Invalid help parameter " + JSON.stringify(param));
+    return [param];
+}
+// var constraints is used for self-call
+var constraints = module.exports.constraints =
+    /** Constraint constructors
+    *  @namespace constraints
+    */
+{
+    //******************************************************************************
+    // Raw constraint, specified directly as JSON
+    //******************************************************************************
+    /** Constructs constraint object from raw data. No checks for type value, body being object etc.
+     *
+     *  @param  {*}      body - any JavaScript value
+     *  @return {Constraint}
+     */
+    raw: function(body) {
+        var c = new Constraint(body.type);
+        c.__data__ = body;
+        return c;
+    },
+    /** Constructs parallel constraint
+     *  Defined only for geometries with a direction
+     *  It implies that the directions of the geometries are parallel
+     *
+     *  @function
+     *  @param  {Entity} e1     - first entity
+     *  @param  {Entity} e2     - second entity
+     *  @return {Constraint}      parallel constraint
+     */
+    parallel: function(e1, e2) {
+        return type('parallel', constr2(e1, e2));
+    },
+    /** Constructs radius constraint
+     *  Defined only for circles
+     *
+     *  @function
+     *  @param  {Entity} val    - circle radius value
+     *  @param  {Entity} e      - circle entity
+     *  @return {Constraint}      radius constraint
+     */
+    radius: function(val, e) {
+        return type('radius', valueConstr1(val, e));
+    }
+};
 // Operations
 //******************************************************************************
 var ops =
@@ -2098,7 +2186,15 @@ module.exports.operations =
      *  @param  {Wire[]}  profiles
      *  @return {Sheet}   profile
      */
-    createResilientProfiles: op('createResilientProfiles', 1)
+    createResilientProfiles: op('createResilientProfiles', 1),
+    /** 'eval' operation
+     *  Evaluates entire scene inside DCM-Worker
+     *  @function
+     *  @return {DCM/Scene} scene
+     */
+    eval: function() {
+        return new Operation('eval');
+    }
 };
 
 // Helper function
