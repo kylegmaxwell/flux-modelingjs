@@ -4,7 +4,10 @@
  */
 
 /* jslint node:true */
-'use strict';
+
+(function (define) { /* 'use strict';*/ define(function(require) {
+// TODO Use strict should be enabled. Previously the statement was there,
+// but had no effect because it was at the top of the file. See PLT-3108.
 
 var uuid = require('./uuid');
 
@@ -12,7 +15,7 @@ var eps = 1e-8;
 
 // Object that containts 'genId' method, to be used for GUID generation
 // Needed for test purposes
-var gen_id_object = module.exports.gen_id_object = undefined;
+var gen_id_object = undefined;
 
 /* Generate uuid, that will be used as geometry id
  */
@@ -91,7 +94,7 @@ function Scene() {
  *
  *  @return {Scene} new empty scene object
  */
-module.exports.scene = function () { return new Scene(); };
+var scene = function () { return new Scene(); };
 /** Converts Scene object to JSON representation
  *  Adds custom-conversion support for {@link JSON.stringify}
  *
@@ -240,7 +243,7 @@ DCMScene.prototype.addMultiple = function (elements) {
  *
  *  @return {DCMScene} new scene object
  */
-module.exports.dcmScene = function (value) {
+var dcmScene = function (value) {
     var scene = new DCMScene();
     if (value) {
         Object.keys(value).forEach(function(key) {
@@ -1316,7 +1319,7 @@ Material.prototype = {
     }
 };
 
-var attributes = module.exports.attributes =
+var attributes =
 /** Attribute constructors.
  *  Attributes are added to entities via {@link Entity#attribute Entity.attribute}
  *  @namespace attributes
@@ -1380,7 +1383,7 @@ var getEntityAttribute = function(entity, property) {
 //******************************************************************************
 // Utilities
 //******************************************************************************
-module.exports.utilities = {
+var utilities = {
     coords:coords,
     vecCoords:vecCoords,
     setEntityAttribute: setEntityAttribute,
@@ -1391,7 +1394,7 @@ module.exports.utilities = {
 // Entities
 //******************************************************************************
 // var entities is used for self-call
-var entities = module.exports.entities =
+var entities =
 /** Entity constructors
  *  @namespace entities
  */
@@ -1814,7 +1817,6 @@ var constraints = module.exports.constraints =
 // Operations
 //******************************************************************************
 var ops =
-module.exports.operations =
 /** Operation constructors
  *  This documentation isn't precise on argument and result types,
  *  because functions listed here effectively create operation objects.
@@ -2219,3 +2221,13 @@ function getCircleCenterByThreePoints(start, middle, end)
 
     return [centerX, centerY, 0.0];
 }
+return {
+    gen_id_object: gen_id_object,
+    scene: scene,
+    dcmScene: dcmScene,
+    attributes: attributes,
+    utilities: utilities,
+    entities: entities,
+    operations: ops
+}
+});}(typeof define==='function'&&define.amd?define:function(factory){module.exports=factory(require);}));
