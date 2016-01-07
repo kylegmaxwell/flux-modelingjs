@@ -1772,7 +1772,7 @@ function help(param) {
     return [param];
 }
 // var constraints is used for self-call
-var constraints = module.exports.constraints =
+var constraints =
     /** Constraint constructors
     *  @namespace constraints
     */
@@ -2228,6 +2228,7 @@ return {
     attributes: attributes,
     utilities: utilities,
     entities: entities,
+    constraints: constraints,
     operations: ops
 }
 });}(typeof define==='function'&&define.amd?define:function(factory){module.exports=factory(require);}));
