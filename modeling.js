@@ -1858,16 +1858,22 @@ var ops =
     },
     /** 'repr' operation
      *  Produces Brep object in desired format.
-     *  "content" field, which contains actual data, is zip-packed and base64 encoded
+     *  "content" field, which contains actual data, may be zip-packed and base64 encoded
+     *  You cannot enable compression and disable base64-coding
      *  Format identifiers supported:
-     *  - "x_b": Parasolid binary format
-     *  - "x_t": Parasolid textual format
+     *  - "x_b":  Parasolid binary format
+     *  - "x_t":  Parasolid textual format
+     *  - "iges": IGES format
+     *  - "step": STEP
+     *  - "sat":  SAT
      *  @function
-     *  @param  {string} format identifier
-     *  @param  {Entity} entity which should be converted to BREP
-     *  @return {Entity} BREP
+     *  @param  {string}                    format identifier
+     *  @param  {Entity}                    entity which should be converted to BREP
+     *  @param  {boolean} [is_compressed] - compress content data stream or not, default false
+     *  @param  {boolean} [is_base64]     - encode content data stream as base-64 or not, default true
+     *  @return {Entity}  BREP
      */
-    repr: op('repr', 2),
+    repr: op('repr', 4),
     /** 'raw' operation
      *  Accepts operation name and variadic list of its arguments directly
      *  Use with caution, only when you know what you do
