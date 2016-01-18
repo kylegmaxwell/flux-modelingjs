@@ -1546,7 +1546,7 @@ var entities =
             originId: getId(center) || guid(),
             majorRadius: rMajor,
             minorRadius: rMinor,
-            direction: vecCoords(dir),
+            direction: (dir ? vecCoords(dir) : undefined),
             id: name || guid()
         },
         Wire);
