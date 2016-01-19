@@ -15,7 +15,7 @@ var eps = 1e-8;
 
 // Object that containts 'genId' method, to be used for GUID generation
 // Needed for test purposes
-var gen_id_object = undefined;
+var gen_id_object;
 
 /* Generate uuid, that will be used as geometry id
  */
@@ -2236,5 +2236,5 @@ return {
     entities: entities,
     constraints: constraints,
     operations: ops
-}
+};
 });}(typeof define==='function'&&define.amd?define:function(factory){module.exports=factory(require);}));
