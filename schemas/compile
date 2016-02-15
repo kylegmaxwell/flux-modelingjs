@@ -1,0 +1,152 @@
+#!/usr/bin/env python2.7
+#
+# This small script receives JSON schema and sub-path inside it,
+# then extracts all referenced parts of schema starting from that address
+#
+
+from __future__ import print_function
+import argparse
+import json
+import sys
+# Translate schema ref into path list
+def ref_to_path(ref):
+    if not ref.startswith('#'):
+        print(ref, ": external reference, omitted", file= sys.stderr)
+        return None
+    return [p for p in ref[1:].split('/') if p]
+# Normalized version of ref_to_path,
+# where generated path will contain integers
+# at sub-elements where schema piece is a list
+# this basically allows to re-create schema parts
+def ref_to_path_normalized(ref, schema):
+    path = ref_to_path(ref)
+    if not path:
+        return None
+
+    def mapper(p):
+        ty = type(schema)
+        if ty is list:
+            return int(p)
+        if ty is dict:
+            return str(p)
+        raise Exception('cannot recurse')
+    return map(mapper, path)
+
+# Walk specified JSON subpath and return underlying element
+# Can walk wildcard subpaths
+def inspect_subpath(json, subpath):
+    if not subpath: # Terminal rule
+        yield json
+    else: # Descend rule
+        head = subpath[0]
+        tail = subpath[1:]
+        ty = type(json)
+        
+        if   ty is list:
+            if head is list:
+                for v in json:
+                    for r in inspect_subpath(v, tail):
+                        yield r
+            else:
+                try:
+                    for r in inspect_subpath(json[int(head)], tail):
+                        yield r
+                except:
+                    pass
+        elif ty is dict:
+            if head is dict:
+                for v in json.itervalues():
+                    for r in inspect_subpath(v, tail):
+                        yield r
+            else:
+                try:
+                    for r in inspect_subpath(json[str(head)], tail):
+                        yield r
+                except:
+                    pass
+# List of possible locations of sub-schemas
+# dict means 'any value in dictionary',
+# list means 'any element in list'
+#
+all_subpaths = [
+    ['properties', dict],
+    ['additionalProperties'],
+    ['dependencies', dict],
+    ['items'],
+    ['items', list],
+    ['allOf', list],
+    ['anyOf', list],
+    ['oneOf', list],
+    ['not']
+]
+# Check for $ref element in this schema
+# and descend into sub-schemas
+def find_all_refs_in(json):
+    if type(json) is dict and "$ref" in json:
+        yield json["$ref"]
+    # Iterate subordinates
+    for sub in all_subpaths:
+        for subjson in inspect_subpath(json, sub):
+            for ref in find_all_refs_in(subjson):
+                yield ref
+
+def find_all_pieces(schema, ref):
+    seen = set()
+    
+    def recurse(ref):
+        path = ref_to_path_normalized(ref, schema)
+        if not path:
+            return
+        
+        for s in inspect_subpath(schema, path):
+            yield (ref, path, s)
+            for r in find_all_refs_in(s):
+                if r not in seen:
+                    seen.add(r)
+                    for r1 in recurse(r):
+                        yield r1
+    for r in recurse(ref):
+        yield r
+
+# main script
+
+parser = argparse.ArgumentParser(description = "Perform 'compilation' of JSON schema by extracting only required part and everything it depends on")
+parser.add_argument('schema',
+    metavar = 'SCHEMA',
+    type = str,
+    help = 'File with JSON schema')
+
+parser.add_argument('path',
+    metavar = 'REF',
+    type = str,
+    help = 'JSON ref inside schema to start from')
+
+parser.add_argument('--pretty',
+    action = 'store_const',
+    const = True, default = False,
+    help = 'Pretty-print resulting sub-schema, using 4 spaces indent')
+
+args = parser.parse_args()
+
+schema = None
+with open(args.schema) as f:
+    schema = json.load(f)
+
+new_schema = {}
+for ref, path, piece in find_all_pieces(schema, args.path):
+    s = new_schema
+    last = path[-1]
+    init = path[:-1]
+    for p in init:
+        if p not in s:
+            s[p] = {} # construct intermediate subtrees
+        s = s[p]
+    if last in s:
+        if s[last] != piece:
+            raise Exception('conflicting tree additions at {}'.format(ref))
+    else:
+        s[last] = piece
+
+new_schema["$ref"] = args.path
+
+json.dump(new_schema, sys.stdout, indent = 4 if args.pretty else None)

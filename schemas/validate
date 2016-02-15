@@ -1,0 +1,74 @@
+#!/usr/bin/env node
+'use strict';
+// CLI JSON schema validator
+
+var Ajv   = require('ajv'),
+    fs    = require('fs'),
+    path  = require('path');
+
+function _try(func, message) {
+    try {
+        return func();
+    }
+    catch (e) {
+        console.error("ERR: ", message);
+        throw e;
+    }
+}
+
+var schema    = process.argv[2];
+var instances = process.argv.slice(3);
+
+var syntax = function() {
+    console.log('Syntax: validate <schema> <instances>...');
+    console.log('To validate instances against sub-schema, use');
+    console.log('standard in-schema reference syntax:');
+    console.log('\tpath/to/schema.json#/path/to/sub/schema');
+};
+
+if (!instances || !schema) {
+    return syntax();
+}
+
+// support sub-paths in schema, after hash sign
+var hashIndex = schema.lastIndexOf('#');
+var schemaId = "#";
+if (hashIndex != -1) {
+  schemaId = schema.slice(hashIndex);
+  schema = schema.slice(0, hashIndex);
+}
+
+var schemaRaw = _try(
+    function() { return fs.readFileSync(schema); },
+    "failed to read schema file " + schema
+);
+var schemaJson = _try(
+    function () { return JSON.parse(schemaRaw); },
+    "schema is not valid JSON"
+);
+
+var ajv = Ajv({ allErrors: true });
+ajv.addSchema(schemaJson, "_");
+var validate = ajv.compile({ $ref: "_" + schemaId });
+
+instances.forEach(function (file) {
+    try {
+        var raw = _try(
+            function() { return fs.readFileSync(file); },
+            file + ": failed to read"
+        );
+        var obj = _try(
+            function () { return JSON.parse(raw); },
+            file + ": not a valid JSON"
+        );
+
+        if (!validate(obj)) {
+            console.error(">>> " + file);
+            console.error(validate.errors);
+            console.error("");
+        }
+    }
+    catch (e) {
+        console.error(e.stack);
+    }
+});
