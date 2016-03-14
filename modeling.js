@@ -2026,6 +2026,14 @@ var ops =
         r.args = [ arguments[0], arguments[1] || DEFAULT_LINEAR_TOLERANCE, arguments[2] || DEFAULT_ANGULAR_SIZE ];
         return r;
     },
+    /** 'tesselateStl' operation
+     *  Constructs STL representation of specified BREP
+     *  @function
+     *  @param  {Body}    body      - body being tessellated
+     *  @param  {number}  quality   - tesselation quality, ranges 0-4; the bigger, the better
+     *  @return {Entity}  BREP
+     */
+    tesselateStl: op('tessellateStl', 2),
     /** 'createPolylineApprox' operation
      *  Converts NURBS curve to polyline
      *  @function
