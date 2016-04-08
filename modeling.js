@@ -5,10 +5,9 @@
 
 /* jslint node:true */
 
-(function (define) { /* 'use strict';*/ define(function(require) {
+(function (define) { "use strict"; define(function(require) {
 // TODO Use strict should be enabled. Previously the statement was there,
 // but had no effect because it was at the top of the file. See PLT-3108.
-
 var uuid = require('./uuid');
 
 var eps = 1e-8;
