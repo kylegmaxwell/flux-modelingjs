@@ -1,0 +1,22 @@
+{
+  "name": "flux-modelingjs",
+  "version": "0.0.1",
+  "description": "Create modeling entities",
+  "main": "modeling.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/vannevartech/flux-modelingjs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/vannevartech/flux-modelingjs#readme",
+  "dependencies": {
+    "ajv": "^3.8.10"
+  }
+}

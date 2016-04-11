@@ -1,3 +1,8 @@
 flux-modelingjs contains the helper module used by the flux web-client, flux block libraries, and integration tests to formulate queries to the dcm- and parasolid-workers.
 
-It also embeds uuid.js, a dependency. This isn't a great way to manage dependencies, but until the flux web client figures out whether it wants to install javascript dependnencies via bower or npm, we're going with this because it's at least simple.
+It also embeds uuid.js, a dependency. This isn't a great way to manage dependencies, but until the flux web client figures out whether it wants to install javascript dependnencies via submodule or npm, we're going with this because it's at least simple.
+
+If you want to use the schema you can install the dependencies and run the sample script.
+npm install
+./schemas/validate schemas/psworker.json#/entities/sphere schemas/data/error.json
+./schemas/validate schemas/psworker.json#/entities/sphere schemas/data/valid.json
