@@ -250,9 +250,9 @@
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
 
-                "coords":       { "$ref": "#/types/position" }
+                "point":       { "$ref": "#/types/position" }
             },
-            "required": [ "primitive", "coords" ],
+            "required": [ "primitive", "point" ],
             "additionalProperties": false
         },
 
@@ -544,7 +544,7 @@
                 "attributes":   {},
 
                 "origin":       { "$ref": "#/types/position" },
-                "majorRadius":  { "type": "#/types/coordinate" },
+                "majorRadius":  { "$ref": "#/types/coordinate" },
                 "minorRadius":  { "$ref": "#/types/distance-nonzero" },
                 "axis":         { "$ref": "#/types/direction" }
             },
