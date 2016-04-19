@@ -6,3 +6,6 @@ If you want to use the schema you can install the dependencies and run the sampl
 npm install
 ./schemas/validate schemas/psworker.json#/entities/sphere schemas/data/error.json
 ./schemas/validate schemas/psworker.json#/entities/sphere schemas/data/valid.json
+
+To run tests use npm:
+npm test

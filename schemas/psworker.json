@@ -199,6 +199,13 @@
             "items": { "$ref": "#/types/distance-nonzero" },
             "minItems": 3,
             "maxItems": 3
+        },
+        "units": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                "^/.*" : {"type": "string" }
+            }
         }
     },
     "entities": {
@@ -236,6 +243,7 @@
                 "primitive":    { "enum": [ "vector" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "coords":       { "$ref": "#/types/position" }
             },
@@ -247,6 +255,7 @@
                 "primitive":    { "enum": [ "point" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "point":       { "$ref": "#/types/position" }
             },
@@ -259,6 +268,7 @@
                 "primitive":    { "enum": [ "plane" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position"  },
                 "normal":       { "$ref": "#/types/direction" }
@@ -271,6 +281,7 @@
                 "primitive":    { "enum": [ "affineTransform" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "mat":          {
                     "type": "array",
@@ -289,6 +300,7 @@
                 "primitive":    { "enum": [ "massProps" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "mass":         { "$ref": "#/types/distance" },
                 "centerOfMass": { "$ref": "#/types/position" },
@@ -314,6 +326,7 @@
                 "primitive":    { "enum": [ "line" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "start":        { "$ref": "#/types/position" },
                 "end":          { "$ref": "#/types/position" }
@@ -326,6 +339,7 @@
                 "primitive":    { "enum": [ "polyline" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "points":       {
                     "type": "array",
@@ -341,6 +355,7 @@
                 "primitive":    { "enum": [ "circle" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
                 "radius":       { "$ref": "#/types/distance-nonzero" },
@@ -354,6 +369,7 @@
                 "primitive":    { "enum": [ "ellipse" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
                 "majorRadius":  { "$ref": "#/types/distance-nonzero" },
@@ -369,6 +385,7 @@
                 "primitive":    { "enum": [ "curve" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "degree":       { "$ref": "#/types/index-nonzero" },
                 "controlPoints":{ "type": "array", "items": { "$ref": "#/types/position" }},
@@ -383,6 +400,7 @@
                 "primitive":    { "enum": [ "arc" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "start":        { "$ref": "#/types/position" },
                 "middle":       { "$ref": "#/types/position" },
@@ -396,6 +414,7 @@
                 "primitive":    { "enum": [ "rectangle" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
                 "dimensions":   {
@@ -437,6 +456,7 @@
                 "primitive":    { "enum": [ "polygonSet" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "polygons":     {
                     "type": "array",
@@ -468,6 +488,7 @@
                 "primitive":    { "enum": [ "surface" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "uDegree":      { "$ref": "#/types/index-nonzero" },
                 "vDegree":      { "$ref": "#/types/index-nonzero" },
@@ -511,6 +532,7 @@
                 "primitive":    { "enum": [ "block" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
                 "dimensions":   { "$ref": "#/types/dimensions" },
@@ -525,6 +547,7 @@
                 "primitive":    { "enum": [ "torus" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
                 "majorRadius":  { "$ref": "#/types/coordinate" },
@@ -539,6 +562,7 @@
                 "primitive":    { "enum": [ "sphere" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
                 "radius":       { "$ref": "#/types/distance-nonzero" }
@@ -551,6 +575,7 @@
                 "primitive":    { "enum": [ "cylinder" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
                 "radius":       { "$ref": "#/types/distance-nonzero" },
@@ -565,6 +590,7 @@
                 "primitive":    { "enum": [ "cone" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
                 "radius":       { "$ref": "#/types/distance-nonzero" },
@@ -580,6 +606,7 @@
                 "primitive":    { "enum": [ "mesh" ] },
                 "__repr__":     { "type": "string" },
                 "attributes":   {},
+                "units":        { "$ref": "#/types/units" },
 
                 "vertices":     {
                     "type":     "array",
