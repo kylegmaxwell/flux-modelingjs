@@ -96,7 +96,7 @@
         "entities": {
             "type": "object",
             "minProperties": 1,
-            "additionalProperties": { "$ref": "#/scene/entity" }
+            "items": { "$ref": "#/scene/entity" }
         },
         "entity": {
             "oneOf": [
@@ -227,8 +227,7 @@
                 },
                 "attributes":   {}
             },
-            "required": [ "primitive", "content", "format" ],
-            "additionalProperties": false
+            "required": [ "primitive", "content", "format" ]
         },
 
         "vector": {
@@ -240,8 +239,7 @@
 
                 "coords":       { "$ref": "#/types/position" }
             },
-            "required": [ "primitive", "coords" ],
-            "additionalProperties": false
+            "required": [ "primitive", "coords" ]
         },
         "point": {
             "type": "object",
@@ -252,8 +250,7 @@
 
                 "point":       { "$ref": "#/types/position" }
             },
-            "required": [ "primitive", "point" ],
-            "additionalProperties": false
+            "required": [ "primitive", "point" ]
         },
 
         "plane": {
@@ -266,8 +263,7 @@
                 "origin":       { "$ref": "#/types/position"  },
                 "normal":       { "$ref": "#/types/direction" }
             },
-            "required": [ "primitive", "origin", "normal" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "normal" ]
         },
         "affineTransform": {
             "type": "object",
@@ -322,8 +318,7 @@
                 "start":        { "$ref": "#/types/position" },
                 "end":          { "$ref": "#/types/position" }
             },
-            "required": [ "primitive", "start", "end" ],
-            "additionalProperties": false
+            "required": [ "primitive", "start", "end" ]
         },
         "polyline": {
             "type": "object",
@@ -338,8 +333,7 @@
                     "minItems": 2
                 }
             },
-            "required": [ "primitive", "points" ],
-            "additionalProperties": false
+            "required": [ "primitive", "points" ]
         },
         "circle": {
             "type": "object",
@@ -352,8 +346,7 @@
                 "radius":       { "$ref": "#/types/distance-nonzero" },
                 "axis":         { "$ref": "#/types/direction" }
             },
-            "required": [ "primitive", "origin", "radius" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "radius" ]
         },
         "ellipse": {
             "type": "object",
@@ -368,8 +361,7 @@
                 "axis":         { "$ref": "#/types/direction" },
                 "reference":    { "$ref": "#/types/direction" }
             },
-            "required": [ "primitive", "origin", "majorRadius", "minorRadius" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "majorRadius", "minorRadius" ]
         },
         "curve": {
             "type": "object",
@@ -383,8 +375,7 @@
                 "knots":        { "type": "array", "items": { "type": "number" }},
                 "weights":      { "type": "array", "items": { "type": "number" }}
             },
-            "required": [ "primitive", "degree", "controlPoints", "knots" ],
-            "additionalProperties": false
+            "required": [ "primitive", "degree", "controlPoints", "knots" ]
         },
         "arc": {
             "type": "object",
@@ -397,8 +388,7 @@
                 "middle":       { "$ref": "#/types/position" },
                 "end":          { "$ref": "#/types/position" }
             },
-            "required": [ "primitive", "start", "middle", "end" ],
-            "additionalProperties": false
+            "required": [ "primitive", "start", "middle", "end" ]
         },
         "rectangle": {
             "type": "object",
@@ -418,8 +408,7 @@
                 "axis":         { "$ref": "#/types/direction" },
                 "reference":    { "$ref": "#/types/direction" }
             },
-            "required": [ "primitive", "origin", "dimensions" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "dimensions" ]
         },
         "polycurve": {
             "type": "object",
@@ -439,8 +428,7 @@
                     ] }
                 }
             },
-            "required": [ "primitive", "curves" ],
-            "additionalProperties": false
+            "required": [ "primitive", "curves" ]
         },
 
         "polygonSet": {
@@ -468,8 +456,6 @@
                 }
             },
             "required": [ "primitive", "polygons" ],
-            "additionalProperties": false,
-
             "polygon": {
                 "type": "array",
                 "items": { "$ref": "#/types/position" },
@@ -498,8 +484,7 @@
                 },
                 "weights":      { "type": "array", "items": { "type": "number" }}
             },
-            "required": [ "primitive", "uDegree", "vDegree", "uKnots", "vKnots", "controlPoints" ],
-            "additionalProperties": false
+            "required": [ "primitive", "uDegree", "vDegree", "uKnots", "vKnots", "controlPoints" ]
         },
         "polysurface": {
             "type": "object",
@@ -517,8 +502,7 @@
                     "minItems": 1
                 }
             },
-            "required": [ "primitive", "surfaces" ],
-            "additionalProperties": false
+            "required": [ "primitive", "surfaces" ]
         },
 
         "block": {
@@ -533,8 +517,7 @@
                 "axis":         { "$ref": "#/types/direction" },
                 "reference":    { "$ref": "#/types/direction" }
             },
-            "required": [ "primitive", "origin", "dimensions" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "dimensions" ]
         },
         "torus": {
             "type": "object",
@@ -548,8 +531,7 @@
                 "minorRadius":  { "$ref": "#/types/distance-nonzero" },
                 "axis":         { "$ref": "#/types/direction" }
             },
-            "required": [ "primitive", "origin", "majorRadius", "minorRadius" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "majorRadius", "minorRadius" ]
         },
         "sphere": {
             "type": "object",
@@ -561,8 +543,7 @@
                 "origin":       { "$ref": "#/types/position" },
                 "radius":       { "$ref": "#/types/distance-nonzero" }
             },
-            "required": [ "primitive", "origin", "radius" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "radius" ]
         },
         "cylinder": {
             "type": "object",
@@ -576,8 +557,7 @@
                 "height":       { "$ref": "#/types/distance-nonzero" },
                 "axis":         { "$ref": "#/types/direction" }
             },
-            "required": [ "primitive", "origin", "radius", "height" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "radius", "height" ]
         },
         "cone": {
             "type": "object",
@@ -592,8 +572,7 @@
                 "semiAngle":    { "$ref": "#/types/angle" },
                 "axis":         { "$ref": "#/types/direction" }
             },
-            "required": [ "primitive", "origin", "radius", "height", "semiAngle" ],
-            "additionalProperties": false
+            "required": [ "primitive", "origin", "radius", "height", "semiAngle" ]
         },
         "mesh": {
             "type": "object",
@@ -615,8 +594,7 @@
                     }
                 }
             },
-            "required": [ "primitive", "vertices", "faces" ],
-            "additionalProperties": false
+            "required": [ "primitive", "vertices", "faces" ]
         }
     }
 }
