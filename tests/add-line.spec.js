@@ -1,7 +1,7 @@
 describe("DCMScene/addEntity/Line", function() {
     'use strict';
 
-    var modeling = require("../modeling");
+    var modeling = require("./dcm-test-modeling.js");
 
     // Test data
     var start = modeling.entities.point([1, 1, 0]);

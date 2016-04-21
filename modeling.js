@@ -14,13 +14,15 @@ var eps = 1e-8;
 
 // Object that containts 'genId' method, to be used for GUID generation
 // Needed for test purposes
-var gen_id_object;
+var gen_id_object = {};
 
 /* Generate uuid, that will be used as geometry id
+    By default, this generates null. Users who want to generate id's should
+    explicitly override the exported property on this module.
  */
 function guid() {
     if (isNone(gen_id_object) || isNone(gen_id_object.genId)) {
-        return uuid.v4();
+        return null;
     }
     return gen_id_object.genId();
 }

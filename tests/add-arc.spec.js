@@ -1,7 +1,7 @@
 describe("DCMScene/addEntity/Arc", function() {
     'use strict';
 
-    var modeling = require("../modeling");
+    var modeling = require("./dcm-test-modeling.js");
 
     // Test data
     var start = modeling.entities.point([0, 1, 0]);
