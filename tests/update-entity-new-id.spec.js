@@ -1,7 +1,7 @@
 describe("DCMScene/updateEntity/UpdatePointWithoutId", function() {
     'use strict';
 
-    var modeling = require("../modeling");
+    var modeling = require("./dcm-test-modeling.js");
 
     // Test data
     var pt = modeling.entities.point([1, 1, 0]).toJSON();
