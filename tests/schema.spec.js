@@ -46,9 +46,9 @@ describe("Schema test", function() {
     it ("Should manage units", function() {
         var cone = {
             "units":{
-                "/height":"cm",
-                "/origin":"m",
-                "/radius":"in"
+                "height":"cm",
+                "ORIGIN":"m",
+                "radius":"in"
             },
             "height":10,
             "origin":[0,0,0],
@@ -66,8 +66,9 @@ describe("Schema test", function() {
 
         var badUnits = {
             "units":{
-                "/height":123,
-                "/origin":"m"
+                "height":123,
+                "ORIGIN":"m",
+                "radius":"in"
             },
             "height":10,
             "origin":[0,0,0],
