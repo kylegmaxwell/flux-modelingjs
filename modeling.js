@@ -4,8 +4,11 @@
 // reach a conclusion (either way) on that, maintain the existing modeling.js
 // name for compatability with existing users.
 var modeling = require("./modeling-core.js");
-// Inject the schema
-modeling.init(require("./schemas/psworker.json"));
+// Inject the schema and a measure registryl
+var schema = require("./schemas/psworker.json");
+var measure = require("./measure.js");
+var registry = new measure.Registry();
+modeling.init(schema, registry);
 
 // Public API
 module.exports = modeling;

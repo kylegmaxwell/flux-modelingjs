@@ -9,6 +9,18 @@
 // TODO Use strict should be enabled. Previously the statement was there,
 // but had no effect because it was at the top of the file. See PLT-3108.
 
+
+/* Initialize this module with schema and registry objects.
+ * These arguments are optional, but are required for full units-of-measure
+ * support. If not provided, units will not be correctly interpreted
+*/
+var _schema = {};
+var _measure = {};
+function init(schema, registry) {
+    _schema.schema = schema;
+    _measure.registry = registry;
+}
+
 var eps = 1e-8;
 
 // Object that containts 'genId' method, to be used for GUID generation
@@ -661,10 +673,6 @@ inherit(Plane, Geometry);
 function Vector() { Geometry.apply(this, arguments); }
 inherit(Vector, Geometry);
 
-var _schema = {};
-function init(schema) {
-    _schema.schema = schema;
-}
 
 function parsePath(s) {
     if(s[0] !== "#") {
@@ -730,6 +738,17 @@ function lookupFieldDimensions(typeid) {
     return results;
 }
 
+
+// TODO(andrew): consdier setting these at a per-project level, rather than
+// hardcoding them.
+_defaultDimToUnits = {
+    "length":"meters",
+    "area":"meters*meters",
+    "volume":"meters*meters*meters",
+    "angle":"degrees"
+};
+
+
 /** Looks up default field units
  *
  *  @param  {string}    typeid  - name of entity type, value for 'primitive' property
@@ -738,18 +757,12 @@ function lookupFieldDimensions(typeid) {
  */
 function defaultUnits(typeid) {
     var dimensions = lookupFieldDimensions(typeid);
-    var dimToUnits = {
-        "length":"meters",
-        "area":"meters*meters",
-        "volume":"meters*meters*meters",
-        "angle":"degrees"
-    };
     var results;
     for (var key in dimensions) {
         if (results === undefined) {
             results = {};
         }
-        results[key] = dimToUnits[dimensions[key]];
+        results[key] = _defaultDimToUnits[dimensions[key]];
     }
     return results;
 }
@@ -771,14 +784,38 @@ function primitive(typeid, params, OptCtor) {
     e.__data__.units = defaultUnits(typeid);
     return e;
 }
-// if arg is array, returns it; if it's a point, returns its coords as array
-function coords(obj) {
+/** Helper function to extract point coordinates
+
+    @private
+    @param  {any}   obj  - entity or array
+    @param  {string} dimToUnits - optional, desired units of resulting
+        vector. Only used if the input object is an entity, and if this module
+        has been init'd with a units of measure registry.
+    @return {Array}             Coordinate array
+*/
+function coords(obj, dimToUnits) {
     if (Array.isArray(obj))
         return obj;
-    if (obj instanceof Point)
-        return coords(obj.toJSON().point);
-    if (obj.primitive == "point")
-        return coords(obj.point);
+
+    // TODO(andrew): get rid of the __data subobject.
+    if (obj instanceof Point) {
+        obj = obj.toJSON();
+    }
+
+    if (obj.primitive == "point") {
+        if (dimToUnits === undefined) {
+            dimToUnits = _defaultDimToUnits;
+        }
+
+        // Only perform the conversion if we have a registry, and if the units
+        // do not already match the desired units.
+        if (_measure.registry !== undefined &&
+            obj.units && obj.units.point != dimToUnits.length) {
+            obj = JSON.parse(_measure.registry.ConvertUnits(JSON.stringify(obj),
+                JSON.stringify(dimToUnits)));
+        }
+        return obj.point;
+    }
     throw Error("expected array of numbers or Point entity");
 }
 
@@ -789,13 +826,37 @@ function mapCoords(vec) {
     return out;
 }
 
-function vecCoords(obj) {
+/** Helper function to extract vector components
+
+    @private
+    @param  {any}   obj  - entity or array
+    @param  {string} dimToUnits - optional, desired units of resulting
+        vector. Only used if the input object is an entity, and if this module
+        has been init'd with a units of measure registry.
+    @return {Array}             Component array
+*/
+function vecCoords(obj, dimToUnits) {
     if (Array.isArray(obj))
         return obj;
-    if (obj instanceof Vector)
-        return vecCoords(obj.toJSON().coords);
-    if (obj.primitive == "vector")
-        return coords(obj.coords);
+
+    if (obj instanceof Vector) {
+        obj = obj.toJSON();
+    }
+
+    if (obj.primitive == "vector") {
+        if (dimToUnits === undefined) {
+            dimToUnits = _defaultDimToUnits;
+        }
+
+        // Only perform the conversion if we have a registry, and if the units
+        // do not already match the desired units.
+        if (_measure.registry !== undefined &&
+            obj.units && obj.units.coords != dimToUnits.length) {
+            obj = JSON.parse(_measure.registry.ConvertUnits(JSON.stringify(obj),
+                JSON.stringify(dimToUnits)));
+        }
+        return obj.coords;
+    }
     throw Error("expected array of numbers or Vector entity");
 }
 
