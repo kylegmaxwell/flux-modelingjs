@@ -48,3 +48,36 @@ describe("modeling/measure/constructors", function() {
         expect(a2).toEqual([1,2,3]);
     })
 })
+
+describe("modeling/measure/detectUnits", function() {
+    'use strict';
+
+    var modeling = require("../modeling.js");
+    it("should detect units correctly", function() {
+        var v1 = modeling.utilities.detectUnits({});
+        expect(v1).toEqual(false);
+
+        var v2 = modeling.utilities.detectUnits({"primitive":"brep"});
+        expect(v2).toEqual(true);
+
+        var v3 = modeling.utilities.detectUnits({"primitive":"sphere", "units":{"origin":"meters"}});
+        expect(v3).toEqual(true);
+
+        var v4 = modeling.utilities.detectUnits({"primitive":"polycurve",
+            "curves":[{"units":{"points":"meters"}}]});
+        expect(v4).toEqual(true);
+
+        var v5 = modeling.utilities.detectUnits({"primitive":"polycurve",
+            "curves":[{}]});
+        expect(v5).toEqual(false);
+
+        var v6 = modeling.utilities.detectUnits({"primitive":"polysurface",
+            "surfaces":[{"units":{"points":"meters"}}]});
+        expect(v4).toEqual(true);
+
+        var v7 = modeling.utilities.detectUnits({"primitive":"polysurface",
+            "surfaces":[{}]});
+        expect(v5).toEqual(false);
+
+    })
+})

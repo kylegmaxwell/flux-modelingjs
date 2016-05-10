@@ -767,6 +767,47 @@ function defaultUnits(typeid) {
     return results;
 }
 
+/** Determines whether or not an entity has units information attached
+ *
+ *  @param  {object}    entity  - name of entity type, value for 'primitive' property
+ *  @return {object}            - map from field to unit, appropriate for setting
+ *                                as the "units" field of an entity.
+ */
+function detectUnits(entity) {
+    // TODO(andrew): get rid of __data
+    if (entity instanceof Entity) {
+        entity = entity.toJSON();
+    }
+
+    // If units are defined, return true
+    if (entity.units) {
+        return true;
+    }
+
+    // Brep entities have implicit units.
+    if (entity.primitive == "brep") {
+        return true;
+    }
+
+    // For polycurve and polysurface entities, loop through subentities;
+    if (entity.primitive == "polycurve") {
+        for (var i = 0; i < entity.curves.length; i++) {
+            if (detectUnits(entity.curves[i])) {
+                return true;
+            }
+        }
+    }
+    if (entity.primitive == "polysurface") {
+        for (var j = 0; j < entity.surfaces.length; j++) {
+            if (detectUnits(entity.surfaces[j])) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 
 /** Helper function
 
@@ -1543,6 +1584,7 @@ var utilities = {
     setEntityAttribute: setEntityAttribute,
     getEntityAttribute: getEntityAttribute,
     defaultUnits: defaultUnits,
+    detectUnits: detectUnits,
     lookupFieldDimensions: lookupFieldDimensions
 };
 
