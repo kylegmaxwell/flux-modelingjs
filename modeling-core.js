@@ -811,8 +811,7 @@ function coords(obj, dimToUnits) {
         // do not already match the desired units.
         if (_measure.registry !== undefined &&
             obj.units && obj.units.point != dimToUnits.length) {
-            obj = JSON.parse(_measure.registry.ConvertUnits(JSON.stringify(obj),
-                JSON.stringify(dimToUnits)));
+            obj = _measure.registry.ConvertUnits(obj,dimToUnits);
         }
         return obj.point;
     }
@@ -852,8 +851,7 @@ function vecCoords(obj, dimToUnits) {
         // do not already match the desired units.
         if (_measure.registry !== undefined &&
             obj.units && obj.units.coords != dimToUnits.length) {
-            obj = JSON.parse(_measure.registry.ConvertUnits(JSON.stringify(obj),
-                JSON.stringify(dimToUnits)));
+            obj = _measure.registry.ConvertUnits(obj,dimToUnits);
         }
         return obj.coords;
     }

@@ -256,10 +256,12 @@ Registry.prototype.Convert = function(fromUnits, toUnits, value) {
 //     "length":"meters"
 // }
 Registry.prototype.ConvertUnits = function(jsonData, dimToUnitsJson) {
-    var result = UoM.ConvertUnits(jsonData, dimToUnitsJson, this.impl);
+    var data = (typeof(jsonData) == "object") ? JSON.stringify(jsonData) : jsonData;
+    var dimToUnits = (typeof(dimToUnitsJson) == "object") ? JSON.stringify(dimToUnitsJson) : dimToUnitsJson;
+    var result = UoM.ConvertUnits(data, dimToUnits, this.impl);
     if(result.ok != true)
         throw new Error(result.err);
-    return result.str;
+    return JSON.parse(result.str);
 }
 
 // Parses a string that of the format 'u1*u2*u3/u4'
