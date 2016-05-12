@@ -5,10 +5,7 @@
 
 /* jslint node:true */
 
-/*"use strict";*/
-// TODO Use strict should be enabled. Previously the statement was there,
-// but had no effect because it was at the top of the file. See PLT-3108.
-
+"use strict";
 
 /* Initialize this module with schema and registry objects.
  * These arguments are optional, but are required for full units-of-measure
@@ -173,11 +170,11 @@ function dumpOperations(self) {
     for (var i = 0, e = self.__operations__.length; i < e; ++i)
         try {
             var item = self.__operations__[i];
-            item.__resolver__ = makeResolver(i);
+            item._resolver = makeResolver(i);
             r.push(item.toJSON());
         }
         finally {
-            i.__resolver__ = undefined;
+            if (i._resolver) i._resolver = undefined;
         }
     return r;
 }
@@ -192,11 +189,11 @@ function OpSlot(name, op) {
 OpSlot.prototype.toJSON = function () {
     var op = null;
     try {
-        this.operation.__resolver__ = this.__resolver__;
+        this.operation._resolver = this._resolver;
         op = this.operation.toJSON();
     }
     finally {
-        this.operation.__resolver__ = undefined;
+        if (this.operation._resolver) this.operation._resolver = undefined;
     }
     return {
         name: this.name,
@@ -374,11 +371,11 @@ function dumpDCMOperations(self) {
     for (var i = 0, e = self.__operations__.length; i < e; ++i)
         try {
             var item = self.__operations__[i];
-            item.__resolver__ = makeResolver(i);
+            item._resolver = makeResolver(i);
             r.push(item.toJSON());
         }
         finally {
-            i.__resolver__ = undefined;
+            if (i._resolver) i._resolver = undefined;
         }
     return r;
 }
@@ -1396,29 +1393,29 @@ Operation.prototype.toJSON = function () {
         this.args.forEach(function (v) {
             if (v instanceof Operation) {
                 try {
-                    var name = self.__resolver__(v); // check if that operation was already bound
+                    var name = self._resolver(v); // check if that operation was already bound
                     if (name) {
                         r.push(name);
                     }
                     else {
-                        v.__resolver__ = self.__resolver__;
+                        v._resolver = self._resolver;
                         r.push(v.toJSON());
                     }
                 }
                 finally {
-                    v.__resolver__ = undefined;
+                    if (v._resolver) v._resolver = undefined;
                 }
             }
             else if (v instanceof Entity) { // locate bound entity by name
-                if (!self.__resolver__)
+                if (!self._resolver)
                     throw Error("No entity resolver provided");
-                r.push(self.__resolver__(v));
+                r.push(self._resolver(v));
             }
             else if (v.primitive !== undefined) {
                 var eraw = entities.raw(v);
-                if (!self.__resolver__)
+                if (!self._resolver)
                     throw Error("No entity resolver provided");
-                r.push(self.__resolver__(eraw));
+                r.push(self._resolver(eraw));
             }
             else {
                 r.push(v);
