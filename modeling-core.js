@@ -5,7 +5,7 @@
 
 /* jslint node:true */
 
-(function (define) { /*"use strict";*/ define(function(require) {
+/*"use strict";*/
 // TODO Use strict should be enabled. Previously the statement was there,
 // but had no effect because it was at the top of the file. See PLT-3108.
 
@@ -2433,7 +2433,8 @@ function getCircleCenterByThreePoints(start, middle, end)
 
     return [centerX, centerY, 0.0];
 }
-return {
+
+module.exports = {
     init: init,
     gen_id_object: gen_id_object,
     scene: scene,
@@ -2444,4 +2445,3 @@ return {
     constraints: constraints,
     operations: ops
 };
-});}(typeof define==='function'&&define.amd?define:function(factory){module.exports=factory(require);}));
