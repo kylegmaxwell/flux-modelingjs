@@ -741,7 +741,7 @@ function lookupFieldDimensions(typeid) {
 
 // TODO(andrew): consdier setting these at a per-project level, rather than
 // hardcoding them.
-_defaultDimToUnits = {
+var _defaultDimToUnits = {
     "length":"meters",
     "area":"meters*meters",
     "volume":"meters*meters*meters",
