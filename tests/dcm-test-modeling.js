@@ -1,7 +1,9 @@
-(function (define) { "use strict"; define(function(require) {
-    // Insert uuid generation, so that dcm tests will pass.
-    var uuid = require('../uuid');
-    var modeling = require("../modeling");
-    modeling.gen_id_object.genId = uuid.v4;
-return modeling;
-});}(typeof define==='function'&&define.amd?define:function(factory){module.exports=factory(require);}));
+"use strict";
+// Insert uuid generation, so that dcm tests will pass.
+var pack = require('../index');
+var uuid = pack.uuid;
+var modeling = pack.modeling;
+modeling.init(pack.schema, new pack.measure.Registry());
+modeling.gen_id_object.genId = uuid.v4;
+
+module.exports = modeling;

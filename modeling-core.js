@@ -723,6 +723,8 @@ function recurseToDimension(subSchema) {
  *  @return {object}            - map from field to dimension
  */
 function lookupFieldDimensions(typeid) {
+    if (!_schema.schema)
+        return {};
     var subSchema = _schema.schema.entities[typeid];
 
     var results = {};
@@ -2442,3 +2444,4 @@ module.exports = {
     constraints: constraints,
     operations: ops
 };
+
