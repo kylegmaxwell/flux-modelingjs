@@ -96,22 +96,6 @@ Registry.prototype.AddAffineRelationship = function(fromUnit, toUnit, scale, off
         throw new Error(err.err);
 }
 
-// AddCompositeToBaseConversion provides the conversion function 
-// for stepping between dimension
-Registry.prototype.AddCompositeToBaseConversion = function(from, to, forward, backward) {
-    var comps = toMapStringInt(to);
-    try {
-        var fwd = UoM.Runtime.addFunction(forward);
-        var bwd = UoM.Runtime.addFunction(backward);
-        var err = UoM.AddCompositeToBaseConversion(this.impl, from, comps, fwd, bwd);
-        if(err.ok != true)
-            throw new Error(err.err);
-    }
-    finally {
-        comps.delete();
-    }
-}
-
 // Handles checks that units' components are well defined.
 Registry.prototype.Handles = function(components) {
     var comps = toMapStringInt(components);
