@@ -2,13 +2,11 @@ describe("Schema test", function() {
     'use strict';
     var Ajv   = require('ajv');
     var fs    = require('fs');
-    var modeling = require("../modeling");
+    var schema = require("../index").schema;
+    var modeling = require('../index').modeling;
 
-    var schema    = "../schemas/psworker.json";
-    var schemaRaw = fs.readFileSync(schema);
-    var schemaJson = JSON.parse(schemaRaw);
     var ajv = Ajv({ allErrors: true });
-    ajv.addSchema(schemaJson, "_");
+    ajv.addSchema(schema, "_");
 
     it ("Sphere should work with the right schema", function() {
         var origin = [0,5,0];

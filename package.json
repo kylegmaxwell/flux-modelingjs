@@ -1,13 +1,13 @@
 {
   "name": "flux-modelingjs",
   "version": "0.0.1",
-  "description": "Create modeling entities",
-  "main": "modeling.js",
+  "description": "Modeling entity constructors, measurement unit handlers, JSON schema validators etc.",
+  "main": "index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "(cd tests; ./run_tests.sh)"
+    "test": "PATH=$(npm bin):$PATH jasmine-node --verbose --captureExceptions ./tests/"
   },
   "repository": {
     "type": "git",
@@ -15,8 +15,12 @@
   },
   "author": "",
   "license": "ISC",
+  "private": true,
   "homepage": "https://bitbucket.org/vannevartech/flux-modelingjs#readme",
   "dependencies": {
     "ajv": "^3.8.10"
+  },
+  "devDependencies": {
+    "jasmine-node": "^1.14.1"
   }
 }
