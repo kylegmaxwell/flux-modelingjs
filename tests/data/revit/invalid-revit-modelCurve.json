@@ -1,0 +1,23 @@
+{
+    "primitive": "revitElement",
+    "fluxId": null,
+    "familyInfo": {
+        "category": "Lines",
+        "family": "ModelCurve",
+        "type": "",
+        "placementType": "Invalid"
+    },
+    "geometryParameters": {
+        "Curve": {
+            "primitive": "line",
+            "start": [ 0.0, 0.0, 0.0],
+            "end": [10.0, 0.0, 0.0]
+        }
+    },
+    "instanceParameters": {
+    },
+    "typeParameters": {
+    },
+    "customParameters": {
+    }
+}

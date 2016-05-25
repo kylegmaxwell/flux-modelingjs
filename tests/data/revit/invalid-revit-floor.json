@@ -1,0 +1,26 @@
+{
+    "primitive": "revitElement",
+    "fluxId": "Id-1",
+    "familyInfo": {
+        "category": "Floors",
+        "family": "Floor",
+        "type": "FloorType-1",
+        "placementType": "Invalid"
+    },
+    "geometryParameters": {
+        "profile": {},
+        "Level": "Level-1",
+        "Structural": true,
+        "Normal": {}
+    },
+    "instanceParameters": {
+        "i1":"InstanceParam 1",
+        "i2":"InstanceParam 2"
+    },
+    "typeParameters": {
+    },
+    "customParameters": {
+        "c1":"CustomParam 1",
+        "c2":"CustomParam 2"
+    }
+}

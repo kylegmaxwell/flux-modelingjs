@@ -1,0 +1,23 @@
+{
+    "primitive": "revitElement",
+    "fluxId": null,
+    "familyInfo": {
+        "category": "Reference Planes",
+        "family": "ReferencePlane",
+        "type": "",
+        "placementType": "Invalid"
+    },
+    "geometryParameters": {
+        "bubbleEnd": {"x": 1.0, "y": 0.0, "z": 0.0},
+        "freeEnd": {"x": 10.0, "y":0.0, "z": 0.0},
+        "cutVector": {"x":0.0, "y":1.0, "z":0.0},
+        "Name": "RefPlane-1",
+        "wallClosure": false
+    },
+    "instanceParameters": {
+    },
+    "typeParameters": {
+    },
+    "customParameters": {
+    }
+}

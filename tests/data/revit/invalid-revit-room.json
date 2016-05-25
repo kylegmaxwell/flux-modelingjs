@@ -1,0 +1,25 @@
+{
+    "primitive": "revitElement",
+    "fluxId": "flux-id",
+    "familyInfo": {
+        "category": "Rooms",
+        "family": "Room",
+        "type": "",
+        "placementType": "Invalid"
+    },
+    "geometryParameters": {
+        "uv": {"x": "x-coordinate", "y": "y-coordinate"},
+        "level": "Level-1",
+        "name": "room 1",
+        "phase": "phase 1"
+    },
+    "instanceParameters": {
+        "i1":"InstanceParam 1",
+        "i2":"InstanceParam 2"
+    },
+    "typeParameters": {},
+    "customParameters": {
+        "c1":"CustomParam 1",
+        "c2":"CustomParam 2"
+    }
+}

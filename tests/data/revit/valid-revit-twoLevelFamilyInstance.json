@@ -1,0 +1,36 @@
+{
+  "primitive": "revitElement",
+  "fluxId": "Id-1",
+  "familyInfo":
+   {
+    "category": "Category-1",
+    "family": "Family-1",
+    "type": "Type-1",
+    "placementType": "OneLevelBased" },
+  "geometryParameters": {
+      "location": {
+          "primitive": "point",
+          "point": [ 0, 0, 0],
+          "units": {
+              "point": "inches"
+          }
+      },
+     "baseLevel": "Level-1",
+     "topLevel": "Level-2",
+     "structuralType": "NonStructural",
+     "faceFlipped": false,
+     "handFlipped": false },
+  "instanceParameters": {
+      "i1": "Instance param 1",
+      "i2": 500
+   },
+   "typeParameters": {
+      "t1": "type param 1",
+      "t2": false
+   },
+   "customParameters": {
+      "c1": true,
+      "c2": "Custom Param 2"
+   },
+  "extra-param": "extra param value"
+}

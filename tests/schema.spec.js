@@ -2,7 +2,7 @@ describe("Schema test", function() {
     'use strict';
     var Ajv   = require('ajv');
     var fs    = require('fs');
-    var schema = require("../index").schema;
+    var schema = require("../index").fluxEntitySchema;
     var modeling = require('../index').modeling;
 
     var ajv = Ajv({ allErrors: true });

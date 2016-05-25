@@ -1,0 +1,46 @@
+{
+  "primitive": "revitElement",
+  "fluxId": null,
+  "familyInfo":
+   { "category": "Reference Planes",
+     "family": "ReferencePlane",
+     "type": "",
+     "placementType": "Invalid" },
+  "geometryParameters":
+   { "bubbleEnd": {
+          "primitive": "point",
+          "point": [ 0, 0, 0],
+          "units": {
+              "point": "inches"
+          }
+      },
+     "freeEnd": {
+          "primitive": "point",
+          "point": [ 0, 0, 0],
+          "units": {
+              "point": "inches"
+          }
+      },
+     "cutVector": {
+          "primitive": "vector",
+          "coords": [ 1, 1, 1],
+          "units": {
+              "point": "inches"
+          }
+      },
+     "name": "RefPlane-1",
+     "wallClosure": false },
+  "instanceParameters": {
+      "i1": "Instance param 1",
+      "i2": 500
+   },
+   "typeParameters": {
+      "t1": "type param 1",
+      "t2": false
+   },
+   "customParameters": {
+      "c1": true,
+      "c2": "Custom Param 2"
+   },
+  "extra-param": "extra param value"
+}

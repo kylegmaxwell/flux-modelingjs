@@ -1,0 +1,33 @@
+{
+  "primitive": "revitElement",
+  "units": {},
+  "customParameters": {},
+  "familyInfo": {
+    "category": "Walls",
+    "family": "Basic Wall",
+    "placementType": "Invalid",
+    "Type": "Generic - 8\""
+  },
+  "fluxId": "8e781638-43ec-4ce2-aaa3-4fc516061e53-0004f2eb",
+  "geometryParameters": {
+    "flipped": false,
+    "profile": [
+      {
+        "units": null,
+        "end": [
+          33.36,
+          10.22,
+          0
+        ],
+        "primitive": "line",
+        "start": [
+          -53.63,
+          10.22,
+          0
+        ]
+      }
+    ],
+    "structural": false
+  },
+  "instanceParameters": {}
+}

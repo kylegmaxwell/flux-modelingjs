@@ -35,5 +35,7 @@ module.exports = submodules({
     'measure':  './measure',
     'modeling': './modeling-core',
     'uuid':     './uuid',
-    'schema':   './schemas/psworker.json'
+    'revit': './revit-core',
+    'fluxEntitySchema':   './schemas/psworker.json',
+    'fluxRevitSchema': './schemas/flux-revit.json'
 });

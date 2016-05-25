@@ -1,0 +1,23 @@
+{
+    "primitive": "revitElement",
+    "fluxId": "fluxid-1",
+    "familyInfo": {
+        "category": "Levels",
+        "family": "Level",
+        "type": "LevelType-1",
+        "placementType": "Invalid"
+    },
+    "geometryParameters": {
+        "name": 10,
+        "elevation": 10
+    },
+    "instanceParameters": {
+        "i1": "InstanceParam 1",
+        "i2": "InstanceParam 2"
+    },
+    "typeParameters": {},
+    "customParameters": {
+        "c1": "CustomParam 1",
+        "c2": "CustomParam 2"
+    }
+}

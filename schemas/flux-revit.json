@@ -1,0 +1,364 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "flux-revit schema",
+    "description": "schema for revit elements in flux.",
+    "revit-types": {
+        "revit-primitive": { "enum": [ "revitElement"] },
+        "revit-fluxId": { "type": [ "string", "null" ] },
+        "revit-level": { "type": "string" },
+        "revit-structuralType": { "enum": [ "Beam", "Column", "Brace", "Footing", "NonStructural" ] },
+        "revit-placementType": { "enum": [ "OneLevelBased", "TwoLevelsBased", "OneLevelBasedHosted", "Invalid" ] },
+        "revit-parameters-map": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                ".*" : {"type": [ "string", "number", "boolean", "null" ]}
+            }
+        },
+        "revit-familyInfo": {
+            "type": "object",
+            "properties": {
+                "category": { "type": "string" },
+                "family": { "type": "string" },
+                "type": { "type": "string" },
+                "placementType": { "$ref": "#/revit-types/revit-placementType" }
+            },
+            "required": ["category", "family", "type", "placementType"]
+        },
+        "revit-profile": {
+            "type": "array",
+                "minItems": 1,
+                "items": {
+                    "anyOf": [
+                        { "$ref": "flux-entity#/entities/line" },
+                        { "$ref": "flux-entity#/entities/curve" },
+                        { "$ref": "flux-entity#/entities/arc" }
+                    ]
+                }
+        },
+        "revit-location": {
+            "anyOf": [
+                    { "$ref": "flux-entity#/entities/point" },
+                    { "$ref": "flux-entity#/entities/line" },
+                    { "$ref": "flux-entity#/entities/curve" },
+                    { "$ref": "flux-entity#/entities/arc" }
+                ]
+        },
+        "revit-common": {
+            "type": "object",
+            "properties": {
+                "fluxId": { "$ref": "#/revit-types/revit-fluxId" },
+                "primitive": { "$ref": "#/revit-types/revit-primitive" },
+                "familyInfo": { "$ref": "#/revit-types/revit-familyInfo" },
+                "units": { "$ref": "flux-entity#/types/units" }
+            },
+            "required": [
+                "fluxId",
+                "primitive",
+                "familyInfo"
+            ]
+        }
+    },
+    "revit-wall": {
+        "type": "object",
+        "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "flipped": { "type": "boolean" },
+                        "level": { "$ref": "#/revit-types/revit-level" },
+                        "profile": { "$ref": "#/revit-types/revit-profile"},
+                        "structural": { "type": "boolean" }
+                    },
+                    "required": [
+                        "flipped",
+                        "level",
+                        "profile",
+                        "structural"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-room": {
+        "type": "object",
+         "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "name": { "type": "string" },
+                        "level": { "$ref": "#/revit-types/revit-level" },
+                        "uv": { "$ref": "flux-entity#/entities/point" },
+                        "phase": { "type": "string" }
+                    },
+                    "required": [
+                        "name",
+                        "level",
+                        "uv"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-referencePlane": {
+        "type": "object",
+         "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "name": { "type": "string" },
+                        "wallClosure": { "type": "boolean" },
+                        "bubbleEnd": { "$ref": "flux-entity#/entities/point" },
+                        "freeEnd": { "$ref": "flux-entity#/entities/point" },
+                        "thirdPoint": { "$ref": "flux-entity#/entities/point" },
+                        "cutVector": { "$ref": "flux-entity#/entities/vector" }
+                    },
+                    "required": [
+                        "name",
+                        "wallClosure",
+                        "bubbleEnd",
+                        "freeEnd",
+                        "cutVector"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+            },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-modelCurve": {
+        "type": "object",
+        "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "curve": {
+                            "anyOf": [
+                                { "$ref": "flux-entity#/entities/line" },
+                                { "$ref": "flux-entity#/entities/curve" },
+                                { "$ref": "flux-entity#/entities/arc" }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "curve"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+            },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-level": {
+        "type": "object",
+        "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                    "geometryParameters": {
+                        "properties": {
+                            "name": { "type": "string" },
+                            "elevation":  { "$ref": "flux-entity#/types/distance" }
+                        },
+                        "required": [
+                            "name",
+                            "elevation"
+                        ]
+                    },
+                    "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                    "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-grid": {
+        "type": "object",
+        "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "name": { "type": "string" },
+                        "curve": {
+                            "anyOf": [
+                                { "$ref": "#/entities/line" },
+                                { "$ref": "#/entities/arc" }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "curve"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+            },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-floor":{
+        "type": "object",
+        "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "profile": { "$ref": "#/revit-types/revit-profile" },
+                        "structural": { "type": "boolean" },
+                        "normal": { "$ref": "flux-entity#/types/direction" },
+                        "level": { "$ref": "#/revit-types/revit-level" }
+                    },
+                    "required": [
+                        "profile",
+                        "structural",
+                        "level"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+            },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-oneLevelFamilyInstance": {
+        "type": "object",
+        "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "location": { "$ref": "#/revit-types/revit-location" },
+                        "level": { "$ref": "#/revit-types/revit-level" },
+                        "structuralType": { "enum": [ "Beam", "Column", "Brace", "Footing", "NonStructural"] }
+                    },
+                    "required": [
+                        "location",
+                        "level"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+            },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-twoLevelFamilyInstance": {
+        "type": "object",
+        "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "location": { "$ref": "#/revit-types/revit-location" },
+                        "baseLevel": { "$ref": "#/revit-types/revit-level" },
+                        "topLevel": { "$ref": "#/revit-types/revit-level" },
+                        "structuralType": { "$ref": "#/revit-types/revit-structuralType" },
+                        "faceFlipped": { "type": "boolean" },
+                        "handFlipped": { "type": "boolean" }
+                    },
+                    "required":[
+                        "location",
+                        "baseLevel",
+                        "topLevel",
+                        "faceFlipped",
+                        "handFlipped"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+            },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    },
+    "revit-oneLevelHostedFamilyInstance": {
+        "type": "object",
+        "allOf": [
+            { "$ref": "#/revit-types/revit-common" },
+            { "properties": {
+                "geometryParameters": {
+                    "properties": {
+                        "location": { "$ref": "#/revit-types/revit-location" },
+                        "level": { "$ref": "#/revit-types/revit-level" },
+                        "hostId": { "$ref": "#/revit-types/revit-fluxId" },
+                        "structuralType": { "$ref": "#/revit-types/revit-structuralType" },
+                        "faceFlipped": { "type": "boolean" },
+                        "handFlipped": { "type": "boolean" }
+                    },
+                    "required": [
+                        "location",
+                        "level",
+                        "hostId",
+                        "structuralType",
+                        "faceFlipped",
+                        "handFlipped"
+                    ]
+                },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+            },
+            "required": [
+                "geometryParameters",
+                "instanceParameters",
+                "customParameters"
+            ]
+            }
+        ]
+    }
+}
