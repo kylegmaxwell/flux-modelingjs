@@ -39,3 +39,14 @@ module.exports = submodules({
     'fluxEntitySchema':   './schemas/psworker.json',
     'fluxRevitSchema': './schemas/flux-revit.json'
 });
+
+/*
+    Initializes the modeling submodule with the geometry entity schema and
+    a measure registry.
+*/
+module.exports.initialize = function() {
+    module.exports.modeling.init(
+        module.exports.fluxEntitySchema,
+        module.exports.measure.Registry());
+    return module.exports;
+}
