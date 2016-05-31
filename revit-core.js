@@ -62,7 +62,7 @@ function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeP
 * @param {object} [modelCurve] Input curve.         *
 * @returns {{Out: revit-modelLine}} The created revit model line.
 */
-function createModelLine(modelCurve) {
+function createModelLine(fluxId, modelCurve) {
     var familyInfo = {
         category: "Lines",
         family: "ModelCurve",
@@ -82,7 +82,7 @@ function createModelLine(modelCurve) {
         return {Error: "Model Line element could not be created: Missing required geometry parameters " + missingParams.join(", ")};
     }
 
-    var modelLine = createElement(undefined, familyInfo, geomParams, undefined, undefined, undefined);
+    var modelLine = createElement(fluxId, familyInfo, geomParams, undefined, undefined, undefined);
     if (modelLine.Error) {
         return {Error: "Model Line " + modelLine.Error};
     }
@@ -100,7 +100,7 @@ function createModelLine(modelCurve) {
 * @param {boolean} [wallClosure] If reference plane is wall closure.
 * @returns {{Out: revit-referencePlane}} The created revit reference plane.
 */
-function createReferencePlane(bubbleEnd, freeEnd, cutVector, name, wallClosure) {
+function createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, name, wallClosure) {
     var familyInfo = {
         category: "Reference Planes",
         family: "ReferencePlane",
@@ -122,7 +122,7 @@ function createReferencePlane(bubbleEnd, freeEnd, cutVector, name, wallClosure) 
     if (missingParams) {
         return {Error: "Reference Plane element could not be created: Missing required geometry parameters " + missingParams.join(", ")};
     }
-    var refPlane = createElement(undefined, familyInfo, geomParams, undefined, undefined, undefined);
+    var refPlane = createElement(fluxId, familyInfo, geomParams, undefined, undefined, undefined);
     if (refPlane.Error) {
         return {Error: "Reference Plane " + refPlane.Error};
     }

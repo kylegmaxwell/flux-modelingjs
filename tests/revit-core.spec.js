@@ -47,6 +47,7 @@ describe("revit-core test", function () {
     });
 
     describe("createModelLine", function() {
+        var fluxId = "FluxId-1";
         var curve = {
             "primitive": "line",
             "start": [ 0.0, 0.0, 0.0],
@@ -54,16 +55,16 @@ describe("revit-core test", function () {
         };
 
         it("should return error if required parameters are not provided.", function () {
-            var el = revit.createModelLine(undefined);
+            var el = revit.createModelLine(fluxId, undefined);
             expect(el.Error).toBeDefined();
         });
 
         it("should work.", function () {
-            var el = revit.createModelLine(curve);
+            var el = revit.createModelLine(fluxId, curve);
             expect(el).toEqual({
                 Out: {
                     primitive: "revitElement",
-                    fluxId: null,
+                    fluxId: fluxId,
                     familyInfo: {
                         category: "Lines",
                         family: "ModelCurve",
@@ -85,27 +86,28 @@ describe("revit-core test", function () {
     });
 
     describe("createReferencePlane", function() {
+        var fluxId = "FluxId-1";
         var bubbleEnd = {x: 1.0, y: 0.0, z: 0.0};
         var freeEnd = {x: 10.0, y:0.0, z: 0.0};
         var cutVector = {x:0.0, y:1.0, z:0.0};
 
         it("should return error if required parameters are not provided.", function () {
-            var el = revit.createReferencePlane(undefined, freeEnd, cutVector, "RefPlane-1", false);
+            var el = revit.createReferencePlane(fluxId, undefined, freeEnd, cutVector, "RefPlane-1", false);
             expect(el.Error).toBeDefined();
 
-            el = revit.createReferencePlane(bubbleEnd, undefined, cutVector, "RefPlane-1", false);
+            el = revit.createReferencePlane(fluxId, bubbleEnd, undefined, cutVector, "RefPlane-1", false);
             expect(el.Error).toBeDefined();
 
-            el = revit.createReferencePlane(bubbleEnd, freeEnd, undefined, "RefPlane-1", false);
+            el = revit.createReferencePlane(fluxId, bubbleEnd, freeEnd, undefined, "RefPlane-1", false);
             expect(el.Error).toBeDefined();
         });
 
         it("should work.", function () {
-            var el = revit.createReferencePlane(bubbleEnd, freeEnd, cutVector, "RefPlane-1", false);
+            var el = revit.createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, "RefPlane-1", false);
             expect(el).toEqual({
                 Out: {
                     primitive: "revitElement",
-                    fluxId: null,
+                    fluxId: fluxId,
                     familyInfo: {
                         category: "Reference Planes",
                         family: "ReferencePlane",

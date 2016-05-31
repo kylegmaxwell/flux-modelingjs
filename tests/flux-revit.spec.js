@@ -103,7 +103,7 @@ describe("flux-revit schema test", function() {
                     "point": "inches"
                 }
             }
-            var validRefPlane = revit.createReferencePlane( point, point, vector,
+            var validRefPlane = revit.createReferencePlane("FluxId-1", point, point, vector,
                 "RefPlane-1", false);
             var isValid = validate(validRefPlane.Out);
             if (!isValid) {
@@ -135,7 +135,7 @@ describe("flux-revit schema test", function() {
                 "start": [ 0.0, 0.0, 0.0],
                 "end": [10.0, 0.0, 0.0]
             };
-            var validCurve = revit.createModelLine(curve);
+            var validCurve = revit.createModelLine("FluxId-1", curve);
             var isValid = validate(validCurve.Out);
             if (!isValid) {
                 console.log(validate.errors);
