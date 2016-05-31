@@ -276,11 +276,16 @@
                     "properties": {
                         "location": { "$ref": "#/revit-types/revit-location" },
                         "level": { "$ref": "#/revit-types/revit-level" },
-                        "structuralType": { "enum": [ "Beam", "Column", "Brace", "Footing", "NonStructural"] }
+                        "structuralType": { "$ref": "#/revit-types/revit-structuralType" },
+                        "faceFlipped": { "type": "boolean" },
+                        "handFlipped": { "type": "boolean" }
                     },
                     "required": [
                         "location",
-                        "level"
+                        "level",
+                        "structuralType",
+                        "faceFlipped",
+                        "handFlipped"
                     ]
                 },
                 "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
@@ -312,6 +317,7 @@
                         "location",
                         "baseLevel",
                         "topLevel",
+                        "structuralType",
                         "faceFlipped",
                         "handFlipped"
                     ]

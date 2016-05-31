@@ -305,7 +305,7 @@ describe("flux-revit schema test", function() {
             expect(isValid).toEqual(true);
         });
 
-        it ("Valid revit-one-level-hosted-familyinstance with extra parameters should fail", function() {
+        it ("Valid revit-one-level-hosted-familyinstance with extra parameters should validate", function() {
             var validFamilyInstance = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-oneLevelHostedFamilyInstance.json"));
             var isValid = validate(validFamilyInstance);
             expect(isValid).toEqual(true);
