@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+ssh://git@bitbucket.org/vannevartech/flux-modelingjs.git"
   },
-  "author": "",
+  "author": "Flux Factory",
   "license": "ISC",
   "homepage": "https://bitbucket.org/vannevartech/flux-modelingjs",
   "dependencies": {
