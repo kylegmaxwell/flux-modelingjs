@@ -2149,6 +2149,13 @@ var ops =
      *  @return {Sheet}                 resulting cross-section
      */
     crossSection: op('crossSection', 2),
+    /** 'extractSheetBoundary' operation
+     *  Extracts a sheet body's boundary as a wire body.
+     *  @function
+     *  @param  {Sheet}       body    - sheet body to extract boundary of
+     *  @return {Sheet}                 resulting boundary
+    */
+     extractSheetBoundary: op('extractSheetBoundary', 1),
     /** 'intersectBodyWithLine' operation
      *  Computes a list of points where line intersects faces of specified body
      *  Points are ordered by their position on the line, along line's main direction
