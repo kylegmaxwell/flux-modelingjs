@@ -2414,7 +2414,21 @@ var ops =
      */
     eval: function() {
         return new Operation('eval');
-    }
+    },
+    /** 'evalBoundingBox' operation
+     *  Calculates axis-aligned bounding box of an array of entities
+     *  @function
+     *  @param  {Point|Wire|Sheet|Solid[]} entities
+     *  @return {Point[]} minimum and maximum points of the bounding box
+     */
+    evalBoundingBox: op('evalBoundingBox', 1),
+    /** 'getBodyInfo' operation
+     *  Returns body type and other info of an entity
+     *  @function
+     *  @param  {Point|Wire|Sheet|Solid} body
+     *  @return {BodyInfo} info
+     */
+    getBodyInfo: op('getBodyInfo', 1)
 };
 
 // Helper function
