@@ -1,7 +1,7 @@
 describe("DCMScene/addEntity/Circle", function() {
     'use strict';
 
-    var modeling = require("./dcm-test-modeling");
+    var modeling = require("../index").modeling();
 
     // Test data
     var origin = modeling.entities.point([1, 1, 0]);

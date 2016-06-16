@@ -5,35 +5,40 @@
 
 /* jslint node:true */
 
+/***************************************************************************************************
+ *  Constructs new instance for current module
+ */
+function constructModule(config) {
 "use strict";
+/***************************************************************************************************
+ *  Configuration part
+ */
+var flux = require('./index');
+config = config || {};
+if (typeof config !== 'object')
+    throw Error("config: expected object");
 
-/* Initialize this module with schema and registry objects.
- * These arguments are optional, but are required for full units-of-measure
- * support. If not provided, units will not be correctly interpreted
-*/
-var _schema = {};
-var _measure = {};
-function init(schema, registry) {
-    _schema.schema = schema;
-    _measure.registry = registry;
+function defaulted(name, defvalue) {
+    return (name in config) ? config[name] : defvalue();
 }
+// Functions are used for defaults - because of modules' lazy load process
+var schema   = defaulted('schema',   function () { return flux.schemas.pbw; });
+var guid     = defaulted('genId',    function () { return flux.uuid.v4; }) || function () { return undefined; };
+
+var convertUnits = (function () {
+    var registry = defaulted('registry', function () { return new flux.measure.Registry(); });
+    return registry
+        ? registry.ConvertUnits.bind(registry)
+        : function (obj, dimUnits) { return obj; };
+})();
 
 var eps = 1e-8;
-
-// Object that containts 'genId' method, to be used for GUID generation
-// Needed for test purposes
-var gen_id_object = {};
 
 /* Generate uuid, that will be used as geometry id
     By default, this generates undefined. Users who want to generate id's should
     explicitly override the exported property on this module.
  */
-function guid() {
-    if (isNone(gen_id_object) || isNone(gen_id_object.genId)) {
-        return undefined;
-    }
-    return gen_id_object.genId();
-}
+
 // Get id from entity
 function getId(e) {
     if (e.id) {
@@ -85,6 +90,26 @@ function inherit(clazz, base, proto) {
                 clazz.prototype[key] = proto[key];
             }
         );
+}
+
+//******************************************************************************
+// Resolver becoming kind of scope stuff
+
+var sceneResolver = function () { return undefined; };
+
+function resolve(item) {
+    return sceneResolver(item);
+}
+
+function withResolver(resolver, lambda) {
+    var prev = sceneResolver;
+    sceneResolver = resolver;
+    try {
+        return lambda();
+    }
+    finally {
+        sceneResolver = prev;
+    }
 }
 
 //******************************************************************************
@@ -161,22 +186,22 @@ function resolveItem(self, e, opIndex) {
     }
 }
 
+
 function dumpOperations(self) {
-    var r = [];
-    function makeResolver (i) {
-        return function(e) { return resolveItem(self, e, i); };
+    function resolver(index) {
+        return function(e) { return resolveItem(self, e, index); };
     }
 
-    for (var i = 0, e = self.__operations__.length; i < e; ++i)
-        try {
-            var item = self.__operations__[i];
-            item._resolver = makeResolver(i);
-            r.push(item.toJSON());
+    return self.__operations__.map(
+        function (item, index) {
+            return withResolver(
+                resolver(index),
+                function () {
+                    return item.toJSON();
+                }
+            );
         }
-        finally {
-            if (i._resolver) i._resolver = undefined;
-        }
-    return r;
+    );
 }
 
 /*  @class
@@ -187,17 +212,9 @@ function OpSlot(name, op) {
     this.operation = op;
 }
 OpSlot.prototype.toJSON = function () {
-    var op = null;
-    try {
-        this.operation._resolver = this._resolver;
-        op = this.operation.toJSON();
-    }
-    finally {
-        if (this.operation._resolver) this.operation._resolver = undefined;
-    }
     return {
         name: this.name,
-        op:   op
+        op:   this.operation.toJSON()
     };
 };
 
@@ -363,21 +380,20 @@ function dumpEquations(self) {
 }
 
 function dumpDCMOperations(self) {
-    var r = [];
-    function makeResolver (i) {
-        return function(e) { return resolveDCMItem(self, e, i); };
+    function resolver(index) {
+        return function (e) { return resolveDCMItem(self, e, index); };
     }
 
-    for (var i = 0, e = self.__operations__.length; i < e; ++i)
-        try {
-            var item = self.__operations__[i];
-            item._resolver = makeResolver(i);
-            r.push(item.toJSON());
+    return self.__operations__.map(
+        function (item, index) {
+            return withResolver(
+                resolver(index),
+                function () {
+                    return item.toJSON();
+                }
+            );
         }
-        finally {
-            if (i._resolver) i._resolver = undefined;
-        }
-    return r;
+    );
 }
 
 DCMScene.prototype.hasEntity = function (name) {
@@ -681,7 +697,7 @@ function parsePath(s) {
 
 function getSubSchema(refPath) {
     var components = parsePath(refPath);
-    var s = _schema.schema;
+    var s = schema;
     for (var i = 0; i < components.length; i++) {
         var sub = s[components[i]];
         s = sub;
@@ -723,9 +739,9 @@ function recurseToDimension(subSchema) {
  *  @return {object}            - map from field to dimension
  */
 function lookupFieldDimensions(typeid) {
-    if (!_schema.schema)
+    if (!schema)
         return {};
-    var subSchema = _schema.schema.entities[typeid];
+    var subSchema = schema.entities[typeid];
 
     var results = {};
     for (var key in subSchema.properties) {
@@ -833,30 +849,29 @@ function primitive(typeid, params, OptCtor) {
         has been init'd with a units of measure registry.
     @return {Array}             Coordinate array
 */
-function coords(obj, dimToUnits) {
-    if (Array.isArray(obj))
-        return obj;
+function makeAdjustCoords(type, primitive, field) {
+    return function coords(obj, dimToUnits) {
+        if (Array.isArray(obj))
+            return obj;
 
-    // TODO(andrew): get rid of the __data subobject.
-    if (obj instanceof Point) {
-        obj = obj.toJSON();
-    }
+        if (obj instanceof type)
+            obj = obj.toJSON();
 
-    if (obj.primitive == "point") {
-        if (dimToUnits === undefined) {
-            dimToUnits = _defaultDimToUnits;
+        if (obj.primitive === primitive) {
+            dimToUnits = dimToUnits || _defaultDimToUnits;
+
+            // Only perform the conversion if the units
+            // do not already match the desired units.
+            if (obj.units && obj.units[field] != dimToUnits.length) {
+                obj = convertUnits(obj, dimToUnits);
+            }
+            return obj[field];
         }
-
-        // Only perform the conversion if we have a registry, and if the units
-        // do not already match the desired units.
-        if (_measure.registry !== undefined &&
-            obj.units && obj.units.point != dimToUnits.length) {
-            obj = _measure.registry.ConvertUnits(obj,dimToUnits);
-        }
-        return obj.point;
-    }
-    throw Error("expected array of numbers or Point entity");
+        throw Error("expected array of numbers or " + type.name + " entity");
+    };
 }
+
+var coords = makeAdjustCoords(Point, "point", "point");
 
 function mapCoords(vec) {
     var out = [];
@@ -874,29 +889,7 @@ function mapCoords(vec) {
         has been init'd with a units of measure registry.
     @return {Array}             Component array
 */
-function vecCoords(obj, dimToUnits) {
-    if (Array.isArray(obj))
-        return obj;
-
-    if (obj instanceof Vector) {
-        obj = obj.toJSON();
-    }
-
-    if (obj.primitive == "vector") {
-        if (dimToUnits === undefined) {
-            dimToUnits = _defaultDimToUnits;
-        }
-
-        // Only perform the conversion if we have a registry, and if the units
-        // do not already match the desired units.
-        if (_measure.registry !== undefined &&
-            obj.units && obj.units.coords != dimToUnits.length) {
-            obj = _measure.registry.ConvertUnits(obj,dimToUnits);
-        }
-        return obj.coords;
-    }
-    throw Error("expected array of numbers or Vector entity");
-}
+var vecCoords = makeAdjustCoords(Vector, "vector", "coords");
 
 function mapVecCoords(vec) {
     var out = [];
@@ -1389,41 +1382,25 @@ function Operation(id) {
     @return {*} JSON-ready object
  */
 Operation.prototype.toJSON = function () {
-    var r = [this.opcode];
-    var self = this;
-    if (this.args) {
-        this.args.forEach(function (v) {
-            if (v instanceof Operation) {
-                try {
-                    var name = self._resolver(v); // check if that operation was already bound
-                    if (name) {
-                        r.push(name);
-                    }
-                    else {
-                        v._resolver = self._resolver;
-                        r.push(v.toJSON());
-                    }
-                }
-                finally {
-                    if (v._resolver) v._resolver = undefined;
-                }
-            }
-            else if (v instanceof Entity) { // locate bound entity by name
-                if (!self._resolver)
-                    throw Error("No entity resolver provided");
-                r.push(self._resolver(v));
-            }
-            else if (v.primitive !== undefined) {
-                var eraw = entities.raw(v);
-                if (!self._resolver)
-                    throw Error("No entity resolver provided");
-                r.push(self._resolver(eraw));
-            }
-            else {
-                r.push(v);
-            }
-        });
-    }
+    var r = (this.args || []).map(function (item) {
+        if (item instanceof Operation)
+            return resolve(v) || v.toJSON();
+        if (item instanceof Entity) { // locate bound entity by name
+            var entity = resolve(item);
+            if (!entity)
+                throw Error("Failed to resolve entity");
+            return entity;
+        }
+        if (item.primitive !== undefined) {
+            var entity = resolve(entities.raw(item));
+            if (!entity)
+                throw Error("Failed to resolve entity-like object");
+            return entity;
+        }
+
+        return item;
+    });
+    r.unshift(this.opcode);
     return r;
 };
 // Helper, generates operation factory
@@ -2454,15 +2431,28 @@ function getCircleCenterByThreePoints(start, middle, end)
     return [centerX, centerY, 0.0];
 }
 
-module.exports = {
-    init: init,
-    gen_id_object: gen_id_object,
-    scene: scene,
-    dcmScene: dcmScene,
+return {
+    scene:      scene,
+    dcmScene:   dcmScene,
     attributes: attributes,
-    utilities: utilities,
-    entities: entities,
+    utilities:  utilities,
+    entities:   entities,
     constraints: constraints,
     operations: ops
 };
 
+}
+
+/**
+    Module exports factory function, which itself constructs module instance
+    Factory accepts optional configuration object. If config object is absent,
+    it's treated as empty one. If config property is set, its value is used;
+    otherwiase, default is used. Please note that "property in object" is used,
+    instead of "object.property !== undefined", which allows to distinguish
+    config options set to undefined explicitly.
+    Config options available:
+    - schema - parsed JSON schema object, used for validation purposes; default '<index>.schemas.pbw'
+    - registry - UoM registry, used for units conversion; default 'new <index>.measure.Registry()'
+    - genId - UUID generator function; default '<index>.uuid.v4'
+ */
+module.exports = constructModule;

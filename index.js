@@ -26,27 +26,32 @@ function submodules(obj) {
     var exps = {};
     Object.keys(obj).forEach(function (key) {
         var modpath = obj[key];
-        lazy_prop(exps, key, function () { return require(modpath); });
+        if (typeof modpath === 'string')
+            lazy_prop(exps, key, function () { return require(modpath); });
+        else
+            Object.defineProperty(exps, key, {
+                enumerable: true,
+                writable: false,
+                value: modpath
+            });
     });
     return exps;
 }
+/**
+    Exports section
 
+    NB: Submodules are loaded lazily here, only when they're referenced. Some submodules can
+    impact load times, even when not needed at all. As an example, PBW integration tests run
+    about twice the time when 'measure' is loaded eagerly. It's a large piece of ASM.JS code,
+    and loading it on each script run impacts interpreter.
+ */
 module.exports = submodules({
     'measure':  './measure',
-    'modeling': './modeling-core',
+    'modeling': './modeling',
     'uuid':     './uuid',
-    'revit': './revit-core',
-    'fluxEntitySchema':   './schemas/psworker.json',
-    'fluxRevitSchema': './schemas/flux-revit.json'
+    'revit':    './revit-core',
+    'schemas':  submodules({
+        'pbw':  './schemas/psworker.json',
+        'revit':'./schemas/flux-revit.json'
+    })
 });
-
-/*
-    Initializes the modeling submodule with the geometry entity schema and
-    a measure registry.
-*/
-module.exports.initialize = function() {
-    module.exports.modeling.init(
-        module.exports.fluxEntitySchema,
-        module.exports.measure.Registry());
-    return module.exports;
-}
