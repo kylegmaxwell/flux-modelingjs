@@ -32,7 +32,8 @@
                     "anyOf": [
                         { "$ref": "flux-entity#/entities/line" },
                         { "$ref": "flux-entity#/entities/curve" },
-                        { "$ref": "flux-entity#/entities/arc" }
+                        { "$ref": "flux-entity#/entities/arc" },
+                        { "$ref": "flux-entity#/entities/polyline"}
                     ]
                 }
         },
