@@ -1,7 +1,7 @@
 describe("DCMScene/updateEntity/Ellipse", function() {
     'use strict';
 
-    var modeling = require("./dcm-test-modeling.js");
+    var modeling = require("../index").modeling();
 
     // Test data
     var origin = modeling.entities.point([1, 1, 0]);

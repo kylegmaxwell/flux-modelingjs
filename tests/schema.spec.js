@@ -2,8 +2,9 @@ describe("Schema test", function() {
     'use strict';
     var Ajv   = require('ajv');
     var fs    = require('fs');
-    var schema = require("../index").fluxEntitySchema;
-    var modeling = require('../index').modeling;
+    var flux  = require('../index');
+    var schema = flux.schemas.pbw;
+    var modeling = flux.modeling({ schema: null, registry: null, genId: null });
 
     var ajv = Ajv({ allErrors: true });
     ajv.addSchema(schema, "_");

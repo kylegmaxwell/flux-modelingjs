@@ -2,9 +2,10 @@ describe("flux-revit schema test", function() {
     'use strict';
     var Ajv   = require("ajv");
     var fs    = require("fs");
-    var revit = require("../index").revit;
-    var fluxEntitySchema = require("../index").fluxEntitySchema;
-    var fluxRevitSchema = require("../index").fluxRevitSchema;
+    var flux  = require('../index');
+    var revit = flux.revit;
+    var fluxEntitySchema = flux.schemas.pbw;
+    var fluxRevitSchema = flux.schemas.revit;
 
     var ajv = Ajv({
         allErrors: true

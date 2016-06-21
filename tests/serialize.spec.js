@@ -1,6 +1,6 @@
 describe("Serialize test", function() {
     'use strict';
-    var modeling = require("../index").modeling;
+    var modeling = require("../index").modeling({ schema: null, registry: null, genId: null });
 
     it ("Scene should serialize to json", function() {
         var scene = modeling.scene();

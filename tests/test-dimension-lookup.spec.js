@@ -2,7 +2,7 @@ describe("modeling/measure/lookupDimensions", function() {
     'use strict';
 
     it("Should look up field dimensions correctly", function(){
-        var lookupDimensions = require("./dcm-test-modeling").utilities.lookupFieldDimensions;
+        var lookupDimensions = require("../index").modeling().utilities.lookupFieldDimensions;
         expect(lookupDimensions("point")).toEqual( { point: 'length' });
         expect(lookupDimensions("curve")).toEqual( { controlPoints: 'length' });
         expect(lookupDimensions("block")).toEqual( { origin: 'length', dimensions: 'length' });
@@ -18,7 +18,7 @@ describe("modeling/measure/lookupDimensions", function() {
 describe("modeling/measure/constructors", function() {
     'use strict';
 
-    var modeling = require("./dcm-test-modeling");
+    var modeling = require("../index").modeling();
     it("should convert unitful entities passed to constructors to a common unit", function() {
         var p1 = modeling.entities.point([100,200,300]).toJSON();
         p1.units.point = "cm";
@@ -52,7 +52,7 @@ describe("modeling/measure/constructors", function() {
 describe("modeling/measure/detectUnits", function() {
     'use strict';
 
-    var modeling = require("./dcm-test-modeling");
+    var modeling = require("../index").modeling();
     it("should detect units correctly", function() {
         var v1 = modeling.utilities.detectUnits({});
         expect(v1).toEqual(false);

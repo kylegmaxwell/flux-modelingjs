@@ -1,6 +1,6 @@
 describe("revit-core test", function () {
     "use strict";
-    var revit = require('../revit-core');
+    var revit = require('../index').revit;
 
     function Copy(obj) {
         return JSON.parse(JSON.stringify(obj));
