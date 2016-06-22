@@ -1,6 +1,7 @@
 'use strict';
 
 var jsonpointer = require('json-pointer');
+var modeling = require('./index').modeling({genId: null});
 
 /**
 * Function to create a revit element.
@@ -93,9 +94,9 @@ function createModelLine(fluxId, modelCurve) {
 /**
 * Function to create a revit reference plane.
 *
-* @param {position} [bubbleEnd] Position of bubble end.
-* @param {position} [freeEnd] Position of free end.
-* @param {vector} [cutVector] Cut vector.
+* @param {position} [bubbleEnd] First point on reference plane.
+* @param {position} [freeEnd] Second point on reference plane.
+* @param {vector} [cutVector] Vector perpendicular to vector from bubbleEnd to freeEnd, tangent to the reference plane.
 * @param {string} [name] Name of the reference plane.
 * @param {boolean} [wallClosure] If reference plane is wall closure.
 * @returns {{Out: revit-referencePlane}} The created revit reference plane.
@@ -107,10 +108,26 @@ function createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, name, wallC
         type: "",
         placementType: "Invalid"
     };
+
+    var validBubbleEnd = createPoint(bubbleEnd);
+    if (validBubbleEnd.Error) {
+        return validBubbleEnd;
+    }
+
+    var validFreeEnd = createPoint(freeEnd);
+    if (validFreeEnd.Error) {
+        return validFreeEnd;
+    }
+
+    var validCutVector = createVector(cutVector);
+    if (validCutVector.Error) {
+        return validCutVector;
+    }
+
     var geomParams = {
-        bubbleEnd: bubbleEnd,
-        freeEnd: freeEnd,
-        cutVector: cutVector,
+        bubbleEnd: validBubbleEnd,
+        freeEnd: validFreeEnd,
+        cutVector: validCutVector,
         name: isInvalid(name) ? null : name,
         wallClosure: !!wallClosure
     };
@@ -184,8 +201,14 @@ function createRoom(fluxId, location, level, name, instParamMap, custParamMap) {
         type: "",
         placementType: "Invalid"
     };
+
+    var validUV = createPoint(location);
+    if (validUV.Error) {
+        return validUV;
+    }
+
     var geomParams = {
-        uv: location,
+        uv: validUV,
         level: extractLevelName(level),
         name: name
     };
@@ -316,7 +339,7 @@ function createOneLevelFamilyInstance(fluxId, category, family, type, location,
         placementType: "OneLevelBased"
     };
     var geomParams = {
-        location: location,
+        location: getLocation(location),
         level: extractLevelName(level),
         structuralType: getValidStructuralType(structuraltype),
         faceFlipped: !!faceflipped,
@@ -367,7 +390,7 @@ function createTwoLevelFamilyInstance(fluxId, category, family, type, location,
         placementType: "TwoLevelsBased"
     };
     var geomParams = {
-        location: location,
+        location: getLocation(location),
         baseLevel: extractLevelName(baselevel),
         topLevel: extractLevelName(toplevel),
         structuralType: getValidStructuralType(structuraltype),
@@ -419,7 +442,7 @@ function createOneLevelHostedFamilyInstance(fluxId, category, family, type, loca
         placementType: "OneLevelBasedHosted"
     };
     var geomParams = {
-        location: location,
+        location: getLocation(location),
         hostId: extractFluxId(host),
         level: extractLevelName(level),
         structuralType: getValidStructuralType(structuraltype),
@@ -835,6 +858,59 @@ function addRootSlashIfNecessary(path) {
         return path;
     }
     return "/" + path;
+}
+
+// A valid location for a family instance in revit could
+// be one of: point, curve, line or arc.
+// This function returns back a valid location by converting
+// an array of numbers to point.
+function getLocation(obj) {
+    if (isInvalid(obj)) {
+        return obj;
+    }
+
+    if (obj.primitive == "point" || obj.primitivve == "line" ||
+        obj.primitive == "curve" || obj.primitive == "arc") {
+        return obj;
+    }
+
+    return createPoint(obj);
+}
+
+// Returns a point given an array of number or spoint.
+// Returns FluxModelingError if the input is invalid.
+function createPoint(obj) {
+    var pt;
+    try {
+        pt = modeling.entities.point(obj).toJSON();
+    }
+    catch(err) {
+        if (err.name !== "FluxModelingError") {
+            throw err;
+        }
+        else {
+            return {Error: err.message};
+        }
+    }
+
+    return pt;
+}
+
+function createVector(obj) {
+    var vec;
+    try {
+        vec = modeling.entities.vector(obj).toJSON();
+    }
+    catch(err) {
+        if (err.name !== "FluxModelingError") {
+            throw err;
+        }
+        else {
+            return {Error: err.message};
+        }
+    }
+
+    return vec;
 }
 
 module.exports = {

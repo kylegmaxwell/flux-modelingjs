@@ -16,7 +16,7 @@ function constructModule(config) {
 var flux = require('./index');
 config = config || {};
 if (typeof config !== 'object')
-    throw Error("config: expected object");
+    throw new FluxModelingError("config: expected object");
 
 function defaulted(name, defvalue) {
     return (name in config) ? config[name] : defvalue();
@@ -60,7 +60,7 @@ function toArray(obj) {
 }
 
 function notImplemented() {
-    throw Error('not implemented');
+    throw new FluxModelingError('not implemented');
 }
 
 function normalize(arr) {
@@ -75,7 +75,7 @@ function isNone(value) { return value === null || value === undefined; }
 
 function isInst(value, type) {
     if (!(type instanceof Function))
-        throw Error('type: constructor expected');
+        throw new FluxModelingError('type: constructor expected');
     if (isNone(value))
         return false;
     return (value instanceof type) || value.constructor == type;
@@ -226,10 +226,10 @@ OpSlot.prototype.toJSON = function () {
  */
 Scene.prototype.add = function(name, obj) {
     if (!isInst(name, String))
-        throw Error('name: string expected');
+        throw new FluxModelingError('name: string expected');
     if (isInst(obj, Entity)) {
         if (this.__entities__[name] !== undefined)
-            throw Error('entity "' + name + '" already defined');
+            throw new FluxModelingError('entity "' + name + '" already defined');
         this.__entities__[name] = obj;
     }
     else if (obj.primitive !== undefined) {
@@ -239,7 +239,7 @@ Scene.prototype.add = function(name, obj) {
         this.__operations__.push(new OpSlot(name, obj));
     }
     else
-        throw Error('obj: either Entity or Operation is expected');
+        throw new FluxModelingError('obj: either Entity or Operation is expected');
     return this;
 };
 
@@ -434,7 +434,7 @@ DCMScene.prototype.updateEntity = function (old) {
     var name = getId(old);
     var self = this;
     if (!self.hasEntity(name))
-        throw Error("Entity " + name + " is not present in scene");
+        throw new FluxModelingError("Entity " + name + " is not present in scene");
     var e = self.__entities__[name];
     updateEntityIds(e);
     return e;
@@ -497,7 +497,7 @@ DCMScene.prototype.addEntity = function(entity, name) {
         }
         default:
         {
-            throw Error("Entity with primitive " + entity.primitive + " can not be added to scene");
+            throw new FluxModelingError("Entity with primitive " + entity.primitive + " can not be added to scene");
         }
     }
 
@@ -512,24 +512,24 @@ DCMScene.prototype.addEntity = function(entity, name) {
 DCMScene.prototype.add = function(obj, name) {
     name = name || getId(obj);
     if (!isInst(name, String))
-        throw Error('name: string expected ' + name + '   ' + JSON.stringify(obj));
+        throw new FluxModelingError('name: string expected ' + name + '   ' + JSON.stringify(obj));
     if (isInst(obj, Entity)) {
         if (!this.hasEntity(name))
             this.addEntity(obj, name);
     }
     else if (isInst(obj, Constraint)) {
         if (this.hasConstraint(name))
-            throw Error('constraint "' + name + '" already defined');
+            throw new FluxModelingError('constraint "' + name + '" already defined');
         this.__constraints__[name] = obj;
     }
     else if (isInst(obj, Variable)) {
         if (this.hasVariable(name))
-            throw Error('variable "' + name + '" already defined');
+            throw new FluxModelingError('variable "' + name + '" already defined');
         this.__variables__[name] = obj;
     }
     else if (isInst(obj, Equation)) {
         if (this.hasEquation(name))
-            throw Error('equation "' + name + '" already defined');
+            throw new FluxModelingError('equation "' + name + '" already defined');
         this.__equations__[name] = obj;
     }
     else if (obj.primitive !== undefined) {
@@ -538,20 +538,20 @@ DCMScene.prototype.add = function(obj, name) {
     }
     else if (obj.type !== undefined) {
         if (this.hasConstraint(name))
-            throw Error('constraint "' + name + '" already defined');
+            throw new FluxModelingError('constraint "' + name + '" already defined');
         this.__constraints__[name] = constraints.raw(obj);
     }
     else if (obj.name !== undefined && obj.value !== undefined) {
-        throw Error('Adding raw variable is not supported');
+        throw new FluxModelingError('Adding raw variable is not supported');
     }
     else if (obj.equation !== undefined) {
-        throw Error('Adding raw equation is not supported');
+        throw new FluxModelingError('Adding raw equation is not supported');
     }
     else if (isInst(obj, Operation)) {
         this.__operations__.push(new OpSlot(name, obj));
     }
     else
-        throw Error('obj: either Entity, Constraint, Variable, Equation or Operation is expected');
+        throw new FluxModelingError('obj: either Entity, Constraint, Variable, Equation or Operation is expected');
     return this;
 };
 
@@ -566,6 +566,7 @@ function Entity(id) { this.primitive = id; }
  *
  *  @return {*} JSON object
  */
+
 Entity.prototype.toJSON    = function() { return this.__data__; };
 
 /** Add attribute to entity
@@ -594,7 +595,7 @@ Entity.prototype.attribute = function(keyobj, value) {
     if (!d.attributes)
         d.attributes = {};
     if (d.attributes[key])
-        throw Error("attribute of type '" + key + "' already defined");
+        throw new FluxModelingError("attribute of type '" + key + "' already defined");
     d.attributes[key] = value;
     return this;
 };
@@ -857,17 +858,19 @@ function makeAdjustCoords(type, primitive, field) {
         if (obj instanceof type)
             obj = obj.toJSON();
 
-        if (obj.primitive === primitive) {
-            dimToUnits = dimToUnits || _defaultDimToUnits;
+        if (obj != undefined) {
+            if (obj.primitive === primitive) {
+                dimToUnits = dimToUnits || _defaultDimToUnits;
 
-            // Only perform the conversion if the units
-            // do not already match the desired units.
-            if (obj.units && obj.units[field] != dimToUnits.length) {
-                obj = convertUnits(obj, dimToUnits);
+                // Only perform the conversion if the units
+                // do not already match the desired units.
+                if (obj.units && obj.units[field] != dimToUnits.length) {
+                    obj = convertUnits(obj, dimToUnits);
+                }
+                return obj[field];
             }
-            return obj[field];
         }
-        throw Error("expected array of numbers or " + type.name + " entity");
+        throw new FluxModelingError("expected array of numbers or " + type.name + " entity");
     };
 }
 
@@ -889,6 +892,7 @@ function mapCoords(vec) {
         has been init'd with a units of measure registry.
     @return {Array}             Component array
 */
+
 var vecCoords = makeAdjustCoords(Vector, "vector", "coords");
 
 function mapVecCoords(vec) {
@@ -1159,7 +1163,7 @@ function canonicVertex(item) {
         // repr #3, #6
         return [coords(item), undefined];
     // Didn't match anything, so just throw
-    throw Error("Unsupported vertex representation");
+    throw new FluxModelingError("Unsupported vertex representation");
 }
 
 function appendVertex(ctxt, item) {
@@ -1171,13 +1175,13 @@ function appendVertex(ctxt, item) {
             if (ctxt.points.length === 0)
                 ctxt.weights = [ w ];
             else
-                throw Error('Cannot add weighted vertex because previous vertices were weightless');
+                throw new FluxModelingError('Cannot add weighted vertex because previous vertices were weightless');
         }
         ctxt.points.push(pt);
     }
     else {
         if (w === undefined)
-            throw Error('Vertex must have weight specified');
+            throw new FluxModelingError('Vertex must have weight specified');
         ctxt.weights.push(w);
         ctxt.points.push(pt);
     }
@@ -1735,7 +1739,7 @@ var entities =
     rectangle: function (center, span) {
         var c = vecCoords(span);
         if (c.length != 2) {
-            throw Error("Expected rectangle dimensions to be 2-dimensional.");
+            throw new FluxModelingError("Expected rectangle dimensions to be 2-dimensional.");
         }
         return primitive('rectangle', { origin: coords(center), dimensions: c }, Wire);
     },
@@ -1934,15 +1938,15 @@ function constr3(e1, e2, e3) {
 }
 function help(param) {
     if (arguments.length !== 1)
-        throw Error("Invalid help parameter " + JSON.stringify(arguments));
+        throw new FluxModelingError("Invalid help parameter " + JSON.stringify(arguments));
     if (Array.isArray(param)) {
         if(param.length !== 0 && param.length !== 3) {
-            throw Error("Invalid help point " + JSON.stringify(param));
+            throw new FluxModelingError("Invalid help point " + JSON.stringify(param));
         }
         return param;
     }
     if (typeof param !== 'number')
-        throw Error("Invalid help parameter " + JSON.stringify(param));
+        throw new FluxModelingError("Invalid help parameter " + JSON.stringify(param));
     return [param];
 }
 // var constraints is used for self-call
@@ -2419,7 +2423,7 @@ function getCircleCenterByThreePoints(start, middle, end)
     var cd = (offset - Math.pow(end[0], 2) - Math.pow(end[1], 2)) / 2.0;
     var det = (start[0] - middle[0]) * (middle[1] - end[1]) - (middle[0] - end[0]) * (start[1] - middle[1]);
     if (Math.abs(det) < eps) {
-        throw Error("Cannot get circle center by three points [" +
+        throw new FluxModelingError("Cannot get circle center by three points [" +
             start[0] + ", " + start[1] + "], [" + middle[0] + ", " +
             middle[1] + "], [" + end[0] + ", " + end[1] + "]");
     }
@@ -2430,6 +2434,14 @@ function getCircleCenterByThreePoints(start, middle, end)
 
     return [centerX, centerY, 0.0];
 }
+
+function FluxModelingError(message) {
+            this.name = 'FluxModelingError';
+            this.message = message || 'Invalid or degenerate geometry specified.';
+            this.stack = (new Error()).stack;
+        }
+FluxModelingError.prototype = Object.create(Error.prototype);
+FluxModelingError.prototype.constructor = FluxModelingError;
 
 return {
     scene:      scene,

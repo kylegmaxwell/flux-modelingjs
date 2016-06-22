@@ -259,13 +259,9 @@ describe("flux-revit schema test", function() {
         var validate = ajv.compile({ $ref: schemaId });
 
         it ("Library created revit-two-level-familyinstance should validate", function() {
-            var curve = {
-                "primitive": "line",
-                "start": [ 0.0, 0.0, 0.0],
-                "end": [10.0, 0.0, 0.0]
-            };
+            var point = [0.0, 0.0, 0.0];
             var validFamilyInstance = revit.createTwoLevelFamilyInstance("Id-1", "Category-1",
-                "Family-1", "Type-1", curve, "Level-1", "Level-2", "NonStructural",
+                "Family-1", "Type-1", point, "Level-1", "Level-2", "NonStructural",
                 false, false, {}, {});
             var isValid = validate(validFamilyInstance.Out);
             if (!isValid) {
@@ -292,13 +288,9 @@ describe("flux-revit schema test", function() {
         var validate = ajv.compile({ $ref: schemaId });
 
         it ("Library created revit-one-level-hosted-familyinstance should validate", function() {
-            var curve = {
-                "primitive": "line",
-                "start": [ 0.0, 0.0, 0.0],
-                "end": [10.0, 0.0, 0.0]
-            };
+            var point = [10.0, 0.0, 0.0];
             var validFamilyInstance = revit.createOneLevelHostedFamilyInstance("Id-1", "Category-1", "Family-1",
-                "Type-1", curve, "HostId-1", "Level-1", "NonStructural", false, false, {}, {});
+                "Type-1", point, "HostId-1", "Level-1", "NonStructural", false, false, {}, {});
             var isValid = validate(validFamilyInstance.Out);
             if (!isValid) {
                 console.log(validate.errors);
