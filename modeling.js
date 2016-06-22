@@ -1388,7 +1388,7 @@ function Operation(id) {
 Operation.prototype.toJSON = function () {
     var r = (this.args || []).map(function (item) {
         if (item instanceof Operation)
-            return resolve(v) || v.toJSON();
+            return resolve(item) || item.toJSON();
         if (item instanceof Entity) { // locate bound entity by name
             var entity = resolve(item);
             if (!entity)
