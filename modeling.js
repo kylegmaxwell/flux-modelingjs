@@ -13,20 +13,20 @@ function constructModule(config) {
 /***************************************************************************************************
  *  Configuration part
  */
+
 var flux = require('./index');
 config = config || {};
 if (typeof config !== 'object')
     throw new FluxModelingError("config: expected object");
 
-function defaulted(name, defvalue) {
-    return (name in config) ? config[name] : defvalue();
-}
-// Functions are used for defaults - because of modules' lazy load process
-var schema   = defaulted('schema',   function () { return flux.schemas.pbw; });
-var guid     = defaulted('genId',    function () { return flux.uuid.v4; }) || function () { return undefined; };
+var schema = 'schema' in config ? config['schema'] : flux.schemas.pbw;
+// If a user of modelingjs is explicitly passing a falsey value for genId,
+// then default to a function that returns undefined, to avoid errors attempting
+// to call a null value downstream.
+var genId =  config['genId'] ||  function () { return undefined; };
 
 var convertUnits = (function () {
-    var registry = defaulted('registry', function () { return new flux.measure.Registry(); });
+    var registry = 'registry' in config ? config['registry'] : new flux.measure.Registry();
     return registry
         ? registry.ConvertUnits.bind(registry)
         : function (obj, dimUnits) { return obj; };
@@ -316,7 +316,7 @@ function resolveDCMItem(self, e, opIndex) {
             }
         });
         if (!key) {
-            key = getId(e) || guid();
+            key = getId(e) || genId();
             self.__entities__[key] = e;
         }
     }
@@ -419,12 +419,12 @@ function updateEntityIds (elem) {
         var idFields = ['startId', 'endId', 'originId'];
         idFields.forEach(function(field){
             if (data.hasOwnProperty(field)) {
-                data[field] = guid();
+                data[field] = genId();
             }
         });
 
         // 'id' field is obligatory
-        data.id = guid();
+        data.id = genId();
     }
 
     return elem;
@@ -1310,7 +1310,7 @@ function type(typeid, params) {
     var e = new Constraint(typeid);
     e.__data__ = params;
     e.__data__.type = typeid;
-    e.__data__.id = guid();
+    e.__data__.id = genId();
     return e;
 }
 
@@ -1330,7 +1330,7 @@ function Variable() {}
 function variable(params) {
     var v = new Variable();
     v.__data__ = params;
-    v.__data__.id = guid();
+    v.__data__.id = genId();
     return v;
 }
 
@@ -1359,7 +1359,7 @@ function Equation() {}
 function equation(params) {
     var e = new Equation();
     e.__data__ = params;
-    e.__data__.id = guid();
+    e.__data__.id = genId();
     return e;
 }
 
@@ -1619,7 +1619,7 @@ var entities =
     point: function (pt, name) {
         return primitive('point', {
             point: coords(pt),
-            id: name || guid()
+            id: name || genId()
         }, Point);
     },
 
@@ -1639,9 +1639,9 @@ var entities =
         return primitive('line', {
             start: coords(start),
             end: coords(end),
-            startId: getId(start) || guid(),
-            endId: getId(end) || guid(),
-            id: name || guid()
+            startId: getId(start) || genId(),
+            endId: getId(end) || genId(),
+            id: name || genId()
         }, Wire);
     },
     /** Constructs polyline entity
@@ -1669,10 +1669,10 @@ var entities =
             start: coords(start),
             middle: coords(middle),
             end: coords(end),
-            startId: getId(start) || guid(),
-            endId: getId(end) || guid(),
-            originId: guid(),
-            id: name || guid()
+            startId: getId(start) || genId(),
+            endId: getId(end) || genId(),
+            originId: genId(),
+            id: name || genId()
         }, Wire);
     },
     /** Constructs NURBS curve entity
@@ -1687,7 +1687,7 @@ var entities =
             degree: degree,
             knots: [],
             controlPoints: [],
-            id: name || guid()
+            id: name || genId()
         },
         Curve);
     },
@@ -1702,9 +1702,9 @@ var entities =
     circle: function (center, r, name) {
         return primitive('circle', {
             origin: coords(center),
-            originId: getId(center) || guid(),
+            originId: getId(center) || genId(),
             radius: r,
-            id: name || guid()
+            id: name || genId()
         },
         Wire);
     },
@@ -1721,11 +1721,11 @@ var entities =
     ellipse: function (center, rMajor, rMinor, dir, name) {
         return primitive('ellipse', {
             origin: coords(center),
-            originId: getId(center) || guid(),
+            originId: getId(center) || genId(),
             majorRadius: rMajor,
             minorRadius: rMinor,
             direction: (dir ? vecCoords(dir) : undefined),
-            id: name || guid()
+            id: name || genId()
         },
         Wire);
     },
@@ -2462,6 +2462,10 @@ return {
     otherwiase, default is used. Please note that "property in object" is used,
     instead of "object.property !== undefined", which allows to distinguish
     config options set to undefined explicitly.
+
+    To disable a related piece of functionality, pass null or undefined in
+    the configuration parameters.
+
     Config options available:
     - schema - parsed JSON schema object, used for validation purposes; default '<index>.schemas.pbw'
     - registry - UoM registry, used for units conversion; default 'new <index>.measure.Registry()'

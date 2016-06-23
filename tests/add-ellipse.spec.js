@@ -1,7 +1,7 @@
 describe("DCMScene/addEntity/Ellipse", function() {
     'use strict';
 
-    var modeling = require("../index").modeling();
+    var modeling = require("../index").modeling({genId:require("../index").uuid.v4});
 
     // Test data
     var origin = modeling.entities.point([1, 1, 0]);

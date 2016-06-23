@@ -1,7 +1,7 @@
 describe("revit-core test", function () {
     "use strict";
     var revit = require('../index').revit;
-    var modeling = require('../index').modeling({genId: null});
+    var modeling = require('../index').modeling();
 
     function Copy(obj) {
         return JSON.parse(JSON.stringify(obj));

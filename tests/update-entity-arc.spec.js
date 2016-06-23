@@ -1,7 +1,7 @@
 describe("DCMScene/updateEntity/Arc", function() {
     'use strict';
 
-    var modeling = require("../index").modeling();
+    var modeling = require("../index").modeling({genId:require("../index").uuid.v4});
 
     // Test data
     var start = modeling.entities.point([0, 1, 0]);

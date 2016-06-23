@@ -1,7 +1,7 @@
 describe("DCMScene/addEntity/Point", function() {
     'use strict';
 
-    var modeling = require("../index").modeling();
+    var modeling = require("../index").modeling({genId:require("../index").uuid});
 
     // Test data
     var point = modeling.entities.point([1, 1, 0]);
