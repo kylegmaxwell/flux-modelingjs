@@ -20,26 +20,26 @@ describe("DCMScene/addEntity/Arc", function() {
         expect(Object.keys(ents).length).toEqual(4);
 
         // Check start point
-        var startId = start.__data__.id;
+        var startId = start.id;
         expect(ents[startId]).toBeDefined();
-        expect(ents[startId]).toEqual(start.toJSON());
+        expect(ents[startId]).toEqual(start);
 
         // Check end point
-        var endId = end.__data__.id;
+        var endId = end.id;
         expect(ents[endId]).toBeDefined();
-        expect(ents[endId]).toEqual(end.toJSON());
+        expect(ents[endId]).toEqual(end);
 
         // Check origin point
         // It will be given new guid so just copy it
-        var originId = arc.toJSON().originId;
+        var originId = arc.originId;
         expect(ents[originId]).toBeDefined();
-        origin.__data__.id = originId;
-        expect(ents[originId]).toEqual(origin.toJSON());
+        origin.id = originId;
+        expect(ents[originId]).toEqual(origin);
 
         // Check arc itself
-        var arcId = arc.__data__.id;
+        var arcId = arc.id;
         expect(ents[arcId]).toBeDefined();
-        expect(ents[arcId]).toEqual(arc.toJSON());
+        expect(ents[arcId]).toEqual(arc);
     });
 
     it ("If arc start point already in scene, add only end, origin and arc itself", function() {
@@ -54,9 +54,9 @@ describe("DCMScene/addEntity/Arc", function() {
         expect(Object.keys(ents).length).toEqual(1);
 
         // Check start point
-        var startId = start.__data__.id;
+        var startId = start.id;
         expect(ents[startId]).toBeDefined();
-        expect(ents[startId]).toEqual(start.toJSON());
+        expect(ents[startId]).toEqual(start);
 
         // Add arc and check we have only 4 entities in scene
         scene.add(arc);
@@ -65,25 +65,25 @@ describe("DCMScene/addEntity/Arc", function() {
         expect(Object.keys(ents).length).toEqual(4);
 
         // Check start point
-        var startId = start.__data__.id;
+        var startId = start.id;
         expect(ents[startId]).toBeDefined();
-        expect(ents[startId]).toEqual(start.toJSON());
+        expect(ents[startId]).toEqual(start);
 
         // Check end point
-        var endId = end.__data__.id;
+        var endId = end.id;
         expect(ents[endId]).toBeDefined();
-        expect(ents[endId]).toEqual(end.toJSON());
+        expect(ents[endId]).toEqual(end);
 
         // Check origin point
         // It will be given new guid so just copy it
-        var originId = arc.toJSON().originId;
+        var originId = arc.originId;
         expect(ents[originId]).toBeDefined();
-        origin.__data__.id = originId;
-        expect(ents[originId]).toEqual(origin.toJSON());
+        origin.id = originId;
+        expect(ents[originId]).toEqual(origin);
 
         // Check arc itself
-        var arcId = arc.__data__.id;
+        var arcId = arc.id;
         expect(ents[arcId]).toBeDefined();
-        expect(ents[arcId]).toEqual(arc.toJSON());
+        expect(ents[arcId]).toEqual(arc);
     });
 });

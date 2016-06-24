@@ -7,7 +7,7 @@ describe("Constructor utilities test", function() {
         expect(a).toEqual([1,2,3]);
         a = modeling.utilities.coords(modeling.entities.point([4,5,6]));
         expect(a).toEqual([4,5,6]);
-        a = modeling.utilities.coords(modeling.entities.point([8,9,0]).toJSON());
+        a = modeling.utilities.coords(modeling.entities.point([8,9,0]));
         expect(a).toEqual([8,9,0]);
     });
 
@@ -16,7 +16,7 @@ describe("Constructor utilities test", function() {
         expect(a).toEqual([1,2,3]);
         a = modeling.utilities.vecCoords(modeling.entities.vector([4,5,6]));
         expect(a).toEqual([4,5,6]);
-        a = modeling.utilities.vecCoords(modeling.entities.vector([8,9,0]).toJSON());
+        a = modeling.utilities.vecCoords(modeling.entities.vector([8,9,0]));
         expect(a).toEqual([8,9,0]);
     });
 
@@ -27,11 +27,11 @@ describe("Constructor utilities test", function() {
     //
     // When https://vannevar.atlassian.net/browse/LIB3D-624, we should be able to
     // re-enable this.
-    // var modeling2 = require('../index').modeling();
-    // it ("Coords and vecCoords should work with data from different instances of the modeling package", function() {
-    //     var a = modeling.utilities.coords(modeling2.entities.point([4,5,6]));
-    //     expect(a).toEqual([4,5,6]);
-    //     a = modeling.utilities.vecCoords(modeling.entities.vector([4,5,6]));
-    //     expect(a).toEqual([4,5,6]);
-    // })
+    var modeling2 = require('../index').modeling();
+    it ("Coords and vecCoords should work with data from different instances of the modeling package", function() {
+        var a = modeling.utilities.coords(modeling2.entities.point([4,5,6]));
+        expect(a).toEqual([4,5,6]);
+        a = modeling.utilities.vecCoords(modeling.entities.vector([4,5,6]));
+        expect(a).toEqual([4,5,6]);
+    })
 });

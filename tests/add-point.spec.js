@@ -16,8 +16,8 @@ describe("DCMScene/addEntity/Point", function() {
         expect(Object.keys(ents).length).toEqual(1);
 
         // Check point
-        var id = point.__data__.id;
+        var id = point.id;
         expect(ents[id]).toBeDefined();
-        expect(ents[id]).toEqual(point.toJSON());
+        expect(ents[id]).toEqual(point);
     });
 });

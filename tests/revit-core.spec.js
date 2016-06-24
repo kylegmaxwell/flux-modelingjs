@@ -1,11 +1,24 @@
+/** Converts object to its JSON representation
+ *  Used because of:
+ *  1. Jasmine's toEqual seems to be comparing not only JSON-like fields,
+ *      but other types of object fields. This results in two objects,
+ *      whose representations should  be equal, to be considered inequal.
+ *  2. JSON.stringify is the only place where it's correct to use .toJSON
+ *      contract. Other cases should consider possible absense of that method,
+ *      and also comparison or not comparison of non-JSON types. Becomes
+ *      complicated too quickly.
+ *  3. As a result of refactoring, some types from modelingjs have lost their
+ *      .toJSON method. Then, due to p.2, that would be the only proper way
+ *      to compare their JSON representations.
+ */
+function forceJSON(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
 describe("revit-core test", function () {
     "use strict";
     var revit = require('../index').revit;
     var modeling = require('../index').modeling();
-
-    function Copy(obj) {
-        return JSON.parse(JSON.stringify(obj));
-    }
 
     describe("createElement", function() {
         var info = {
@@ -113,7 +126,7 @@ describe("revit-core test", function () {
 
         it("should work.", function () {
             var el = revit.createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, "RefPlane-1", false);
-            expect(el).toEqual({
+            expect(forceJSON(el)).toEqual(forceJSON({
                 Out: {
                     primitive: "revitElement",
                     fluxId: fluxId,
@@ -124,9 +137,9 @@ describe("revit-core test", function () {
                         placementType: "Invalid"
                     },
                     geometryParameters: {
-                        bubbleEnd: modeling.entities.point(bubbleEnd).toJSON(),
-                        freeEnd: modeling.entities.point(freeEnd).toJSON(),
-                        cutVector: modeling.entities.vector(cutVector).toJSON(),
+                        bubbleEnd: modeling.entities.point(bubbleEnd),
+                        freeEnd: modeling.entities.point(freeEnd),
+                        cutVector: modeling.entities.vector(cutVector),
                         name: "RefPlane-1",
                         wallClosure: false
                     },
@@ -137,14 +150,14 @@ describe("revit-core test", function () {
                     customParameters: {
                     }
                 }
-            });
+            }));
         });
     });
 
     describe("createRoom", function() {
         var fluxId = "FluxId-1";
         var level = "Level-1";
-        var location = modeling.entities.point([1,1,1]).toJSON();
+        var location = modeling.entities.point([1,1,1]);
         var name = "Room-1";
         var instanceParamMap = {i1:"InstanceParam 1", i2:"InstanceParam 2"};
         var customParamMap = {c1: "CustomParam 1", c2:"CustomParam 2"};
@@ -162,7 +175,7 @@ describe("revit-core test", function () {
 
         it("should work", function () {
             var el = revit.createRoom(fluxId, location, level, name, instanceParamMap, customParamMap);
-            expect(el).toEqual({
+            expect(forceJSON(el)).toEqual(forceJSON({
                 Out: {
                     primitive: "revitElement",
                     fluxId: fluxId,
@@ -173,7 +186,7 @@ describe("revit-core test", function () {
                         placementType: "Invalid"
                     },
                     geometryParameters: {
-                        "uv": modeling.entities.point(location).toJSON(),
+                        "uv": modeling.entities.point(location),
                         "level": level,
                         "name": name
                     },
@@ -188,7 +201,7 @@ describe("revit-core test", function () {
                         c2:"CustomParam 2"
                     }
                 }
-            });
+            }));
         });
     });
 
@@ -371,7 +384,7 @@ describe("revit-core test", function () {
     describe("createOneLevelFamilyInstance", function() {
         var instanceParamMap = {i1: "InstanceParam 1", i2: "InstanceParam 2"};
         var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};
-        var location = modeling.entities.point([1,2,3]).toJSON();
+        var location = modeling.entities.point([1,2,3]);
         var structuralType = "NonStructural";
 
 
@@ -391,7 +404,7 @@ describe("revit-core test", function () {
 
         it("should work.", function () {
             var el = revit.createOneLevelFamilyInstance("Id-1", "Category-1", "Family-1", "Type-1", location, "Level-1", structuralType, false, false, instanceParamMap, customParamMap);
-            expect(el).toEqual({
+            expect(forceJSON(el)).toEqual(forceJSON({
                 Out: {
                     primitive: "revitElement",
                     fluxId: "Id-1",
@@ -402,7 +415,7 @@ describe("revit-core test", function () {
                         placementType: "OneLevelBased"
                     },
                     geometryParameters: {
-                        location: modeling.entities.point(location).toJSON(),
+                        location: modeling.entities.point(location),
                         level: "Level-1",
                         structuralType: "NonStructural",
                         faceFlipped: false,
@@ -419,7 +432,7 @@ describe("revit-core test", function () {
                         c2:"CustomParam 2"
                     }
                 }
-            });
+            }));
         });
 
         it("should work with location as point or array.", function() {
@@ -430,14 +443,14 @@ describe("revit-core test", function () {
             var e2 = revit.createOneLevelFamilyInstance("Id-1", "Category-1", "Family-1", "Type-1",
                 locationArray, "Level-1", structuralType, false, false, instanceParamMap, customParamMap);
             expect(e2.error).toBeUndefined();
-            expect(e1).toEqual(e2);
+            expect(forceJSON(e1)).toEqual(forceJSON(e2));
         });
     });
 
     describe("createTwoLevelFamilyInstance", function() {
         var instanceParamMap = {i1: "InstanceParam 1", i2: "InstanceParam 2"};
         var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};
-        var location = modeling.entities.point([10,20,30]).toJSON();
+        var location = modeling.entities.point([10,20,30]);
         var structuralType = "NonStructural";
 
         it("should return error if required parameters are not provided.", function () {
@@ -461,7 +474,7 @@ describe("revit-core test", function () {
             var el = revit.createTwoLevelFamilyInstance("Id-1", "Category-1",
                 "Family-1", "Type-1", location, "Level-1", "Level-2", structuralType,
                 false, false, instanceParamMap, customParamMap);
-            expect(el).toEqual({
+            expect(forceJSON(el)).toEqual(forceJSON({
                 Out: {
                     primitive: "revitElement",
                     fluxId: "Id-1",
@@ -472,7 +485,7 @@ describe("revit-core test", function () {
                         placementType: "TwoLevelsBased"
                     },
                     geometryParameters: {
-                        location: modeling.entities.point(location).toJSON(),
+                        location: modeling.entities.point(location),
                         baseLevel: "Level-1",
                         topLevel: "Level-2",
                         structuralType: "NonStructural",
@@ -490,7 +503,7 @@ describe("revit-core test", function () {
                         c2:"CustomParam 2"
                     }
                 }
-            });
+            }));
         });
 
         it("should work with location as point or array.", function() {
@@ -503,14 +516,14 @@ describe("revit-core test", function () {
                 "Family-1", "Type-1", locationArray, "Level-1", "Level-2", structuralType,
                 false, false, instanceParamMap, customParamMap);
             expect(e2.error).toBeUndefined();
-            expect(e1).toEqual(e2);
+            expect(forceJSON(e1)).toEqual(forceJSON(e2));
         });
     });
 
     describe("createOneLevelHostedFamilyInstance", function() {
         var instanceParamMap = {i1: "InstanceParam 1", i2: "InstanceParam 2"};
         var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};
-        var location = modeling.entities.point([10.0, 11.0, 12.0]).toJSON();
+        var location = modeling.entities.point([10.0, 11.0, 12.0]);
         var structuralType = "NonStructural";
 
 
@@ -534,7 +547,7 @@ describe("revit-core test", function () {
         it("should work.", function () {
             var el = revit.createOneLevelHostedFamilyInstance("Id-1", "Category-1", "Family-1",
                 "Type-1", location, "HostId-1", "Level-1", structuralType, false, false, instanceParamMap, customParamMap);
-            expect(el).toEqual({
+            expect(forceJSON(el)).toEqual(forceJSON({
                 Out: {
                     primitive: "revitElement",
                     fluxId: "Id-1",
@@ -545,7 +558,7 @@ describe("revit-core test", function () {
                         placementType: "OneLevelBasedHosted"
                     },
                     geometryParameters: {
-                        location: modeling.entities.point(location).toJSON(),
+                        location: modeling.entities.point(location),
                         hostId: "HostId-1",
                         level: "Level-1",
                         structuralType: "NonStructural",
@@ -563,7 +576,7 @@ describe("revit-core test", function () {
                         c2:"CustomParam 2"
                     }
                 }
-            });
+            }));
         });
 
         it("should work with location as point or array.", function() {
@@ -574,7 +587,7 @@ describe("revit-core test", function () {
             var e2 = revit.createOneLevelHostedFamilyInstance("Id-1", "Category-1", "Family-1",
                 "Type-1", locationArray, "HostId-1", "Level-1", structuralType, false, false, instanceParamMap, customParamMap);
             expect(e2.error).toBeUndefined();
-            expect(e1).toEqual(e2);
+            expect(forceJSON(e1)).toEqual(forceJSON(e2));
         });
     });
 
@@ -646,7 +659,7 @@ describe("revit-core test", function () {
         });
 
         it("should work", function() {
-            var expected = Copy(el);
+            var expected = forceJSON(el);
             expected.geometryParameters.g1 = 2;
             expected.typeParameters.t2 = "a";
             expect(revit.updateParameters(el, {g1:2, t2:"a"}).Out).toEqual(expected);

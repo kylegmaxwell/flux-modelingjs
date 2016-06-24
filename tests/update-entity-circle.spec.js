@@ -18,23 +18,21 @@ describe("DCMScene/updateEntity/Circle", function() {
         expect(Object.keys(ents).length).toEqual(2);
 
         // Get old entities
-        var oldOriginId = origin.toJSON().id;
+        var oldOriginId = origin.id;
         var oldOrigin = ents[oldOriginId];
         expect(oldOrigin).toBeDefined();
 
-        var oldCircleId = circle.toJSON().id;
-        var oldCircleOriginId = circle.toJSON().originId;
+        var oldCircleId = circle.id;
+        var oldCircleOriginId = circle.originId;
         var oldCircle = ents[oldCircleId];
         expect(oldCircle).toBeDefined();
 
         // Get updated entities
         var newOrigin = scene.updateEntity(origin);
         expect(newOrigin).toBeDefined();
-        newOrigin = newOrigin.toJSON();
 
         var newCircle = scene.updateEntity(circle);
         expect(newCircle).toBeDefined();
-        newCircle = newCircle.toJSON();
 
         // Compare origin points
         expect(newOrigin.id).not.toEqual(oldOriginId);

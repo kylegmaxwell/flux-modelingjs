@@ -1,3 +1,6 @@
+function forceJSON(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
 /**
  * This test uses a module built by rollup to ensure that this workflow is
  * maintained, as other repositories rely on it.
@@ -12,8 +15,20 @@ describe("Serialize and rollup test", function() {
         scene.add("resultId", {"origin":[0,0,0],"primitive":"sphere","radius":10});
         var tessOp = modeling.operations.tesselateStl("resultId",1);
         scene.add("resultId", tessOp);
-        var sceneStr = JSON.stringify({'Scene':scene});
-        var expectedStr = '{"Scene":{"Entities":{"resultId":{"origin":[0,0,0],"primitive":"sphere","radius":10}},"Operations":[{"name":"resultId","op":["tessellateStl","resultId",1]}]}}';
-        expect(sceneStr).toEqual(expectedStr);
+        var expected = {
+            Entities: {
+                resultId: {
+                    primitive: "sphere",
+                    origin:    [ 0, 0, 0 ],
+                    radius:    10
+                }
+            },
+            Operations: [
+                {   name: "resultId",
+                    op: [ "tessellateStl", "resultId", 1]
+                }
+            ]
+        };
+        expect(forceJSON(scene.toJSON())).toEqual(forceJSON(expected));
     });
 });

@@ -20,14 +20,14 @@ describe("DCMScene/addEntity/Ellipse", function() {
         expect(Object.keys(ents).length).toEqual(2);
 
         // Check origin point
-        var originId = origin.__data__.id;
+        var originId = origin.id;
         expect(ents[originId]).toBeDefined();
-        expect(ents[originId]).toEqual(origin.toJSON());
+        expect(ents[originId]).toEqual(origin);
 
         // Check ellipse itself
-        var ellipseId = ellipse.__data__.id;
+        var ellipseId = ellipse.id;
         expect(ents[ellipseId]).toBeDefined();
-        expect(ents[ellipseId]).toEqual(ellipse.toJSON());
+        expect(ents[ellipseId]).toEqual(ellipse);
     });
 
     it ("If ellipse origin point already in scene, add only ellipse", function() {
@@ -42,9 +42,9 @@ describe("DCMScene/addEntity/Ellipse", function() {
         expect(Object.keys(ents).length).toEqual(1);
 
         // Check origin point
-        var originId = origin.__data__.id;
+        var originId = origin.id;
         expect(ents[originId]).toBeDefined();
-        expect(ents[originId]).toEqual(origin.toJSON());
+        expect(ents[originId]).toEqual(origin);
 
         // Add ellipse and check we have only 2 entities in scene
         scene.add(ellipse);
@@ -53,13 +53,13 @@ describe("DCMScene/addEntity/Ellipse", function() {
         expect(Object.keys(ents).length).toEqual(2);
 
         // Check origin point
-        var originId = origin.__data__.id;
+        var originId = origin.id;
         expect(ents[originId]).toBeDefined();
-        expect(ents[originId]).toEqual(origin.toJSON());
+        expect(ents[originId]).toEqual(origin);
 
         // Check ellipse itself
-        var ellipseId = ellipse.__data__.id;
+        var ellipseId = ellipse.id;
         expect(ents[ellipseId]).toBeDefined();
-        expect(ents[ellipseId]).toEqual(ellipse.toJSON());
+        expect(ents[ellipseId]).toEqual(ellipse);
     });
 });

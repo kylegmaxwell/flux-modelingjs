@@ -4,7 +4,7 @@ describe("DCMScene/updateEntity/UpdatePointWithoutId", function() {
     var modeling = require("../index").modeling({genId:require("../index").uuid.v4});
 
     // Test data
-    var pt = modeling.entities.point([1, 1, 0]).toJSON();
+    var pt = modeling.entities.point([1, 1, 0]);
     var point = JSON.parse(JSON.stringify(pt));
 
 
@@ -18,14 +18,13 @@ describe("DCMScene/updateEntity/UpdatePointWithoutId", function() {
         expect(Object.keys(ents).length).toEqual(1);
 
         // Delete id fron point's data
-        delete(scene.__entities__[Object.keys(scene.__entities__)[0]].__data__.id);
-        expect(scene.__entities__[Object.keys(scene.__entities__)[0]].__data__.id).toBeUndefined();
+        delete(scene.entities[Object.keys(scene.entities)[0]].id);
+        expect(scene.entities[Object.keys(scene.entities)[0]].id).toBeUndefined();
 
         // After update newPoint should have valid new id in its data
         var newPoint = scene.updateEntity(point);
         expect(newPoint).toBeDefined();
-        expect(newPoint.__data__.id).toBeDefined();
-        newPoint = newPoint.toJSON();
+        expect(newPoint.id).toBeDefined();
         expect(newPoint.id).not.toEqual(point.id);
     });
 });

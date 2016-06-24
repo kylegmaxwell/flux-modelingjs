@@ -15,12 +15,11 @@ describe("DCMScene/updateEntity/Point", function() {
         expect(ents).toBeDefined();
         expect(Object.keys(ents).length).toEqual(1);
 
-        var id = point.toJSON().id;
+        var id = point.id;
         var oldPoint = ents[id];
 
         var newPoint = scene.updateEntity(point);
         expect(newPoint).toBeDefined();
-        newPoint = newPoint.toJSON();
 
         // Expect new id in updated point
         expect(newPoint.id).not.toEqual(id);

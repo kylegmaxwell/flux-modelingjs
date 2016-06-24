@@ -20,16 +20,16 @@ describe("DCMScene/updateEntity/Arc", function() {
         expect(Object.keys(ents).length).toEqual(4);
 
         // Get old entities
-        var oldStartId = start.toJSON().id;
+        var oldStartId = start.id;
         var oldStart = ents[oldStartId];
         expect(oldStart).toBeDefined();
-        var oldEndId = end.toJSON().id;
+        var oldEndId = end.id;
         var oldEnd = ents[oldEndId];
         expect(oldEnd).toBeDefined();
-        var oldArcId = arc.toJSON().id;
-        var oldArcStartId = arc.toJSON().startId;
-        var oldArcEndId = arc.toJSON().endId;
-        var oldArcOriginId = arc.toJSON().originId;
+        var oldArcId = arc.id;
+        var oldArcStartId = arc.startId;
+        var oldArcEndId = arc.endId;
+        var oldArcOriginId = arc.originId;
         var oldArc = ents[oldArcId];
         expect(oldArc).toBeDefined();
         var oldOriginId = oldArc.originId;
@@ -39,16 +39,12 @@ describe("DCMScene/updateEntity/Arc", function() {
         // Get updated entities
         var newStart = scene.updateEntity(start);
         expect(newStart).toBeDefined();
-        newStart = newStart.toJSON();
         var newEnd = scene.updateEntity(end);
         expect(newEnd).toBeDefined();
-        newEnd = newEnd.toJSON();
         var newArc = scene.updateEntity(arc);
         expect(newArc).toBeDefined();
-        newArc = newArc.toJSON();
         var newOrigin = scene.updateEntity(oldOrigin);
         expect(newOrigin).toBeDefined();
-        newOrigin = newOrigin.toJSON();
 
         // Compare start points
         expect(newStart.id).not.toEqual(oldStartId);

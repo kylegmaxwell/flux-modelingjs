@@ -18,28 +18,25 @@ describe("DCMScene/updateEntity/Line", function() {
         expect(Object.keys(ents).length).toEqual(3);
 
         // Get old entities
-        var oldStartId = start.toJSON().id;
+        var oldStartId = start.id;
         var oldStart = ents[oldStartId];
         expect(oldStart).toBeDefined();
-        var oldEndId = end.toJSON().id;
+        var oldEndId = end.id;
         var oldEnd = ents[oldEndId];
         expect(oldEnd).toBeDefined();
-        var oldLineId = line.toJSON().id;
-        var oldLineStartId = line.toJSON().startId;
-        var oldLineEndId = line.toJSON().endId;
+        var oldLineId = line.id;
+        var oldLineStartId = line.startId;
+        var oldLineEndId = line.endId;
         var oldLine = ents[oldLineId];
         expect(oldLine).toBeDefined();
 
         // Get updated entities
         var newStart = scene.updateEntity(start);
         expect(newStart).toBeDefined();
-        newStart = newStart.toJSON();
         var newEnd = scene.updateEntity(end);
         expect(newEnd).toBeDefined();
-        newEnd = newEnd.toJSON();
         var newLine = scene.updateEntity(line);
         expect(newLine).toBeDefined();
-        newLine = newLine.toJSON();
 
         // Compare start points
         expect(newStart.id).not.toEqual(oldStartId);

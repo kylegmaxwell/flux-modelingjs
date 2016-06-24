@@ -882,7 +882,7 @@ function getLocation(obj) {
 function createPoint(obj) {
     var pt;
     try {
-        pt = modeling.entities.point(obj).toJSON();
+        pt = modeling.entities.point(obj);
     }
     catch(err) {
         if (err.name !== "FluxModelingError") {
@@ -899,7 +899,7 @@ function createPoint(obj) {
 function createVector(obj) {
     var vec;
     try {
-        vec = modeling.entities.vector(obj).toJSON();
+        vec = modeling.entities.vector(obj);
     }
     catch(err) {
         if (err.name !== "FluxModelingError") {

@@ -14,7 +14,7 @@ describe("Serialize and rollup test", function() {
         scene.add("resultId", {"origin":[0,0,0],"primitive":"sphere","radius":10});
         var tessOp = modeling.operations.tesselateStl("resultId",1);
         scene.add("resultId", tessOp);
-        expect(scene.toJSON())
+        expect(JSON.parse(JSON.stringify(scene)))
         .toEqual({
             "Entities": {
                 "resultId": {

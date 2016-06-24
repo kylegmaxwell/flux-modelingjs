@@ -18,19 +18,19 @@ describe("DCMScene/addEntity/Line", function() {
         expect(Object.keys(ents).length).toEqual(3);
 
         // Check start point
-        var startId = start.__data__.id;
+        var startId = start.id;
         expect(ents[startId]).toBeDefined();
-        expect(ents[startId]).toEqual(start.toJSON());
+        expect(ents[startId]).toEqual(start);
 
         // Check end point
-        var endId = end.__data__.id;
+        var endId = end.id;
         expect(ents[endId]).toBeDefined();
-        expect(ents[endId]).toEqual(end.toJSON());
+        expect(ents[endId]).toEqual(end);
 
         // Check line itself
-        var lineId = line.__data__.id;
+        var lineId = line.id;
         expect(ents[lineId]).toBeDefined();
-        expect(ents[lineId]).toEqual(line.toJSON());
+        expect(ents[lineId]).toEqual(line);
     });
 
     it ("If line start point already in scene, add only end point and line itself", function() {
@@ -45,9 +45,9 @@ describe("DCMScene/addEntity/Line", function() {
         expect(Object.keys(ents).length).toEqual(1);
 
         // Check start point
-        var startId = start.__data__.id;
+        var startId = start.id;
         expect(ents[startId]).toBeDefined();
-        expect(ents[startId]).toEqual(start.toJSON());
+        expect(ents[startId]).toEqual(start);
 
         // Add line and check we have only 3 entities in scene
         scene.add(line);
@@ -56,18 +56,18 @@ describe("DCMScene/addEntity/Line", function() {
         expect(Object.keys(ents).length).toEqual(3);
 
         // Check start point
-        var startId = start.__data__.id;
+        var startId = start.id;
         expect(ents[startId]).toBeDefined();
-        expect(ents[startId]).toEqual(start.toJSON());
+        expect(ents[startId]).toEqual(start);
 
         // Check end point
-        var endId = end.__data__.id;
+        var endId = end.id;
         expect(ents[endId]).toBeDefined();
-        expect(ents[endId]).toEqual(end.toJSON());
+        expect(ents[endId]).toEqual(end);
 
         // Check line itself
-        var lineId = line.__data__.id;
+        var lineId = line.id;
         expect(ents[lineId]).toBeDefined();
-        expect(ents[lineId]).toEqual(line.toJSON());
+        expect(ents[lineId]).toEqual(line);
     });
 });

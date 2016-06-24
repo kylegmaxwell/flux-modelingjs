@@ -49,15 +49,6 @@ var eps = 1e-8;
     explicitly override the exported property on this module.
  */
 
-// Get id from entity
-function getId(e) {
-    if (e.id) {
-        return e.id;
-    } else if (e.__data__) {
-        return e.__data__.id;
-    }
-    return null;
-}
 /* Converts any array-like object to actual array
    Used mostly with Arguments objects
  */
@@ -102,6 +93,27 @@ function inherit(clazz, base, proto) {
         );
 }
 
+function initObject(dest, source) {
+    if (typeof source !== "object")
+        throw new Error("source: expected object");
+    if (typeof dest !== "object")
+        throw new Error("dest: expected object");
+    for (var key in source)
+        dest[key] = source[key];
+}
+
+function mapObject(source, lambda) {
+    if (typeof source !== "object")
+        throw new Error("source: expected object");
+    if (typeof lambda !== "function")
+        throw new Error("lambda: expected object");
+
+    var dest = {};
+    for (var key in source)
+        dest[key] = lambda(key, source[key]);
+    return dest;
+}
+
 //******************************************************************************
 // Resolver becoming kind of scope stuff
 
@@ -130,9 +142,15 @@ function withResolver(resolver, lambda) {
  *  @classdesc Represents block query as query, with geometrical entities and operations over there
  */
 function Query() {
-    this.__entities__   = {};
-    this.__operations__ = [];
-    this.__counter__    = 1;
+    this.entities   = {};
+    this.operations = [];
+
+    var counter = 1;
+    this.generateName = function (prefix) {
+        var name = prefix + '@' + counter;
+        counter += 1;
+        return name;
+    };
 }
 /** Creates new query object
  *
@@ -147,7 +165,7 @@ var query = function () { return new Query(); };
 Query.prototype.toJSON  = function () {
     var ops = dumpOperations(this);
     return {
-        Entities:   dumpEntities(this),
+        Entities:   this.entities,
         Operations: ops
     };
 };
@@ -162,20 +180,19 @@ Query.prototype.toJSON  = function () {
 function resolveItem(self, e, opIndex) {
     var key;
     if (e instanceof Entity) {
-        Object.keys(self.__entities__).forEach(function (k) {
-            if (!key && self.__entities__[k] === e) {
+        Object.keys(self.entities).forEach(function (k) {
+            if (!key && self.entities[k] === e) {
                 key = k;
             }
         });
         if (!key) {
-            key = e.primitive + '@' + self.__counter__;
-            self.__entities__[key] = e;
-            self.__counter__ += 1;
+            key = self.generateName(e.primitive);
+            self.entities[key] = e;
         }
         return key;
     }
     else if (e instanceof Operation) {
-        var ops = self.__operations__;
+        var ops = self.operations;
         var i;
 
         // find latest binding
@@ -202,7 +219,7 @@ function dumpOperations(self) {
         return function(e) { return resolveItem(self, e, index); };
     }
 
-    return self.__operations__.map(
+    return self.operations.map(
         function (item, index) {
             return withResolver(
                 resolver(index),
@@ -235,18 +252,21 @@ OpSlot.prototype.toJSON = function () {
  *  @return {this}                      this, for chaining
  */
 Query.prototype.add = function(name, obj) {
-    if (!isInst(name, String))
+    if (typeof name !== 'string')
         throw new FluxModelingError('name: string expected');
-    if (isInst(obj, Entity)) {
-        if (this.__entities__[name] !== undefined)
+    if (obj instanceof Entity) {
+        if (this.entities[name] !== undefined)
             throw new FluxModelingError('entity "' + name + '" already defined');
-        this.__entities__[name] = obj;
+        this.entities[name] = obj;
+    }
+    else if (obj instanceof Operation) {
+        this.operations.push(new OpSlot(name, obj));
     }
     else if (obj.primitive !== undefined) {
-        this.__entities__[name] = entities.raw(obj);
+        this.add(name, entities.raw(obj));
     }
-    else if (isInst(obj, Operation)) {
-        this.__operations__.push(new OpSlot(name, obj));
+    else if (Array.isArray(obj)) { // Raw operation
+        this.add(name, operations.raw(obj));
     }
     else
         throw new FluxModelingError('obj: either Entity or Operation is expected');
@@ -259,19 +279,17 @@ Query.prototype.add = function(name, obj) {
  *  @classdesc Represents block query as scene, with geometrical entities, constraints, variables, equations and operations over there
  */
 function DCMScene() {
-    this.__entities__   = {};
-    this.__constraints__ = {};
-    this.__variables__ = {};
-    this.__equations__ = {};
-    this.__operations__ = [];
+    this.entities   = {};
+    this.constraints = {};
+    this.variables = {};
+    this.equations = {};
+    this.operations = [];
 }
 
 // Adds array of elements to scene
 DCMScene.prototype.addMultiple = function (elements) {
-    var self = this;
-    Object.keys(elements).forEach(function(key){
-        self.add(elements[key], key);
-    });
+    for (var key in elements)
+        this.add(elements[key], key);
 };
 
 /** Creates new scene object
@@ -282,10 +300,8 @@ DCMScene.prototype.addMultiple = function (elements) {
 var dcmScene = function (value) {
     var scene = new DCMScene();
     if (value) {
-        Object.keys(value).forEach(function(key) {
-            if (value[key])
-                scene.addMultiple(value[key]);
-        });
+        for (var key in value)
+            scene.addMultiple(value[key]);
     }
 
     return scene;
@@ -296,15 +312,12 @@ var dcmScene = function (value) {
  *  @return {*} JSON-ready object
  */
 DCMScene.prototype.toJSON  = function () {
-    var ops = dumpDCMOperations(this);
-    var equats = dumpEquations(this);
-    var vars = dumpVariables(this);
-    var cons = dumpConstraints(this);
+    var ops  = dumpDCMOperations(this);
     return {
-        Entities:       dumpEntities(this),
-        Constraints:    cons,
-        Variables:      vars,
-        Equations:      equats,
+        Entities:       this.entities,
+        Constraints:    this.constraints,
+        Variables:      this.variables,
+        Equations:      this.equations,
         Operations:     ops
     };
 };
@@ -320,18 +333,18 @@ DCMScene.prototype.toJSON  = function () {
 function resolveDCMItem(self, e, opIndex) {
     var key;
     if (e instanceof Entity) {
-        Object.keys(self.__entities__).forEach(function (k) {
-            if (!key && self.__entities__[k] === e) {
+        Object.keys(self.entities).forEach(function (k) {
+            if (!key && self.entities[k] === e) {
                 key = k;
             }
         });
         if (!key) {
-            key = getId(e) || genId();
-            self.__entities__[key] = e;
+            key = e.id || genId();
+            self.entities[key] = e;
         }
     }
     else if (e instanceof Operation) {
-        var ops = self.__operations__;
+        var ops = self.operations;
         var i;
 
         // find latest binding
@@ -351,50 +364,12 @@ function resolveDCMItem(self, e, opIndex) {
     return key;
 }
 
-/*  Internal function, converts given objects to JSON
- */
-function dumpElements(self, elements) {
-    var r = {};
-    var es = elements;
-    Object.keys(elements).forEach(
-        function (k) {
-            r[k] = es[k].toJSON();
-        }
-    );
-
-    return r;
-}
-
-/*  Internal function, converts entity objects to JSON
- */
-function dumpEntities(self) {
-    return dumpElements(self, self.__entities__);
-}
-
-/*  Internal function, converts constraint objects to JSON
- */
-function dumpConstraints(self) {
-    return dumpElements(self, self.__constraints__);
-}
-
-/*  Internal function, converts variable objects to JSON
- */
-function dumpVariables(self) {
-    return dumpElements(self, self.__variables__);
-}
-
-/*  Internal function, converts variable objects to JSON
- */
-function dumpEquations(self) {
-    return dumpElements(self, self.__equations__);
-}
-
 function dumpDCMOperations(self) {
     function resolver(index) {
         return function (e) { return resolveDCMItem(self, e, index); };
     }
 
-    return self.__operations__.map(
+    return self.operations.map(
         function (item, index) {
             return withResolver(
                 resolver(index),
@@ -407,45 +382,43 @@ function dumpDCMOperations(self) {
 }
 
 DCMScene.prototype.hasEntity = function (name) {
-    return this.__entities__[name] !== undefined;
+    return name in this.entities;
 };
 
 DCMScene.prototype.hasConstraint = function (name) {
-    return this.__constraints__[name] !== undefined;
+    return name in this.constraints;
 };
 
 DCMScene.prototype.hasVariable = function (name) {
-    return this.__variables__[name] !== undefined;
+    return name in this.variables;
 };
 
 DCMScene.prototype.hasEquation = function (name) {
-    return this.__equations__[name] !== undefined;
+    return name in this.equations;
 };
 
 // Helper function. Switches all ids in entity fields to new guids
 function updateEntityIds (elem) {
-    if (elem && elem.__data__) {
-        var data = elem.__data__;
+    if (elem) {
         var idFields = ['startId', 'endId', 'originId'];
         idFields.forEach(function(field){
-            if (data.hasOwnProperty(field)) {
-                data[field] = genId();
+            if (elem.hasOwnProperty(field)) {
+                elem[field] = genId();
             }
         });
 
         // 'id' field is obligatory
-        data.id = genId();
+        elem.id = genId();
     }
 
     return elem;
 }
 
 DCMScene.prototype.updateEntity = function (old) {
-    var name = getId(old);
-    var self = this;
-    if (!self.hasEntity(name))
+    var name = old.id;
+    if (!this.hasEntity(name))
         throw new FluxModelingError("Entity " + name + " is not present in scene");
-    var e = self.__entities__[name];
+    var e = this.entities[name];
     updateEntityIds(e);
     return e;
 };
@@ -454,64 +427,44 @@ DCMScene.prototype.updateEntity = function (old) {
 // of the line), adds them and entity itself to scene
 DCMScene.prototype.addEntity = function(entity, name) {
     var self = this;
-    var data = entity.__data__;
-    switch (data.primitive)
+    var initId = function (name, value) {
+        var nameId = name + 'Id';
+        var valueId = entity[nameId];
+        if (!self.hasEntity(valueId))
+            self.addEntity(
+                entities.point(value || entity[name], valueId),
+                valueId
+            );
+    }
+
+    switch (entity.primitive)
     {
         case 'point':
         case 'curve':
-        {
             // Entity is self-sufficient, so need to add only entity itself
             break;
-        }
         case 'line':
-        {
-            if (!self.hasEntity(data.startId)) {
-                self.addEntity(entities.point(data.start, data.startId), data.startId);
-            }
-            if (!self.hasEntity(data.endId)) {
-                self.addEntity(entities.point(data.end, data.endId), data.endId);
-            }
+            initId('start');
+            initId('end');
             break;
-        }
         case 'circle':
         case 'ellipse':
-        {
-            if (!self.hasEntity(data.originId)) {
-                self.addEntity(entities.point(data.origin, data.originId), data.originId);
-            }
+            initId('origin');
             break;
-        }
         case 'arc':
-        {
-            if (!self.hasEntity(data.originId)) {
-                var origin = getCircleCenterByThreePoints(data.start, data.middle, data.end);
-                self.addEntity(entities.point(origin, data.originId), data.originId);
-            }
-            if (!self.hasEntity(data.startId)) {
-                self.addEntity(entities.point(data.start, data.startId), data.startId);
-            }
-            if (!self.hasEntity(data.endId)) {
-                self.addEntity(entities.point(data.end, data.endId), data.endId);
-            }
+            initId('origin', getCircleCenterByThreePoints(entity.start, entity.middle, entity.end));
+            initId('start');
+            initId('end');
             break;
-        }
         case 'polyline':
-        {
-            notImplemented(); // TODO Need to know which blocks will be given as inputs
-            break;
-        }
         case 'polycurve':
-        {
             notImplemented(); // TODO Implement after polyline
             break;
-        }
         default:
-        {
             throw new FluxModelingError("Entity with primitive " + entity.primitive + " can not be added to scene");
-        }
     }
 
-    self.__entities__[name] = entity;
+    this.entities[name] = entity;
 };
 /** Adds entity/constraint/variable/equation/operation to scene
  *
@@ -520,9 +473,9 @@ DCMScene.prototype.addEntity = function(entity, name) {
  *  @return              - this object, for chain of calls
  */
 DCMScene.prototype.add = function(obj, name) {
-    name = name || getId(obj);
+    name = name || obj.id;
     if (!isInst(name, String))
-        throw new FluxModelingError('name: string expected ' + name + '   ' + JSON.stringify(obj));
+        throw new FluxModelingError('name: string expected');
     if (isInst(obj, Entity)) {
         if (!this.hasEntity(name))
             this.addEntity(obj, name);
@@ -530,17 +483,17 @@ DCMScene.prototype.add = function(obj, name) {
     else if (isInst(obj, Constraint)) {
         if (this.hasConstraint(name))
             throw new FluxModelingError('constraint "' + name + '" already defined');
-        this.__constraints__[name] = obj;
+        this.constraints[name] = obj;
     }
     else if (isInst(obj, Variable)) {
         if (this.hasVariable(name))
             throw new FluxModelingError('variable "' + name + '" already defined');
-        this.__variables__[name] = obj;
+        this.variables[name] = obj;
     }
     else if (isInst(obj, Equation)) {
         if (this.hasEquation(name))
             throw new FluxModelingError('equation "' + name + '" already defined');
-        this.__equations__[name] = obj;
+        this.equations[name] = obj;
     }
     else if (obj.primitive !== undefined) {
         if (!this.hasEntity(name))
@@ -549,7 +502,7 @@ DCMScene.prototype.add = function(obj, name) {
     else if (obj.type !== undefined) {
         if (this.hasConstraint(name))
             throw new FluxModelingError('constraint "' + name + '" already defined');
-        this.__constraints__[name] = constraints.raw(obj);
+        this.constraints[name] = constraints.raw(obj);
     }
     else if (obj.name !== undefined && obj.value !== undefined) {
         throw new FluxModelingError('Adding raw variable is not supported');
@@ -558,7 +511,7 @@ DCMScene.prototype.add = function(obj, name) {
         throw new FluxModelingError('Adding raw equation is not supported');
     }
     else if (isInst(obj, Operation)) {
-        this.__operations__.push(new OpSlot(name, obj));
+        this.operations.push(new OpSlot(name, obj));
     }
     else
         throw new FluxModelingError('obj: either Entity, Constraint, Variable, Equation or Operation is expected');
@@ -571,13 +524,6 @@ DCMScene.prototype.add = function(obj, name) {
  *  @classdesc Represents entity in Flux protocol. These objects are added to the 'Entities' part of scene
  */
 function Entity(id) { this.primitive = id; }
-/** JSON representation of entity
- *  Adds support for {@link JSON.stringify}
- *
- *  @return {*} JSON object
- */
-
-Entity.prototype.toJSON    = function() { return this.__data__; };
 
 /** Add attribute to entity
  *  If first argument is a string, it's treated as attribute type,
@@ -591,8 +537,7 @@ Entity.prototype.toJSON    = function() { return this.__data__; };
  *  @param  {*}        [value] - raw attribute value
  *  @return {this}               this, for chaining
  */
-Entity.prototype.attribute = function(keyobj, value) {
-    var d = this.__data__;
+Entity.prototype.addAttribute = function(keyobj, value) {
     var key;
     if (typeof(keyobj) === "string")
         key = keyobj;
@@ -602,11 +547,11 @@ Entity.prototype.attribute = function(keyobj, value) {
         value = keyobj;
     }
 
-    if (!d.attributes)
-        d.attributes = {};
-    if (d.attributes[key])
+    if (!this.attributes)
+        this.attributes = {};
+    if (key in this.attributes)
         throw new FluxModelingError("attribute of type '" + key + "' already defined");
-    d.attributes[key] = value;
+    this.attributes[key] = value;
     return this;
 };
 //******************************************************************************/
@@ -626,16 +571,16 @@ inherit(Body, Entity,
     *   @param {number[]|Vector} a - axis vector
     *   @return {this}               this, for chaining
     */
-    axis: function (a) {
-        this.__data__.axis = vecCoords(a);
+    setAxis: function (a) {
+        this.axis = vecCoords(a);
         return this;
     },
     /** Adds reference vector to the body
     *   @param {number[]|Vector} ref - reference vector
     *   @return {this}                 this, for chaining
     */
-    reference: function (ref) {
-        this.__data__.reference = vecCoords(ref);
+    setReference: function (ref) {
+        this.reference = vecCoords(ref);
         return this;
     }
 });
@@ -800,11 +745,6 @@ function defaultUnits(typeid) {
  *                                as the "units" field of an entity.
  */
 function detectUnits(entity) {
-    // TODO(andrew): get rid of __data
-    if (entity instanceof Entity) {
-        entity = entity.toJSON();
-    }
-
     // If units are defined, return true
     if (entity.units) {
         return true;
@@ -846,9 +786,9 @@ function detectUnits(entity) {
 function primitive(typeid, params, OptCtor) {
     OptCtor = OptCtor || Entity;
     var e = new OptCtor(typeid);
-    e.__data__ = params;
-    e.__data__.primitive = typeid;
-    e.__data__.units = defaultUnits(typeid);
+    initObject(e, params);
+    e.primitive = typeid;
+    e.units = defaultUnits(typeid);
     return e;
 }
 /** Helper function to extract point coordinates
@@ -865,10 +805,7 @@ function makeAdjustCoords(type, primitive, field) {
         if (Array.isArray(obj))
             return obj;
 
-        if (obj instanceof type)
-            obj = obj.toJSON();
-
-        if (obj != undefined) {
+        if (obj !== undefined) {
             if (obj.primitive === primitive) {
                 dimToUnits = dimToUnits || _defaultDimToUnits;
 
@@ -932,7 +869,7 @@ function multMatrix(a, b) {
 }
 // Applies additional affine transform by pre-multiplying
 function applyMatrix(self, m) {
-    self.__data__.mat = multMatrix(m, self.__data__.mat);
+    self.mat = multMatrix(m, self.mat);
     return self;
 }
 
@@ -1037,7 +974,7 @@ inherit(Affine, Entity,
      *  @param  {number[]|Point} origin - in-plane point
      *  @return {this}        this, for chaining
      */
-    reflection: function (n, p) {
+    reflect: function (n, p) {
         n = vecCoords(n);
         p = coords(p);
         var nx = n[0], ny = n[1], nz = n[2],
@@ -1060,7 +997,7 @@ inherit(Affine, Entity,
      *  @param {affine} t - transformation to compose with.
      */
      compose: function (t) {
-        return applyMatrix(this, t.mat || t.__data__.mat);
+        return applyMatrix(this, t.mat);
      }
 });
 
@@ -1080,10 +1017,8 @@ inherit(PolygonSet, Sheet,
      *  @param  {...(number[]|Point)} points - a set of points representing polygon
      *  @return {this}                 this, for chaining
      */
-    boundary: function () { // add polygon to set
-        var polys = this.__data__.polygons;
-
-        polys.push({
+    addBoundary: function () { // add polygon to set
+        this.polygons.push({
             boundary: mapCoords(arguments),
             holes: []
         });
@@ -1095,8 +1030,8 @@ inherit(PolygonSet, Sheet,
      *  @param  {...(number[]|Point)} points - a set of points representing hole
      *  @return {this}                 this, for chaining
      */
-    hole: function() { // add hole to last polygon
-        var polys = this.__data__.polygons;
+    addHole: function() { // add hole to last polygon
+        var polys = this.polygons;
         var last = polys[polys.length - 1];
         last.holes.push(mapCoords(arguments));
         return this;
@@ -1118,8 +1053,19 @@ inherit(Mesh, Solid,
      *  @param  {number[]|Point} coords
      *  @return {this}           this, for chaining
      */
-    vertex: function (c) {
-        this.__data__.vertices.push(coords(c));
+    addVertex: function (c) {
+        this.vertices.push(coords(c));
+        return this;
+    },
+    /** Adds multiple vertices to mesh
+     *
+     *  @function
+     *  @param  {(number[]|Point)[]} coords
+     *  @return {this}               this, for chaining
+     */
+    addVertices: function () {
+        for (var i = 0; i < arguments.length; ++i)
+            this.addVertex(arguments[i]);
         return this;
     },
     /** Builds new face in mesh from vertex indices
@@ -1128,8 +1074,19 @@ inherit(Mesh, Solid,
      *  @param  {...number} index - indices of vertices constituting face
      *  @return {this}              this, for chaining
      */
-    face: function() {
-        this.__data__.faces.push(toArray(arguments));
+    addFace: function() {
+        this.faces.push(toArray(arguments));
+        return this;
+    },
+    /** Adds multiple faces to mesh composed of vertex indices
+     *
+     *  @function
+     *  @param  {...number} index - indices of vertices constituting face
+     *  @return {this}              this, for chaining
+     */
+    addFaces: function() {
+        for (var i = 0; i < arguments.length; ++i)
+            this.faces.push(arguments[i])
         return this;
     }
 });
@@ -1138,7 +1095,7 @@ function appendToField(field) {
     return function() {
         var self = this;
         toArray(arguments).forEach(function (i) {
-            self.__data__[field].push(i);
+            self[field].push(i);
         });
         return this;
     };
@@ -1214,7 +1171,7 @@ inherit(Curve, Wire,
      *  @param  {...number} knot - knot values
      *  @return {this}             this, for chaining
      */
-    knots:  appendToField('knots'),
+    addKnots:  appendToField('knots'),
     /** Adds curve vertex, either weighted or weightless
      *
      *  Weightless vertices are specified in one of the following formats:
@@ -1229,12 +1186,19 @@ inherit(Curve, Wire,
      *  @function
      *  @return {this}                      this, for chaining
      */
-    vertex: function () {
-        var c    = this.__data__;
-        var ctxt = { points: c.controlPoints, weights: c.weights };
+    addVertex: function () {
+        var ctxt = { points: this.controlPoints, weights: this.weights };
         appendVertex(ctxt, toArray(arguments));
-        c.controlPoints = ctxt.points;
-        c.weights       = ctxt.weights;
+        this.controlPoints = ctxt.points;
+        this.weights       = ctxt.weights;
+        return this;
+    },
+    /** Adds multiple vertices to curve, passed argv style
+
+     */
+    addVertices: function () {
+        for (var i = 0; i < arguments.length; ++i)
+            this.addVertex.apply(this, Array.isArray(arguments[i]) ? arguments[i] : [ arguments[i] ])
         return this;
     }
 });
@@ -1255,29 +1219,28 @@ inherit(Surface, Sheet,
      *  @param  {...number} knot - knot values
      *  @return {this}             this, for chaining
      */
-    uKnots: appendToField('uKnots'),
+    addUKnots: appendToField('uKnots'),
     /** Appends numbers to array of V-axis knots
      *
      *  @function
      *  @param  {...number} knot - knot values
      *  @return {this}             this, for chaining
      */
-    vKnots: appendToField('vKnots'),
+    addVKnots: appendToField('vKnots'),
     /** Appends separate row (along surface's U axis) of control points to surface
      *
      *  @function
      *  @param  {...any} point - control points; for supported point representations, see {@link Curve#vertex}, except each vertex is passed as a single argument
      *  @return {this}           this, for chaining
      */
-    row: function() {
-        var c    = this.__data__;
-        var ctxt = { points: [], weights: c.weights };
+    addRow: function() {
+        var ctxt = { points: [], weights: this.weights };
 
         for (var i = 0, e = arguments.length; i < e; ++i)
             appendVertex(ctxt, toArray(arguments[i]));
 
-        c.controlPoints.push(ctxt.points);
-        c.weights = ctxt.weights;
+        this.controlPoints.push(ctxt.points);
+        this.weights = ctxt.weights;
         return this;
     },
     /** Appends multiple rows of control points to surface
@@ -1286,9 +1249,9 @@ inherit(Surface, Sheet,
      *  @param  {...any[]} row - rows of control points; see {@link Surface#row} for exact row structure
      *  @return {this}           this, for chaining
      */
-    points: function() {
+    addPoints: function() {
         for (var i = 0, e = arguments.length; i < e; ++i)
-            this.row.apply(this, arguments[i]);
+            this.addRow.apply(this, arguments[i]);
         return this;
     }
 });
@@ -1300,15 +1263,6 @@ inherit(Surface, Sheet,
  */
 function Constraint(id) { this.type = id; }
 
-/** JSON representation of constraint
- *  Adds support for {@link JSON.stringify}
- *
- *  @return {*} JSON object
- */
-Constraint.prototype.toJSON = function () {
-    return this.__data__;
-};
-
 /** Helper function
 
     @private
@@ -1318,9 +1272,9 @@ Constraint.prototype.toJSON = function () {
 */
 function type(typeid, params) {
     var e = new Constraint(typeid);
-    e.__data__ = params;
-    e.__data__.type = typeid;
-    e.__data__.id = genId();
+    initObject(e, params);
+    e.type = typeid;
+    e.id = genId();
     return e;
 }
 
@@ -1339,19 +1293,10 @@ function Variable() {}
 */
 function variable(params) {
     var v = new Variable();
-    v.__data__ = params;
-    v.__data__.id = genId();
+    initObject(v, params);
+    v.id = genId();
     return v;
 }
-
-/** JSON representation of variable
- *  Adds support for {@link JSON.stringify}
- *
- *  @return {*} JSON object
- */
-Variable.prototype.toJSON = function () {
-    return this.__data__;
-};
 
 //******************************************************************************
 /** Use functions from {@link equations} to construct
@@ -1368,19 +1313,10 @@ function Equation() {}
 */
 function equation(params) {
     var e = new Equation();
-    e.__data__ = params;
-    e.__data__.id = genId();
+    initObject(e, params);
+    e.id = genId();
     return e;
 }
-
-/** JSON representation of equation
- *  Adds support for {@link JSON.stringify}
- *
- *  @return {*} JSON object
- */
-Equation.prototype.toJSON = function () {
-    return this.__data__;
-};
 
 //******************************************************************************
 /** Use functions from {@link operations} to construct
@@ -1433,7 +1369,7 @@ function op(id, nargs) {
  *  @class
  *  @classdesc Material attribute
  */
-function Material() { this.__data__ = { }; }
+function Material() { }
 /** @lends Material.prototype */
 Material.prototype = {
     constructor: Material,
@@ -1444,7 +1380,14 @@ Material.prototype = {
     /** Converts material to JSON object. Adds support for {@link JSON.stringify}
      *  @return {*} JSON-ready object
      */
-    toJSON: function() { return this.__data__; },
+    toJSON: function() {
+        return {
+            ambient:  this.ambient,
+            diffuse:  this.diffuse,
+            specular: this.specular,
+            power:    this.power
+        };
+    },
     /** Sets ambient, diffuse and specular color values
      *
      *  @function
@@ -1453,8 +1396,8 @@ Material.prototype = {
      *  @param  {number} - blue
      *  @return {this}     this, for chaining
      */
-    color: function (r, g, b) {
-        return this.ambient(r, g, b).diffuse(r, g, b).specular(r, g, b).power(1);
+    setColor: function (r, g, b) {
+        return this.setAmbient(r, g, b).setDiffuse(r, g, b).setSpecular(r, g, b).setPower(1);
     },
     /** Sets ambient color
      *
@@ -1464,8 +1407,8 @@ Material.prototype = {
      *  @param  {number} - blue
      *  @return {this}     this, for chaining
      */
-    ambient: function (r, g, b) {
-        this.__data__.ambient = [r, g, b];
+    setAmbient: function (r, g, b) {
+        this.ambient = [r, g, b];
         return this;
     },
     /** Sets specular color
@@ -1476,8 +1419,8 @@ Material.prototype = {
      *  @param  {number} - blue
      *  @return {this}     this, for chaining
      */
-    specular: function (r, g, b) {
-        this.__data__.specular = [r, g, b];
+    setSpecular: function (r, g, b) {
+        this.specular = [r, g, b];
         return this;
     },
     /** Sets diffuse color
@@ -1488,8 +1431,8 @@ Material.prototype = {
      *  @param  {number} - blue
      *  @return {this}     this, for chaining
      */
-    diffuse: function (r, g, b) {
-        this.__data__.diffuse = [r, g, b];
+    setDiffuse: function (r, g, b) {
+        this.diffuse = [r, g, b];
         return this;
     },
     /** Sets specular power
@@ -1498,15 +1441,15 @@ Material.prototype = {
      *  @param  {number} power
      *  @return {this}   this, for chaining
      */
-    power: function (s) {
-        this.__data__.power = s;
+    setPower: function (s) {
+        this.power = s;
         return this;
     }
 };
 
 var attributes =
 /** Attribute constructors.
- *  Attributes are added to entities via {@link Entity#attribute Entity.attribute}
+ *  Attributes are added to entities via {@link Entity#attribute Entity.addAttribute}
  *  @namespace attributes
  */
 {
@@ -1531,15 +1474,10 @@ var setEntityAttribute = function(entity, property, value) {
             setEntityAttribute(elt, property, value);
         });
     }
-    if (!(entity instanceof Entity)) {
-        // Rehydrate entity. This moves fields to the __data__ field, and attaches
-        // entity methods.
-        var ent = entities.raw(entity);
-        ent.attribute(property, value);
-        return ent.toJSON();
-    } else {
-        return entity.attribute(property, value);
-    }
+    if (!(entity instanceof Entity))
+        entity = entities.raw(entity);
+
+    return entity.addAttribute(property, value);
 };
 
 /** Gets entity attribute on either raw object or instance of entity.
@@ -1555,15 +1493,8 @@ var getEntityAttribute = function(entity, property) {
             getEntityAttribute(elt, property);
         });
     }
-    if (!(entity instanceof Entity)) {
-        // Rehydrate entity. This moves fields to the __data__ field, and attaches
-        // entity methods.
-        return entity.attributes[property];
-    } else {
-        return entity.__data__.attributes[property];
-    }
+    return (entity.attributes || {})[property];
 };
-
 
 //******************************************************************************
 // Utilities
@@ -1597,7 +1528,7 @@ var entities =
      */
     raw: function(body) {
         var e = new Entity(body.primitive);
-        e.__data__ = body;
+        initObject(e, body);
         return e;
     },
 
@@ -1647,11 +1578,11 @@ var entities =
      */
     line: function (start, end, name) {
         return primitive('line', {
-            start: coords(start),
-            end: coords(end),
-            startId: getId(start) || genId(),
-            endId: getId(end) || genId(),
-            id: name || genId()
+            start:   coords(start),
+            end:     coords(end),
+            startId: start.id || genId(),
+            endId:   end.id || genId(),
+            id:      name || genId()
         }, Wire);
     },
     /** Constructs polyline entity
@@ -1676,13 +1607,13 @@ var entities =
      */
     arc: function (start, middle, end, name) {
         return primitive('arc', {
-            start: coords(start),
-            middle: coords(middle),
-            end: coords(end),
-            startId: getId(start) || genId(),
-            endId: getId(end) || genId(),
+            start:    coords(start),
+            middle:   coords(middle),
+            end:      coords(end),
+            startId:  start.id || genId(),
+            endId:    end.id || genId(),
             originId: genId(),
-            id: name || genId()
+            id:       name || genId()
         }, Wire);
     },
     /** Constructs NURBS curve entity
@@ -1711,10 +1642,10 @@ var entities =
      */
     circle: function (center, r, name) {
         return primitive('circle', {
-            origin: coords(center),
-            originId: getId(center) || genId(),
-            radius: r,
-            id: name || genId()
+            origin:   coords(center),
+            originId: center.id || genId(),
+            radius:   r,
+            id:       name || genId()
         },
         Wire);
     },
@@ -1730,12 +1661,12 @@ var entities =
      */
     ellipse: function (center, rMajor, rMinor, dir, name) {
         return primitive('ellipse', {
-            origin: coords(center),
-            originId: getId(center) || genId(),
+            origin:      coords(center),
+            originId:    center.id || genId(),
             majorRadius: rMajor,
             minorRadius: rMinor,
-            direction: (dir ? vecCoords(dir) : undefined),
-            id: name || genId()
+            direction:   (dir ? vecCoords(dir) : undefined),
+            id:          name || genId()
         },
         Wire);
     },
@@ -1923,28 +1854,28 @@ var entities =
 //******************************************************************************
 // Helper functions to create json constraints
 function constr1(e) {
-    return { entity1: getId(e) };
+    return { entity1: e.id };
 }
 function valueConstr1(val, e) {
-    return { value: val, entity1: getId(e) };
+    return { value: val, entity1: e.id };
 }
 function constr2(e1, e2) {
-    return { entity1: getId(e1), entity2: getId(e2) };
+    return { entity1: e1.id, entity2: e2.id };
 }
 function valueConstr2(val, e1, e2) {
-    return { value: val, entity1: getId(e1), entity2: getId(e2) };
+    return { value: val, entity1: e1.id, entity2: e2.id };
 }
 function helpConstr2(e1, e2, h1, h2) {
-    return { entity1: getId(e1), entity2: getId(e2), help1: h1, help2: h2 };
+    return { entity1: e1.id, entity2: e2.id, help1: h1, help2: h2 };
 }
 function helpParamsConstr2(e1, e2, p1, p2) {
-    return { entity1: getId(e1), entity2: getId(e2), helpParam1: p1, helpParam2: p2 };
+    return { entity1: e1.id, entity2: e2.id, helpParam1: p1, helpParam2: p2 };
 }
 function valueHelpConstr2(val, e1, e2, h1, h2) {
-    return { value: val, entity1: getId(e1), entity2: getId(e2), help1: h1, help2: h2 };
+    return { value: val, entity1: e1.id, entity2: e2.id, help1: h1, help2: h2 };
 }
 function constr3(e1, e2, e3) {
-    return { entity1: getId(e1), entity2: getId(e2), entity3: getId(e3) };
+    return { entity1: e1.id, entity2: e2.id, entity3: e3.id };
 }
 function help(param) {
     if (arguments.length !== 1)
@@ -1975,7 +1906,7 @@ var constraints =
      */
     raw: function(body) {
         var c = new Constraint(body.type);
-        c.__data__ = body;
+        initObject(c, body);
         return c;
     },
     /** Constructs parallel constraint

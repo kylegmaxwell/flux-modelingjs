@@ -20,23 +20,21 @@ describe("DCMScene/updateEntity/Ellipse", function() {
         expect(Object.keys(ents).length).toEqual(2);
 
         // Get old entities
-        var oldOriginId = origin.toJSON().id;
+        var oldOriginId = origin.id;
         var oldOrigin = ents[oldOriginId];
         expect(oldOrigin).toBeDefined();
 
-        var oldEllipseId = ellipse.toJSON().id;
-        var oldEllipseOriginId = ellipse.toJSON().originId;
+        var oldEllipseId = ellipse.id;
+        var oldEllipseOriginId = ellipse.originId;
         var oldEllipse = ents[oldEllipseId];
         expect(oldEllipse).toBeDefined();
 
         // Get updated entities
         var newOrigin = scene.updateEntity(origin);
         expect(newOrigin).toBeDefined();
-        newOrigin = newOrigin.toJSON();
 
         var newEllipse = scene.updateEntity(ellipse);
         expect(newEllipse).toBeDefined();
-        newEllipse = newEllipse.toJSON();
 
         // Compare origin points
         expect(newOrigin.id).not.toEqual(oldOriginId);

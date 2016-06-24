@@ -18,14 +18,14 @@ describe("DCMScene/addEntity/Circle", function() {
         expect(Object.keys(ents).length).toEqual(2);
 
         // Check origin point
-        var originId = origin.__data__.id;
+        var originId = origin.id;
         expect(ents[originId]).toBeDefined();
-        expect(ents[originId]).toEqual(origin.toJSON());
+        expect(ents[originId]).toEqual(origin);
 
         // Check circle itself
-        var circleId = circle.__data__.id;
+        var circleId = circle.id;
         expect(ents[circleId]).toBeDefined();
-        expect(ents[circleId]).toEqual(circle.toJSON());
+        expect(ents[circleId]).toEqual(circle);
     });
 
     it ("If circle origin point already in scene, add only circle", function() {
@@ -40,9 +40,9 @@ describe("DCMScene/addEntity/Circle", function() {
         expect(Object.keys(ents).length).toEqual(1);
 
         // Check origin point
-        var originId = origin.__data__.id;
+        var originId = origin.id;
         expect(ents[originId]).toBeDefined();
-        expect(ents[originId]).toEqual(origin.toJSON());
+        expect(ents[originId]).toEqual(origin);
 
         // Add circle and check we have only 2 entities in scene
         scene.add(circle);
@@ -51,13 +51,13 @@ describe("DCMScene/addEntity/Circle", function() {
         expect(Object.keys(ents).length).toEqual(2);
 
         // Check origin point
-        var originId = origin.__data__.id;
+        var originId = origin.id;
         expect(ents[originId]).toBeDefined();
-        expect(ents[originId]).toEqual(origin.toJSON());
+        expect(ents[originId]).toEqual(origin);
 
         // Check circle itself
-        var circleId = circle.__data__.id;
+        var circleId = circle.id;
         expect(ents[circleId]).toBeDefined();
-        expect(ents[circleId]).toEqual(circle.toJSON());
+        expect(ents[circleId]).toEqual(circle);
     });
 });
