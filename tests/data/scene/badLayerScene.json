@@ -1,0 +1,18 @@
+{
+    "primitive": "scene",
+    "version":"0.0.1",
+    "elements":[
+        {
+            "id":"ball",
+            "origin":[0,0,10],
+            "radius":10,
+            "primitive":"sphere"
+        },
+        {
+            "id": "plants",
+            "primitive": "layer",
+            "color": "green",
+            "elements": ["ball",2]
+        }
+    ]
+}

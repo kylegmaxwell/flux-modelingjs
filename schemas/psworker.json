@@ -1,142 +1,60 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "block-request": {
-        "type": "object",
-        "properties": {
-            "Label":  { "type": "string" },
-            "Inputs": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/block-request/input"
-                }
-            }
-        },
-        "required": [ "Inputs" ],
-
-        "input": {
-            "anyOf": [
-                {
-                    "type": "object",
-                    "properties": {
-                        "Name":  { "enum": [ "Query" ] },
-                        "Value": { "$ref": "#/scene" }
-                    },
-                    "required": [ "Name", "Value"]
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "Name":  { "type": "string" },
-                        "Value": { }
-                    },
-                    "required": [ "Name", "Value"]
-                }
-            ]
-        }
-    },
-    "block-response": {
-        "type": "object",
-        "properties": {
-            "Done": { "type": "boolean"},
-            "Stats": {
-                "type": "object",
-                "properties": {
-                    "DecodingTime": { "type": "number" },
-                    "CpuTime":      { "type": "number" },
-                    "EncodingTime": { "type": "number" },
-                    "Latency":      { "type": "number" }
-                },
-                "additionalProperties": false
-            },
-            "Log": { "type": "string" },
-            "Outputs": {
-                "type": "object",
-                "properties": {
-                    "Results": { "$ref": "#/scene/entities" }
-                },
-                "additionalProperties": false
-            },
-            "Error": { "type": "string" }
-        },
-        "required": [ "Done", "Stats" ],
-        "additionalProperties": false
-    },
     "scene": {
         "type": "object",
         "properties": {
-            "Entities":     { "$ref": "#/scene/entities"   },
-            "Operations":   { "$ref": "#/scene/operations" }
+            "primitive":    {"enum" : ["scene"]},
+            "version":      {"type": "string"},
+            "elements":     { "$ref": "#/scene/elements"   }
         },
-        "required": [ "Entities", "Operations" ],
+        "required": [ "elements", "version", "primitive" ],
         "additionalProperties": false,
-
-        "operations": {
-            "type":  "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": { "type": "string" },
-                    "op":   { "$ref": "#/scene/operation" }
-                },
-                "additionalProperties": false
-            }
-        },
-        "operation": {
-            "oneOf": [
-                {   "type": "boolean" },
-                {   "type": "number" },
-                {   "type": "string" },
-                {   "type": "array",
-                    "items":            [ { "type": "string"} ],
-                    "minItems":         1,
-                    "additionalItems":  { "$ref": "#/scene/operation" }
-                }
-            ]
-        },
-        "entities": {
-            "type": "object",
-            "minProperties": 1,
-            "items": { "$ref": "#/scene/entity" }
+        "elements": {
+            "type": "array",
+            "items": { "$ref": "#/scene/element" },
+            "additionalItems":  false
         },
         "entity": {
-            "oneOf": [
-                {   "type": "array",
-                    "items": { "$ref": "#/scene/entity" }
-                },
-                {
-                    "oneOf": [
-                        { "$ref": "#/entities/empty"  },
-                        { "$ref": "#/entities/number" },
-                        { "$ref": "#/entities/brep"   },
+            "anyOf": [
+                { "$ref": "#/entities/empty"  },
+                { "$ref": "#/entities/number" },
+                { "$ref": "#/entities/brep"   },
+                { "$ref": "#/entities/vector" },
+                { "$ref": "#/entities/point" },
+                { "$ref": "#/entities/plane" },
 
-                        { "$ref": "#/entities/vector" },
-                        { "$ref": "#/entities/point" },
+                { "$ref": "#/entities/affineTransform" },
+                { "$ref": "#/entities/massProps" },
 
-                        { "$ref": "#/entities/plane" },
-                        { "$ref": "#/entities/affineTransform" },
-                        { "$ref": "#/entities/massProps" },
+                { "$ref": "#/entities/line" },
+                { "$ref": "#/entities/polyline" },
+                { "$ref": "#/entities/circle" },
+                { "$ref": "#/entities/ellipse" },
+                { "$ref": "#/entities/curve" },
+                { "$ref": "#/entities/arc" },
+                { "$ref": "#/entities/rectangle" },
+                { "$ref": "#/entities/polycurve" },
 
-                        { "$ref": "#/entities/line" },
-                        { "$ref": "#/entities/polyline" },
-                        { "$ref": "#/entities/circle" },
-                        { "$ref": "#/entities/ellipse" },
-                        { "$ref": "#/entities/curve" },
-                        { "$ref": "#/entities/arc" },
-                        { "$ref": "#/entities/rectangle" },
-                        { "$ref": "#/entities/polycurve" },
+                { "$ref": "#/entities/polygonSet" },
+                { "$ref": "#/entities/surface" },
+                { "$ref": "#/entities/polysurface" },
 
-                        { "$ref": "#/entities/polygonSet" },
-                        { "$ref": "#/entities/surface" },
-                        { "$ref": "#/entities/polysurface" },
+                { "$ref": "#/entities/block" },
+                { "$ref": "#/entities/torus" },
+                { "$ref": "#/entities/sphere" },
+                { "$ref": "#/entities/cylinder" },
+                { "$ref": "#/entities/cone" },
+                { "$ref": "#/entities/mesh" }
+            ]
+        },
+        "element": {
+            "anyOf": [
+                { "$ref": "#/scene/entity"  },
 
-                        { "$ref": "#/entities/block" },
-                        { "$ref": "#/entities/torus" },
-                        { "$ref": "#/entities/sphere" },
-                        { "$ref": "#/entities/cylinder" },
-                        { "$ref": "#/entities/cone" },
-                        { "$ref": "#/entities/mesh" }
-                    ]
-                }
+                { "$ref": "#/assembly" },
+                { "$ref": "#/instance" },
+                { "$ref": "#/alphaGeometryContainer" },
+                { "$ref": "#/layer" }
             ]
         }
     },
@@ -147,7 +65,7 @@
             "type":    "integer",
             "minimum": 0
         },
-        "index-nonzero": {
+        "indexNonzero": {
             "type":    "integer",
             "minimum": 0,
             "exclusiveMinimum": true
@@ -158,7 +76,9 @@
             "minItems": 3,
             "maxItems": 3
         },
-
+        "fluxid": {
+            "type": "string"
+        },
         "angle": {
             "type": "number",
             "fluxDimension": "angle"
@@ -182,7 +102,7 @@
             "minimum": 0,
             "fluxDimension": "volume"
         },
-        "distance-nonzero": {
+        "distanceNonzero": {
             "type":     "number",
             "minimum":  0,
             "exclusiveMinimum": true,
@@ -196,7 +116,7 @@
         },
         "dimensions": {
             "type": "array",
-            "items": { "$ref": "#/types/distance-nonzero" },
+            "items": { "$ref": "#/types/distanceNonzero" },
             "minItems": 3,
             "maxItems": 3
         },
@@ -206,6 +126,29 @@
             "patternProperties": {
                 ".*" : {"type": "string" }
             }
+        },
+        "boundingBox":{
+            "type": "array",
+            "items":{ "$ref": "#/types/position" },
+            "minItems": 2,
+            "maxItems": 2
+        },
+        "matrix":{
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 16,
+            "maxItems": 16
+        },
+        "color":{
+            "anyOf": [
+                {
+                    "type": "array",
+                    "items": {"$ref": "#/types/indexNonzero"},
+                    "minItems": 3,
+                    "maxItems": 3
+                },
+                {"type": "string" }
+            ]
         }
     },
     "entities": {
@@ -358,7 +301,7 @@
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
-                "radius":       { "$ref": "#/types/distance-nonzero" },
+                "radius":       { "$ref": "#/types/distanceNonzero" },
                 "axis":         { "$ref": "#/types/direction" }
             },
             "required": [ "primitive", "origin", "radius" ]
@@ -372,8 +315,8 @@
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
-                "majorRadius":  { "$ref": "#/types/distance-nonzero" },
-                "minorRadius":  { "$ref": "#/types/distance-nonzero" },
+                "majorRadius":  { "$ref": "#/types/distanceNonzero" },
+                "minorRadius":  { "$ref": "#/types/distanceNonzero" },
                 "axis":         { "$ref": "#/types/direction" },
                 "reference":    { "$ref": "#/types/direction" }
             },
@@ -387,7 +330,7 @@
                 "attributes":   {},
                 "units":        { "$ref": "#/types/units" },
 
-                "degree":       { "$ref": "#/types/index-nonzero" },
+                "degree":       { "$ref": "#/types/indexNonzero" },
                 "controlPoints":{ "type": "array", "items": { "$ref": "#/types/position" }},
                 "knots":        { "type": "array", "items": { "type": "number" }},
                 "weights":      { "type": "array", "items": { "type": "number" }}
@@ -419,7 +362,7 @@
                 "origin":       { "$ref": "#/types/position" },
                 "dimensions":   {
                     "type": "array",
-                    "items": { "$ref": "#/types/distance-nonzero" },
+                    "items": { "$ref": "#/types/distanceNonzero" },
                     "minItems": 2,
                     "maxItems": 2,
                     "additionalItems": false
@@ -490,8 +433,8 @@
                 "attributes":   {},
                 "units":        { "$ref": "#/types/units" },
 
-                "uDegree":      { "$ref": "#/types/index-nonzero" },
-                "vDegree":      { "$ref": "#/types/index-nonzero" },
+                "uDegree":      { "$ref": "#/types/indexNonzero" },
+                "vDegree":      { "$ref": "#/types/indexNonzero" },
                 "uKnots":       { "type": "array", "items": { "type": "number" }},
                 "vKnots":       { "type": "array", "items": { "type": "number" }},
                 "controlPoints":{
@@ -551,7 +494,7 @@
 
                 "origin":       { "$ref": "#/types/position" },
                 "majorRadius":  { "$ref": "#/types/coordinate" },
-                "minorRadius":  { "$ref": "#/types/distance-nonzero" },
+                "minorRadius":  { "$ref": "#/types/distanceNonzero" },
                 "axis":         { "$ref": "#/types/direction" }
             },
             "required": [ "primitive", "origin", "majorRadius", "minorRadius" ]
@@ -565,7 +508,7 @@
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
-                "radius":       { "$ref": "#/types/distance-nonzero" }
+                "radius":       { "$ref": "#/types/distanceNonzero" }
             },
             "required": [ "primitive", "origin", "radius" ]
         },
@@ -578,8 +521,8 @@
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
-                "radius":       { "$ref": "#/types/distance-nonzero" },
-                "height":       { "$ref": "#/types/distance-nonzero" },
+                "radius":       { "$ref": "#/types/distanceNonzero" },
+                "height":       { "$ref": "#/types/distanceNonzero" },
                 "axis":         { "$ref": "#/types/direction" }
             },
             "required": [ "primitive", "origin", "radius", "height" ]
@@ -593,8 +536,8 @@
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
-                "radius":       { "$ref": "#/types/distance-nonzero" },
-                "height":       { "$ref": "#/types/distance-nonzero" },
+                "radius":       { "$ref": "#/types/distanceNonzero" },
+                "height":       { "$ref": "#/types/distanceNonzero" },
                 "semiAngle":    { "$ref": "#/types/angle" },
                 "axis":         { "$ref": "#/types/direction" }
             },
@@ -623,5 +566,66 @@
             },
             "required": [ "primitive", "vertices", "faces" ]
         }
+    },
+    "instance": {
+            "type": "object",
+            "properties": {
+                "primitive":    { "enum": [ "instance" ] },
+                "id":           { "$ref": "#/types/fluxid" },
+                "matrix":       { "$ref": "#/types/matrix" },
+                "bbox":         { "$ref": "#/types/boundingBox" },
+                "label":        { "type": "string" },
+                "entity":       { "$ref": "#/types/fluxid" }
+            },
+                "required": [ "primitive", "id", "entity" ],
+                "additionalProperties": false
+        },
+    "alphaGeometryContainer": {
+            "type": "object",
+            "properties": {
+                "primitive":    { "enum": [ "alphaGeometryContainer" ] },
+                "id":           { "$ref": "#/types/fluxid" },
+                "entity": {
+                    "anyOf": [
+                        { "type": "array"  },
+                        { "type": "object" }
+                    ]
+                },
+                "required": [ "primitive", "id", "entity" ],
+                "additionalProperties": false
+            }
+        },
+    "assembly": {
+        "type": "object",
+        "properties": {
+            "attributes":   {},
+            "primitive":    { "enum":[ "assembly" ] },
+            "id":           { "$ref": "#/types/fluxid" },
+            "matrix":       { "$ref": "#/types/matrix" },
+            "bbox":         { "$ref": "#/types/boundingBox" },
+            "label":        { "type": "string" },
+            "children":     {
+                "type":     "array",
+                "items":    { "$ref": "#/types/fluxid" }
+            }
+        },
+        "required": [ "primitive", "id", "children" ],
+        "additionalProperties": true
+    },
+    "layer": {
+        "type": "object",
+        "properties": {
+            "primitive":    { "enum":[ "layer" ] },
+            "id":           { "$ref": "#/types/fluxid" },
+            "label":            { "type": "string" },
+            "color":            { "$ref": "#/types/color" },
+            "visible":      { "type": "boolean" },
+            "elements": {
+                "type":     "array",
+                "items":    { "$ref": "#/types/fluxid" }
+            }
+        },
+        "required": [ "primitive", "id", "elements" ],
+        "additionalProperties": false
     }
 }

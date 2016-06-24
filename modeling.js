@@ -13,24 +13,34 @@ function constructModule(config) {
 /***************************************************************************************************
  *  Configuration part
  */
-
 var flux = require('./index');
 config = config || {};
-if (typeof config !== 'object')
+if (typeof config !== 'object') {
     throw new FluxModelingError("config: expected object");
+}
 
-var schema = 'schema' in config ? config['schema'] : flux.schemas.pbw;
-// If a user of modelingjs is explicitly passing a falsey value for genId,
-// then default to a function that returns undefined, to avoid errors attempting
-// to call a null value downstream.
-var genId =  config['genId'] ||  function () { return undefined; };
+function defaulted(name, defvalue) {
+    return (name in config) ? config[name] : defvalue();
+}
 
-var convertUnits = (function () {
-    var registry = 'registry' in config ? config['registry'] : new flux.measure.Registry();
-    return registry
-        ? registry.ConvertUnits.bind(registry)
-        : function (obj, dimUnits) { return obj; };
-})();
+// Skip require for environments that don't support it (rollup)
+if (!config.skip) {
+    var flux = require('./index');
+
+    // Functions are used for defaults - because of modules' lazy load process
+    var schema = 'schema' in config ? config['schema'] : flux.schemas.pbw;
+    // If a user of modelingjs is explicitly passing a falsey value for genId,
+    // then default to a function that returns undefined, to avoid errors attempting
+    // to call a null value downstream.
+    var genId =  config['genId'] ||  function () { return undefined; };
+
+    var convertUnits = (function () {
+        var registry = 'registry' in config ? config['registry'] : new flux.measure.Registry();
+        return registry
+            ? registry.ConvertUnits.bind(registry)
+            : function (obj, dimUnits) { return obj; };
+    })();
+}
 
 var eps = 1e-8;
 
@@ -95,46 +105,46 @@ function inherit(clazz, base, proto) {
 //******************************************************************************
 // Resolver becoming kind of scope stuff
 
-var sceneResolver = function () { return undefined; };
+var queryResolver = function () { return undefined; };
 
 function resolve(item) {
-    return sceneResolver(item);
+    return queryResolver(item);
 }
 
 function withResolver(resolver, lambda) {
-    var prev = sceneResolver;
-    sceneResolver = resolver;
+    var prev = queryResolver;
+    queryResolver = resolver;
     try {
         return lambda();
     }
     finally {
-        sceneResolver = prev;
+        queryResolver = prev;
     }
 }
 
 //******************************************************************************
 // Type declarations
 //******************************************************************************
-/** Use factory function {@link scene}
+/** Use factory function {@link query}
  *  @class
- *  @classdesc Represents block query as scene, with geometrical entities and operations over there
+ *  @classdesc Represents block query as query, with geometrical entities and operations over there
  */
-function Scene() {
+function Query() {
     this.__entities__   = {};
     this.__operations__ = [];
     this.__counter__    = 1;
 }
-/** Creates new scene object
+/** Creates new query object
  *
- *  @return {Scene} new empty scene object
+ *  @return {Query} new empty query object
  */
-var scene = function () { return new Scene(); };
-/** Converts Scene object to JSON representation
+var query = function () { return new Query(); };
+/** Converts Query object to JSON representation
  *  Adds custom-conversion support for {@link JSON.stringify}
  *
  *  @return {*} JSON-ready object
  */
-Scene.prototype.toJSON  = function () {
+Query.prototype.toJSON  = function () {
     var ops = dumpOperations(this);
     return {
         Entities:   dumpEntities(this),
@@ -218,13 +228,13 @@ OpSlot.prototype.toJSON = function () {
     };
 };
 
-/** Adds entity/operation to scene
+/** Adds entity/operation to query
  *
  *  @param  {string}             name - name of item being added
  *  @param  {Entity|Operation}   obj  - either entity or operation being added
  *  @return {this}                      this, for chaining
  */
-Scene.prototype.add = function(name, obj) {
+Query.prototype.add = function(name, obj) {
     if (!isInst(name, String))
         throw new FluxModelingError('name: string expected');
     if (isInst(obj, Entity)) {
@@ -2444,7 +2454,7 @@ FluxModelingError.prototype = Object.create(Error.prototype);
 FluxModelingError.prototype.constructor = FluxModelingError;
 
 return {
-    scene:      scene,
+    query:      query,
     dcmScene:   dcmScene,
     attributes: attributes,
     utilities:  utilities,
