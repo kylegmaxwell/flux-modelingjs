@@ -552,19 +552,14 @@ function extractLevelName(elementOrLevel) {
 * @returns {Out: object} Value of parameer if found.
 */
 function selectParameter(element, parameter) {
-    var check = checkElement(element);
-    if (!check.valid) {
-        return {Found: false, Error: check.msg};
-    }
-
     // Then check in familyInfo.
-    value = get(element, "familyInfo/" + parameter);
+    var value = get(element, "familyInfo/" + parameter);
     if (value.Found) {
         return value;
     }
 
     // First check Geometry Parameters
-    var value = get(element, "geometryParameters/" + parameter);
+    value = get(element, "geometryParameters/" + parameter);
     if (value.Found) {
         return value;
     }

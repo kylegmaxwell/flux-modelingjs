@@ -605,8 +605,8 @@ describe("revit-core test", function () {
             expect(revit.selectParameter(el, "familyInfo/category")).toEqual({Out:"foo", Found:true});
         });
 
-        it("should fail with bad input", function() {
-            expect(revit.selectParameter({}, "c1").Error).toBeDefined();
+        it("should not give error with bad input", function() {
+            expect(revit.selectParameter({}, "c1")).toEqual({Out: undefined, Found:false});
         });
     });
 
