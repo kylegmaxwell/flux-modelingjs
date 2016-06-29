@@ -24,6 +24,10 @@ function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeP
         return {Error: "Element could not be created: " + check.msg};
     }
 
+    if (!isInvalid(fluxId)) {
+        fluxId = String(fluxId);
+    }
+
     check = checkFamilyInfo(familyInfo);
     if (!check.valid) {
         return {Error: "Element could not be created: " + check.msg};
@@ -44,6 +48,7 @@ function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeP
     if (!check.valid) {
         customParamMap = {};
     }
+
     return {
         Out: {
             primitive: "revitElement",
@@ -767,7 +772,7 @@ function checkFluxId(fluxId) {
         return {valid: true};
     }
 
-    if (typeof fluxId !== 'string') {
+    if (typeof fluxId !== "string" && typeof fluxId != "number") {
         return {valid: false, msg:"FluxId is not valid."};
     }
 

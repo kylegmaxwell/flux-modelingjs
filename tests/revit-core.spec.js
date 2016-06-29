@@ -38,6 +38,14 @@ describe("revit-core test", function () {
                 customParameters: {}}});
         });
 
+        it("should work if fluxId is a number.", function () {
+            var el = revit.createElement(12345, info, {}, {}, {}, {});
+            expect(el).toEqual({Out: {primitive: "revitElement", fluxId: String(12345),
+                familyInfo: info, geometryParameters: {},
+                instanceParameters: {}, typeParameters: {},
+                customParameters: {}}});
+        });
+
         it("should work if fluxId is not provided", function() {
             var el = revit.createElement(undefined, info, {}, {}, {}, {});
             expect(el).toEqual({Out: {primitive: "revitElement", fluxId: null,
