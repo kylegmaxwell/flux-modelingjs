@@ -7,8 +7,10 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "npm run build-test && npm run tests",
-    "tests": "PATH=$(npm bin):$PATH jasmine-node --verbose --captureExceptions ./tests/",
+    "test": "npm run all-tests",
+    "all-tests": "npm run integration-tests && npm run unit-tests",
+    "integration-tests": "npm run build-test && PATH=$(npm bin):$PATH jasmine-node --verbose --captureExceptions ./testsIntegration/",
+    "unit-tests": "PATH=$(npm bin):$PATH jasmine-node --verbose --captureExceptions ./tests/",
     "build-test": "rollup -c rollup-test.config.js -f=cjs -o=./build/rollup-test.common.js;"
   },
   "repository": {

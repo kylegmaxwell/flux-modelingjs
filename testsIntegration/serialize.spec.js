@@ -5,7 +5,9 @@
 describe("Serialize and rollup test", function() {
     'use strict';
 
-    var modeling = require("../index").modeling();
+    var modules = require('../build/rollup-test.common.js');
+    var modeling = modules.getModeling();
+    var schemaJson = modules.getSchema();
 
     it ("Scene should serialize to json", function() {
         var scene = modeling.query();
@@ -15,5 +17,9 @@ describe("Serialize and rollup test", function() {
         var sceneStr = JSON.stringify({'Scene':scene});
         var expectedStr = '{"Scene":{"Entities":{"resultId":{"origin":[0,0,0],"primitive":"sphere","radius":10}},"Operations":[{"name":"resultId","op":["tessellateStl","resultId",1]}]}}';
         expect(sceneStr).toEqual(expectedStr);
+    });
+
+    it ("Rollup should process JSON", function() {
+        expect(JSON.stringify(schemaJson).indexOf('sphere')).not.toEqual(-1);
     });
 });
