@@ -20,7 +20,7 @@ function SceneValidator() {
  */
 function _findObjectByField(field, value, json) {
     for(var key in json.elements) {
-        if(json.elements[key][field] === value) {
+        if (json.elements[key][field] === value) {
             return json.elements[key];
         }
     }
@@ -35,11 +35,11 @@ function _findObjectByField(field, value, json) {
  * @return {String}                             Error message or null
  */
 function _validateNode(node, parentID, bannedPrimitives){
-    if(node.id === parentID) {
+    if (node.id === parentID) {
         return 'Node ' + node.id +' has ID equal to parent ID';
     }
     var searchRes = bannedPrimitives.indexOf(node.primitive);
-    if(searchRes !== -1) {
+    if (searchRes !== -1) {
         return 'Node ' + node.id +
         ' has a primitive type ('+bannedPrimitives[searchRes]+') that is not allowed with its current parent.'
     }
@@ -53,17 +53,16 @@ function _validateNode(node, parentID, bannedPrimitives){
  * @return {SceneValidatorResults}  The results
  */
 function _validateInstance(instance, json){
-    var entity = _findObjectByField('id', instance.entity, json);
-    if(!entity) {
-        return _invalidId(instance.entity);
+    var node = _findObjectByField('id', instance.entity, json);
+    if (!node) return _invalidId(instance.node);
+    if (!node.primitive) return _primitiveError();
+
+    var result = _validateNode(node, instance.id, ['instance', 'assembly', 'layer']);
+    if (result) {
+        return _error(result);
     }
 
-    var result = _validateNode(entity, instance.id, ['instance', 'assembly', 'layer']);
-    if(result) {
-        return new SceneValidatorResults(false, result);
-    }
-
-    return new SceneValidatorResults(true);
+    return _ok();
 }
 
 /**
@@ -74,25 +73,24 @@ function _validateInstance(instance, json){
  */
 SceneValidator.prototype._validateAssembly = function(assembly, json){
     if (!assembly.children || assembly.children.constructor !== Array) {
-        return new SceneValidatorResults(false, 'Assembly must have array of children');
+        return _error('Assembly must have array of children');
     }
 
     for(var i = 0; i < assembly.children.length; ++i){
         var nodeID = assembly.children[i];
         var node = _findObjectByField('id', nodeID, json);
-        if(!node) {
-            return _invalidId(nodeID);
-        }
+        if (!node) return _invalidId(nodeID);
+        if (!node.primitive) return _primitiveError();
 
         var result = _validateNode(node, assembly.id, ['layer']);
-        if(result) {
-            return new SceneValidatorResults(false, result);
+        if (result) {
+            return _error(result);
         }
 
         // check instances are referenced by only a single assembly
-        if(node.primitive === 'instance') {
-            if(this.usedInstanceIDs.indexOf(node.id) != -1) {
-                return new SceneValidatorResults(false, 'Instance with id = ' + node.id + ' is referenced more than once');
+        if (node.primitive === 'instance') {
+            if (this.usedInstanceIDs.indexOf(node.id) != -1) {
+                return _error('Instance with id = ' + node.id + ' is referenced more than once');
             } else {
                 this.usedInstanceIDs.push(node.id);
             }
@@ -100,11 +98,11 @@ SceneValidator.prototype._validateAssembly = function(assembly, json){
         else if (node.primitive != 'assembly') {
             var message = 'Assembly can only contain instances or assemblies: '
                 + node.id + ' has primitive ' +node.primitive;
-            return new SceneValidatorResults(false, message);
+            return _error(message);
         }
     }
 
-    return new SceneValidatorResults(true);
+    return _ok();
 };
 
 /**
@@ -113,7 +111,32 @@ SceneValidator.prototype._validateAssembly = function(assembly, json){
  * @return {SceneValidatorResults}    The results
  */
 function _invalidId(id) {
-    return new SceneValidatorResults(false, 'No element found with ID=' + id);
+    return _error('No element found with ID=' + id);
+}
+
+/**
+ * Create an error message object
+ * @param  {String} message         Description of the message
+ * @return {SceneValidatorResults}  The results object
+ */
+function _error(message) {
+    return new SceneValidatorResults(false, message);
+}
+
+/**
+ * Create a results object that represents successful validation
+ * @return {SceneValidatorResults}  The results object
+ */
+function _ok() {
+    return new SceneValidatorResults(true);
+}
+
+/**
+ * Error message for objects missing the primitive attribute
+ * @return {SceneValidatorResults}  The results object
+ */
+function _primitiveError() {
+    return _error('Element referenced by ID has no primitive attribute');
 }
 
 /**
@@ -126,16 +149,15 @@ function _validateLayer(layer, json){
     for(var i = 0; i < layer.elements.length; ++i){
         var nodeKey = layer.elements[i];
         var node = _findObjectByField('id', nodeKey, json);
-        if(!node) return _invalidId(nodeKey);
-
+        if (!node) return _invalidId(nodeKey);
+        if (!node.primitive) return _primitiveError();
         // Layers can contain any entity except scenes and layers
         var result = _validateNode(node, layer.id, ['scene', 'layer']);
-        if(result) {
-            return new SceneValidatorResults(false, result);
+        if (result) {
+            return _error(result);
         }
     }
-
-    return new SceneValidatorResults(true);
+    return _ok();
 }
 
 /**
@@ -144,7 +166,8 @@ function _validateLayer(layer, json){
  * @return {Boolean}      True if it is a scene
  */
 SceneValidator.isScene = function (json) {
-    return json && json.elements && json.primitive && json.primitive === 'scene';
+    return json && json.primitive && json.primitive === 'scene' &&
+            json.elements && json.elements.constructor === Array;
 }
 
 /**
@@ -157,43 +180,48 @@ SceneValidator.prototype.validateJSON = function (json)
     var allIDs = [];
 
     if (!SceneValidator.isScene(json)) {
-        return new SceneValidatorResults(false, 'The element is not a scene');
+        return _error('The element is not a scene');
     }
-    for (var key in json.elements){
-        var obj = json.elements[key];
+    var layerCount = 0;
+    for (var i=0;i<json.elements.length;i++){
+        var obj = json.elements[i];
 
         // check for unique id
-        if(allIDs.indexOf(obj.id) != -1) {
-            return new SceneValidatorResults(false, 'The id ' + obj.id + ' is not unique');
+        if (allIDs.indexOf(obj.id) != -1) {
+            return _error('The id ' + obj.id + ' is not unique');
         } else {
             allIDs.push(obj.id);
         }
 
         // check instance reference only valid entity
-        if(obj.primitive === 'instance'){
+        if (obj.primitive === 'instance'){
             var res = _validateInstance(obj, json);
-            if(!res.result) {
+            if (!res.getResult()) {
                 return res;
             }
         }
 
         // check assemblies reference only instances or other assemblies
-        else if(obj.primitive === 'assembly'){
+        else if (obj.primitive === 'assembly'){
             var res = this._validateAssembly(obj, json);
-            if(!res.result) {
+            if (!res.getResult()) {
                 return res;
             }
         }
 
         // check layer reference only assemblies and instances
-        else if(obj.primitive === 'layer'){
+        else if (obj.primitive === 'layer'){
             var res = _validateLayer(obj, json);
-            if(!res.result) {
+            if (!res.getResult()) {
                 return res;
             }
+            layerCount++;
         }
     }
-    return new SceneValidatorResults(true);
+    if (layerCount < 1) {
+        return _error('Scene has no layers');
+    }
+    return _ok();
 }
 
 module.exports = SceneValidator;
