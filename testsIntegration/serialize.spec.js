@@ -14,9 +14,21 @@ describe("Serialize and rollup test", function() {
         scene.add("resultId", {"origin":[0,0,0],"primitive":"sphere","radius":10});
         var tessOp = modeling.operations.tesselateStl("resultId",1);
         scene.add("resultId", tessOp);
-        var sceneStr = JSON.stringify({'Scene':scene});
-        var expectedStr = '{"Scene":{"Entities":{"resultId":{"origin":[0,0,0],"primitive":"sphere","radius":10}},"Operations":[{"name":"resultId","op":["tessellateStl","resultId",1]}]}}';
-        expect(sceneStr).toEqual(expectedStr);
+        expect(scene.toJSON())
+        .toEqual({
+            "Entities": {
+                "resultId": {
+                    "origin": [0, 0, 0],
+                    "primitive": "sphere",
+                    "radius":10
+                }
+            },
+            "Operations": [
+                {   "name": "resultId",
+                    "op": [ "tessellateStl", "resultId", 1 ]
+                }
+            ]
+        });
     });
 
     it ("Rollup should process JSON", function() {
