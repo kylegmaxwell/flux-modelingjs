@@ -42,6 +42,27 @@ describe("Schema test", function() {
         expect(isValid).toEqual(true);
     });
 
+    it ("Should allow attributes on instances", function() {
+        var scene = {
+            "primitive": "scene",
+            "version":"0.0.1",
+            "elements":[ {
+                    "id": "thing",
+                    "attributes":{"label":"My thing"},
+                    "primitive": "instance",
+                    "entity": "ball",
+                    "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+                }
+            ]
+        };
+        var schemaId = "#/scene";
+        var validate = ajv.compile({ $ref: "_" + schemaId });
+        var isValid = validate(scene);
+
+        // Check the results
+        expect(isValid).toEqual(true);
+    });
+
     it ("Should manage units", function() {
         var cone = {
             "units":{

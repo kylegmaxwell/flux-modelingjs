@@ -570,6 +570,7 @@
     "instance": {
             "type": "object",
             "properties": {
+                "attributes":   {},
                 "primitive":    { "enum": [ "instance" ] },
                 "id":           { "$ref": "#/types/fluxid" },
                 "matrix":       { "$ref": "#/types/matrix" },
@@ -583,6 +584,7 @@
     "alphaGeometryContainer": {
             "type": "object",
             "properties": {
+                "attributes":   {},
                 "primitive":    { "enum": [ "alphaGeometryContainer" ] },
                 "id":           { "$ref": "#/types/fluxid" },
                 "entity": {
@@ -615,6 +617,7 @@
     "layer": {
         "type": "object",
         "properties": {
+            "attributes":   {},
             "primitive":    { "enum":[ "layer" ] },
             "id":           { "$ref": "#/types/fluxid" },
             "label":            { "type": "string" },
