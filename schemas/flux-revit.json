@@ -15,6 +15,25 @@
                 ".*" : {"type": [ "string", "number", "boolean", "null" ]}
             }
         },
+        "revit-mesh-geometry": {
+            "type": "array",
+            "items": { "$ref": "flux-entity#/entities/mesh"}
+        },
+        "revit-material": {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" },
+                "area": { "type": "number" },
+                "volume": { "type": "number" },
+                "paintMaterial": { "type": "boolean" },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+            },
+            "required": [ "name", "area", "volume", "paintMaterial", "instanceParameters" ]
+        },
+        "revit-materialInfo": {
+            "type": "array",
+            "items": { "$ref": "#/revit-types/revit-material" }
+        },
         "revit-familyInfo": {
             "type": "object",
             "properties": {
@@ -51,13 +70,13 @@
                 "fluxId": { "$ref": "#/revit-types/revit-fluxId" },
                 "primitive": { "$ref": "#/revit-types/revit-primitive" },
                 "familyInfo": { "$ref": "#/revit-types/revit-familyInfo" },
-                "units": { "$ref": "flux-entity#/types/units" }
+                "materialInfo": { "$ref": "#/revit-types/revit-materialInfo" },
+                "units": { "$ref": "flux-entity#/types/units" },
+                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "typeParameters": { "$ref": "#/revit-types/revit-parameters-map" },
+                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
             },
-            "required": [
-                "fluxId",
-                "primitive",
-                "familyInfo"
-            ]
+            "required": [ "fluxId", "primitive", "familyInfo" ]
         }
     },
     "revit-wall": {
@@ -70,7 +89,8 @@
                         "flipped": { "type": "boolean" },
                         "level": { "$ref": "#/revit-types/revit-level" },
                         "profile": { "$ref": "#/revit-types/revit-profile"},
-                        "structural": { "type": "boolean" }
+                        "structural": { "type": "boolean" },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required": [
                         "flipped",
@@ -78,15 +98,9 @@
                         "profile",
                         "structural"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
-                },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+                }
+            },
+            "required": ["geometryParameters"]
             }
         ]
     },
@@ -100,22 +114,17 @@
                         "name": { "type": "string" },
                         "level": { "$ref": "#/revit-types/revit-level" },
                         "uv": { "$ref": "flux-entity#/entities/point" },
-                        "phase": { "type": "string" }
+                        "phase": { "type": "string" },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required": [
                         "name",
                         "level",
                         "uv"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
-                },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+                }
+            },
+            "required": [ "geometryParameters"]
             }
         ]
     },
@@ -131,7 +140,8 @@
                         "bubbleEnd": { "$ref": "flux-entity#/entities/point" },
                         "freeEnd": { "$ref": "flux-entity#/entities/point" },
                         "thirdPoint": { "$ref": "flux-entity#/entities/point" },
-                        "cutVector": { "$ref": "flux-entity#/entities/vector" }
+                        "cutVector": { "$ref": "flux-entity#/entities/vector" },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required": [
                         "name",
@@ -140,15 +150,9 @@
                         "freeEnd",
                         "cutVector"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                }
             },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+            "required": [ "geometryParameters" ]
             }
         ]
     },
@@ -165,20 +169,15 @@
                                 { "$ref": "flux-entity#/entities/curve" },
                                 { "$ref": "flux-entity#/entities/arc" }
                             ]
-                        }
+                        },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required": [
                         "curve"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                }
             },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+            "required": [ "geometryParameters" ]
             }
         ]
     },
@@ -187,24 +186,19 @@
         "allOf": [
             { "$ref": "#/revit-types/revit-common" },
             { "properties": {
-                    "geometryParameters": {
-                        "properties": {
-                            "name": { "type": "string" },
-                            "elevation":  { "$ref": "flux-entity#/types/distance" }
-                        },
-                        "required": [
-                            "name",
-                            "elevation"
-                        ]
+                "geometryParameters": {
+                    "properties": {
+                        "name": { "type": "string" },
+                        "elevation":  { "$ref": "flux-entity#/types/distance" },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
-                    "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                    "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
-                },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+                    "required": [
+                        "name",
+                        "elevation"
+                    ]
+                }
+            },
+            "required": [ "geometryParameters" ]
             }
         ]
     },
@@ -221,21 +215,16 @@
                                 { "$ref": "#/entities/line" },
                                 { "$ref": "#/entities/arc" }
                             ]
-                        }
+                        },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required": [
                         "name",
                         "curve"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                }
             },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+            "required": [ "geometryParameters" ]
             }
         ]
     },
@@ -249,22 +238,17 @@
                         "profile": { "$ref": "#/revit-types/revit-profile" },
                         "structural": { "type": "boolean" },
                         "normal": { "$ref": "flux-entity#/types/direction" },
-                        "level": { "$ref": "#/revit-types/revit-level" }
+                        "level": { "$ref": "#/revit-types/revit-level" },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required": [
                         "profile",
                         "structural",
                         "level"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                }
             },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+            "required": [ "geometryParameters" ]
             }
         ]
     },
@@ -279,7 +263,8 @@
                         "level": { "$ref": "#/revit-types/revit-level" },
                         "structuralType": { "$ref": "#/revit-types/revit-structuralType" },
                         "faceFlipped": { "type": "boolean" },
-                        "handFlipped": { "type": "boolean" }
+                        "handFlipped": { "type": "boolean" },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required": [
                         "location",
@@ -288,15 +273,9 @@
                         "faceFlipped",
                         "handFlipped"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                }
             },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+            "required": [ "geometryParameters" ]
             }
         ]
     },
@@ -312,7 +291,8 @@
                         "topLevel": { "$ref": "#/revit-types/revit-level" },
                         "structuralType": { "$ref": "#/revit-types/revit-structuralType" },
                         "faceFlipped": { "type": "boolean" },
-                        "handFlipped": { "type": "boolean" }
+                        "handFlipped": { "type": "boolean" },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required":[
                         "location",
@@ -322,15 +302,9 @@
                         "faceFlipped",
                         "handFlipped"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                }
             },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+            "required": [ "geometryParameters" ]
             }
         ]
     },
@@ -346,7 +320,8 @@
                         "hostId": { "$ref": "#/revit-types/revit-fluxId" },
                         "structuralType": { "$ref": "#/revit-types/revit-structuralType" },
                         "faceFlipped": { "type": "boolean" },
-                        "handFlipped": { "type": "boolean" }
+                        "handFlipped": { "type": "boolean" },
+                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
                     },
                     "required": [
                         "location",
@@ -356,15 +331,9 @@
                         "faceFlipped",
                         "handFlipped"
                     ]
-                },
-                "instanceParameters": { "$ref": "#/revit-types/revit-parameters-map" },
-                "customParameters": { "$ref": "#/revit-types/revit-parameters-map" }
+                }
             },
-            "required": [
-                "geometryParameters",
-                "instanceParameters",
-                "customParameters"
-            ]
+            "required": [ "geometryParameters" ]
             }
         ]
     }
