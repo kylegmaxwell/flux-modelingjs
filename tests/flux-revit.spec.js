@@ -37,6 +37,144 @@ describe("flux-revit schema test", function() {
             expect(isValid).toEqual(true);
         });
 
+        it ("Revit Wall with mesh geometry should validate", function() {
+            var profile = [{
+              "units": {
+                    "end": "feet",
+                    "start": "feet"
+                },
+              "end": [ 20.31, 17.82, 0 ],
+              "primitive": "line",
+              "start": [ -63.18, 17.82, 0 ]
+            }]
+            var wallGeometry = [{
+                "primitive": "mesh",
+                "faces": [[0,1,2],[1,2,3]],
+                "vertices": [[0.0,0.0,0.0],[1.00,1.00,1.00]],
+                "units": {
+                    "vertices": "meters"
+                }
+            }]
+            var validWall = revit.createWall("Id-1", "WallFamily-1",
+                    "WallType-1", profile, "Level-1", true, true, {}, {});
+
+            validWall.Out.geometryParameters.geometry = wallGeometry;
+
+            var isValid = validate(validWall.Out);
+            if (!isValid) {
+                console.log(validate.errors);
+            }
+            expect(isValid).toEqual(true);
+        });
+
+        it ("Revit Wall with invalid geometry should not validate", function() {
+            var profile = [{
+              "units": {
+                    "end": "feet",
+                    "start": "feet"
+                },
+              "end": [ 20.31, 17.82, 0 ],
+              "primitive": "line",
+              "start": [ -63.18, 17.82, 0 ]
+            }]
+            var wallGeometry = [{
+                "primitive": "invalidMesh",
+                "faces": [[0,1,2],[1,2,3]],
+                "vertices": [[0.0,0.0,0.0],[1.00,1.00,1.00]],
+                "units": {
+                    "vertices": "meters"
+                }
+            }]
+            var validWall = revit.createWall("Id-1", "WallFamily-1",
+                    "WallType-1", profile, "Level-1", true, true, {}, {});
+
+            validWall.Out.geometryParameters.geometry = wallGeometry;
+            var isValid = validate(validWall.Out);
+            expect(isValid).toEqual(false);
+        });
+
+        it ("Revit wall with valid materialInfo should validate", function() {
+            var profile = [{
+              "units": {
+                    "end": "feet",
+                    "start": "feet"
+                },
+              "end": [ 20.31, 17.82, 0 ],
+              "primitive": "line",
+              "start": [ -63.18, 17.82, 0 ]
+            }]
+            var material = [
+            {
+                "name": "Material 1",
+                "area": 204.5,
+                "volume": 0.0,
+                "paintMaterial": true,
+                "instanceParameters": {
+                    "toxic": true
+                },
+                "customParameters": {
+                    "customParam": "Quartz Parameter"
+                }
+            },
+            {
+                "name": "Material 2",
+                "area": 0.0,
+                "volume": 555.26,
+                "paintMaterial": false,
+                "instanceParameters": {}
+            }]
+
+            var validWall = revit.createWall("Id-1", "WallFamily-1",
+                    "WallType-1", profile, "Level-1", true, true, {}, {});
+
+            validWall.Out.materialInfo = material;
+
+            var isValid = validate(validWall.Out);
+            if (!isValid) {
+                console.log(validate.errors);
+            }
+            expect(isValid).toEqual(true);
+        });
+
+        it ("Revit wall with invalid materialInfo should not validate", function() {
+            var profile = [{
+              "units": {
+                    "end": "feet",
+                    "start": "feet"
+                },
+              "end": [ 20.31, 17.82, 0 ],
+              "primitive": "line",
+              "start": [ -63.18, 17.82, 0 ]
+            }]
+            var material = [
+            {
+                "name": "Material 1",
+                "area": 204.5,
+                "paintMaterial": true,
+                "instanceParameters": {
+                    "toxic": true
+                },
+                "customParameters": {
+                    "customParam": "Quartz Parameter"
+                }
+            },
+            {
+                "Name": "Material 2",
+                "area": 0.0,
+                "volume": 555.26,
+                "paintMaterial": false,
+                "instanceParameters": {}
+            }]
+
+            var validWall = revit.createWall("Id-1", "WallFamily-1",
+                    "WallType-1", profile, "Level-1", true, true, {}, {});
+
+            validWall.Out.materialInfo = material;
+
+            var isValid = validate(validWall.Out);
+            expect(isValid).toEqual(false);
+        });
+
         it ("Valid revit-wall with extra parameters should validate", function() {
             var validWall = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-wall.json"));
             var isValid = validate(validWall);
