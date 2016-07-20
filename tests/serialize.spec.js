@@ -13,7 +13,7 @@ describe("Serialize and rollup test", function() {
     it ("Scene should serialize to json", function() {
         var scene = modeling.query();
         scene.add("resultId", {"origin":[0,0,0],"primitive":"sphere","radius":10});
-        var tessOp = modeling.operations.tesselateStl("resultId",1);
+        var tessOp = modeling.operations.tessellateJson("resultId",2,0.5);
         scene.add("resultId", tessOp);
         var expected = {
             Entities: {
@@ -25,7 +25,7 @@ describe("Serialize and rollup test", function() {
             },
             Operations: [
                 {   name: "resultId",
-                    op: [ "tessellateStl", "resultId", 1]
+                    op: [ "tessellateJson", "resultId", 2, 0.5]
                 }
             ]
         };

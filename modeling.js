@@ -2159,7 +2159,16 @@ var ops =
      *  @param  {number}  quality   - tesselation quality, ranges 0-4; the bigger, the better
      *  @return {Entity}  BREP
      */
-    tesselateStl: op('tessellateStl', 2),
+    tessellateStl: op('tessellateStl', 2),
+    /** 'tesselateJson' operation
+     *  Constructs JSON representation of specified BREP
+     *  @function
+     *  @param  {Body}    body      - body being tessellated
+     *  @param  {number}  quality   - tesselation quality, ranges 0-4; the bigger, the better
+     *  @param  {number}  units     - desired units for result given in terms of relative size of 1 meter
+     *  @return {Entity}  BREP
+     */
+    tessellateJson: op('tessellateJson', 3),
     /** 'createPolylineApprox' operation
      *  Converts NURBS curve to polyline
      *  @function

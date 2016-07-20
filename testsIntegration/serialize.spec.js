@@ -12,7 +12,7 @@ describe("Serialize and rollup test", function() {
     it ("Scene should serialize to json", function() {
         var scene = modeling.query();
         scene.add("resultId", {"origin":[0,0,0],"primitive":"sphere","radius":10});
-        var tessOp = modeling.operations.tesselateStl("resultId",1);
+        var tessOp = modeling.operations.tessellateStl("resultId",1);
         scene.add("resultId", tessOp);
         expect(JSON.parse(JSON.stringify(scene)))
         .toEqual({

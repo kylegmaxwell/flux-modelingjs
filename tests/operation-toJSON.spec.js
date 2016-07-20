@@ -5,7 +5,7 @@ describe("modeling/toJSON", function() {
 
     it ("operation toJSON should work", function() {
         var opJSON = ['tessellateStl', 'resultId-1', 1.2 ];
-        var tessOp = modeling.operations.tesselateStl("resultId-1", 1.2);
+        var tessOp = modeling.operations.tessellateStl("resultId-1", 1.2);
         expect(tessOp.toJSON()).toEqual(opJSON);
     });
 });
