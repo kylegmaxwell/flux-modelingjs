@@ -381,8 +381,15 @@ function createOneLevelFamilyInstance(fluxId, category, family, type, location,
         type: type,
         placementType: "OneLevelBased"
     };
+
+    var validLocation = getLocation(location);
+
+    if (!isInvalid(validLocation) && validLocation.Error) {
+        return validLocation;
+    }
+
     var geomParams = {
-        location: getLocation(location),
+        location: validLocation,
         level: extractLevelName(level),
         structuralType: getValidStructuralType(structuraltype),
         faceFlipped: !!faceflipped,
@@ -432,8 +439,15 @@ function createTwoLevelFamilyInstance(fluxId, category, family, type, location,
         type: type,
         placementType: "TwoLevelsBased"
     };
+
+    var validLocation = getLocation(location);
+
+    if (!isInvalid(validLocation) && validLocation.Error) {
+        return validLocation;
+    }
+
     var geomParams = {
-        location: getLocation(location),
+        location: validLocation,
         baseLevel: extractLevelName(baselevel),
         topLevel: extractLevelName(toplevel),
         structuralType: getValidStructuralType(structuraltype),
@@ -484,8 +498,15 @@ function createOneLevelHostedFamilyInstance(fluxId, category, family, type, loca
         type: type,
         placementType: "OneLevelBasedHosted"
     };
+
+    var validLocation = getLocation(location);
+
+    if (!isInvalid(validLocation) && validLocation.Error) {
+        return validLocation;
+    }
+
     var geomParams = {
-        location: getLocation(location),
+        location: validLocation,
         hostId: extractFluxId(host),
         level: extractLevelName(level),
         structuralType: getValidStructuralType(structuraltype),
@@ -907,12 +928,18 @@ function getLocation(obj) {
         return obj;
     }
 
-    if (obj.primitive == "point" || obj.primitivve == "line" ||
+    if (obj.primitive == "point" || obj.primitive == "line" ||
         obj.primitive == "curve" || obj.primitive == "arc") {
         return obj;
     }
 
-    return createPoint(obj);
+    var location = createPoint(obj);
+
+    if (location.Error) {
+        location.Error = "Invalid Location: expected point, line, curve or arc.";
+    }
+
+    return location;
 }
 
 // Returns a point given an array of number or spoint.
@@ -927,7 +954,7 @@ function createPoint(obj) {
             throw err;
         }
         else {
-            return {Error: err.message};
+            return {Error: "Invalid Point: " + err.message};
         }
     }
 
@@ -944,7 +971,7 @@ function createVector(obj) {
             throw err;
         }
         else {
-            return {Error: err.message};
+            return {Error: "Invalid Vector: " + err.message};
         }
     }
 
@@ -966,3 +993,4 @@ module.exports = {
     createTwoLevelFamilyInstance: createTwoLevelFamilyInstance,
     createOneLevelHostedFamilyInstance: createOneLevelHostedFamilyInstance
 }
+
