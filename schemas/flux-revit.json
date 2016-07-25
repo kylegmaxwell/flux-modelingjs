@@ -140,8 +140,7 @@
                         "bubbleEnd": { "$ref": "flux-entity#/entities/point" },
                         "freeEnd": { "$ref": "flux-entity#/entities/point" },
                         "thirdPoint": { "$ref": "flux-entity#/entities/point" },
-                        "cutVector": { "$ref": "flux-entity#/entities/vector" },
-                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
+                        "cutVector": { "$ref": "flux-entity#/entities/vector" }
                     },
                     "required": [
                         "name",
@@ -169,8 +168,7 @@
                                 { "$ref": "flux-entity#/entities/curve" },
                                 { "$ref": "flux-entity#/entities/arc" }
                             ]
-                        },
-                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
+                        }
                     },
                     "required": [
                         "curve"
@@ -189,8 +187,7 @@
                 "geometryParameters": {
                     "properties": {
                         "name": { "type": "string" },
-                        "elevation":  { "$ref": "flux-entity#/types/distance" },
-                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
+                        "elevation":  { "$ref": "flux-entity#/types/distance" }
                     },
                     "required": [
                         "name",
@@ -215,8 +212,7 @@
                                 { "$ref": "#/entities/line" },
                                 { "$ref": "#/entities/arc" }
                             ]
-                        },
-                        "geometry": { "$ref": "#/revit-types/revit-mesh-geometry"}
+                        }
                     },
                     "required": [
                         "name",
