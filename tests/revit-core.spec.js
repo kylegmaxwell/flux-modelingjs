@@ -282,6 +282,96 @@ describe("revit-core test", function () {
         });
     });
 
+    describe("createGrid", function() {
+        var instanceParamMap = {i1:"InstanceParam 1", i2:"InstanceParam 2"};
+        var customParamMap = {c1: "CustomParam 1", c2:"CustomParam 2"};
+        var gridCurve = {
+            "primitive": "line",
+            "start": [ 0.0, 0.0, 0.0],
+            "end": [10.0, 0.0, 0.0]
+        };
+
+        it("should work.", function () {
+            var el = revit.createGrid("Id-1", "GridType-1", gridCurve, "Grid-1",
+                instanceParamMap, customParamMap);
+            expect(el).toEqual({
+                Out: {
+                    primitive: "revitElement",
+                    fluxId: "Id-1",
+                    familyInfo: {
+                        category: "Grids",
+                        family: "Grid",
+                        type: "GridType-1",
+                        placementType: "Invalid"
+                    },
+                    geometryParameters: {
+                        name: "Grid-1",
+                        curve: gridCurve
+                    },
+                    instanceParameters: {
+                        i1:"InstanceParam 1",
+                        i2:"InstanceParam 2"
+                    },
+                    typeParameters: {
+                    },
+                    customParameters: {
+                        c1:"CustomParam 1",
+                        c2:"CustomParam 2"
+                    }
+                }
+            });
+        });
+
+        it("should return error if required parameters are not provided.", function () {
+            var gridCurve = {
+            "primitive": "line",
+            "start": [ 0.0, 0.0, 0.0],
+            "end": [10.0, 0.0, 0.0]
+            };
+            var el = revit.createGrid("Id-1", undefined, gridCurve, "grid-1",
+                instanceParamMap, customParamMap);
+            expect(el.Error).toBeDefined();
+            var el = revit.createGrid("Id-1", "GridType-1", undefined, "grid-1",
+                instanceParamMap, customParamMap);
+            expect(el.Error).toBeDefined();
+            var el = revit.createGrid("Id-1", "GridType-1", gridCurve, undefined,
+                instanceParamMap, customParamMap);
+            expect(el.Error).toBeDefined();
+        });
+
+        it("should work if optional parameters are not provided", function() {
+            var gridCurve = {
+            "primitive": "line",
+            "start": [ 0.0, 0.0, 0.0],
+            "end": [10.0, 0.0, 0.0]
+            };
+            var el = revit.createGrid(undefined, "GridType-1", gridCurve, "Grid-1",
+                undefined, undefined);
+            expect(el).toEqual({
+                 Out: {
+                    primitive: "revitElement",
+                    fluxId: null,
+                    familyInfo: {
+                        category: "Grids",
+                        family: "Grid",
+                        type: "GridType-1",
+                        placementType: "Invalid"
+                    },
+                    geometryParameters: {
+                        name: "Grid-1",
+                        curve: gridCurve
+                    },
+                    instanceParameters: {
+                    },
+                    typeParameters: {
+                    },
+                    customParameters: {
+                    }
+                }
+            });
+        });
+    });
+
     describe("createWall", function() {
         var instanceParamMap = {i1: "InstanceParam 1", i2: "InstanceParam 2"};
         var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};

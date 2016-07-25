@@ -65,7 +65,7 @@ function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeP
 /**
 * Function to create a revit Model Line.
 *
-* @param {object} [modelCurve] Input curve.         *
+* @param {object} [modelCurve] Input curve.
 * @returns {{Out: revit-modelLine}} The created revit model line.
 */
 function createModelLine(fluxId, modelCurve) {
@@ -186,6 +186,44 @@ function createLevel(fluxId, levelType, elevation, name, instanceParams, customP
         return {Error: "Level " + level.Error};
     }
     return level;
+}
+
+/**
+* Function to create a revit grid.
+*
+* @param {string} [fluxId] Flux Id for the level.
+* @param {string} [gridType] Type of the grid.
+* @param {object} [gridCurve] Grid line.
+* @param {string} [gridName] Name of the grid.
+* @param {object} [instanceParams] Instance parameters to be assigned to this element.
+* @param {object} [customParams] Custom parameters to be assigned to this element.
+* @returns {{Out: revit-level}} The created revit grid.
+*/
+function createGrid(fluxId, gridType, gridCurve, gridName, instanceParams, customParams) {
+    var familyInfo = {
+        category: "Grids",
+        family: "Grid",
+        type: gridType,
+        placementType: "Invalid"
+    }
+    var geomParams = {
+        name: gridName,
+        curve: gridCurve
+    }
+    var missingParams = checkForKeys(familyInfo, ["type"]);
+    if (missingParams) {
+        return {Error: "Grid element could not be created: Missing required familyinfo parameters " + missingParams.join(", ")};
+    }
+
+    missingParams = checkForKeys(geomParams, ["name", "curve"]);
+    if (missingParams) {
+        return {Error: "Grid element could not be created: Missing required geometry parameters " + missingParams.join(", ")};
+    }
+    var grid = createElement(fluxId, familyInfo, geomParams, instanceParams, undefined, customParams);
+    if (grid.Error) {
+        return {Error: "Grid " + grid.Error};
+    }
+    return grid;
 }
 
 /**
@@ -921,6 +959,7 @@ module.exports = {
     createReferencePlane: createReferencePlane,
     createRoom: createRoom,
     createLevel: createLevel,
+    createGrid: createGrid,
     createFloor: createFloor,
     createWall: createWall,
     createOneLevelFamilyInstance: createOneLevelFamilyInstance,
