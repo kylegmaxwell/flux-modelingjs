@@ -1754,21 +1754,7 @@ var entities =
     block: function (center, span) {
         return primitive('block', { origin: coords(center), dimensions: vecCoords(span) }, Solid);
     },
-    /** Constructs torus, lying in XY plane
-     *
-     *  @function
-     *  @param  {number[]|Point} center
-     *  @param  {number}         rMinor - minor radius
-     *  @param  {number}         rMajor - major radius
-     *  @return {Solid}
-     */
-    torus: function (center, minr, majr) {
-        return primitive('torus', {
-            origin:      coords(center),
-            minorRadius: minr,
-            majorRadius: majr
-        }, Solid);
-    },
+
     /** Constructs sphere
      *
      *  @function
@@ -1778,38 +1764,6 @@ var entities =
      */
     sphere: function (c, r) {
         return primitive('sphere', { origin: coords(c), radius: r }, Solid);
-    },
-    /** Constructs cylinder
-     *
-     *  @function
-     *  @param  {number[]|Point}  center    - center of cylinder's basement
-     *  @param  {number}          radius
-     *  @param  {number}          height
-     *  @return {Solid}
-     */
-    cylinder: function (c, r, h) {
-        return primitive('cylinder', {
-            origin:    coords(c),
-            radius:    r,
-            height:    h
-        }, Solid);
-    },
-    /** Constructs cone
-     *
-     *  @function
-     *  @param  {number[]|Point}  center     - center of cone's basement
-     *  @param  {number}          radius
-     *  @param  {number}          height
-     *  @param  {number}          phi        - semi-angle, in degrees
-     *  @return {Solid}
-     */
-    cone: function (c, r, h, phi) {
-        return primitive('cone', {
-            origin:       coords(c),
-            radius:       r,
-            height:       h,
-            semiAngle:    phi
-        }, Solid);
     },
 
     //******************************************************************************
