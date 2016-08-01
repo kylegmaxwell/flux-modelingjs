@@ -2,7 +2,7 @@ describe("modeling/measure/lookupDimensions", function() {
     'use strict';
 
     it("Should look up field dimensions correctly", function(){
-        var lookupDimensions = require("../index").modeling().utilities.lookupFieldDimensions;
+        var lookupDimensions = require("../index").typecheck().measure.lookupFieldDimensions;
         expect(lookupDimensions("point")).toEqual( { point: 'length' });
         expect(lookupDimensions("curve")).toEqual( { controlPoints: 'length' });
         expect(lookupDimensions("block")).toEqual( { origin: 'length', dimensions: 'length' });
@@ -37,45 +37,35 @@ describe("modeling/measure/constructors", function() {
         expect(b1.origin).toEqual([1,2,3]);
         expect(b1.dimensions).toEqual([10,20,30]);
     })
-
-    it("should extract coordinates from points and vectors in correct units", function() {
-        var p1 = modeling.entities.point([1000,2000,3000]);
-        var a1 = modeling.utilities.coords(p1, {"length":"km"})
-        expect(a1).toEqual([1,2,3]);
-
-        var v1 = modeling.entities.vector([1000,2000,3000]);
-        var a2 = modeling.utilities.vecCoords(v1, {"length":"km"})
-        expect(a2).toEqual([1,2,3]);
-    })
 })
 
 describe("modeling/measure/detectUnits", function() {
     'use strict';
 
-    var modeling = require("../index").modeling();
+    var measure = require("../index").typecheck().measure;
     it("should detect units correctly", function() {
-        var v1 = modeling.utilities.detectUnits({});
+        var v1 = measure.detectUnits({});
         expect(v1).toEqual(false);
 
-        var v2 = modeling.utilities.detectUnits({"primitive":"brep"});
+        var v2 = measure.detectUnits({"primitive":"brep"});
         expect(v2).toEqual(true);
 
-        var v3 = modeling.utilities.detectUnits({"primitive":"sphere", "units":{"origin":"meters"}});
+        var v3 = measure.detectUnits({"primitive":"sphere", "units":{"origin":"meters"}});
         expect(v3).toEqual(true);
 
-        var v4 = modeling.utilities.detectUnits({"primitive":"polycurve",
+        var v4 = measure.detectUnits({"primitive":"polycurve",
             "curves":[{"units":{"points":"meters"}}]});
         expect(v4).toEqual(true);
 
-        var v5 = modeling.utilities.detectUnits({"primitive":"polycurve",
+        var v5 = measure.detectUnits({"primitive":"polycurve",
             "curves":[{}]});
         expect(v5).toEqual(false);
 
-        var v6 = modeling.utilities.detectUnits({"primitive":"polysurface",
+        var v6 = measure.detectUnits({"primitive":"polysurface",
             "surfaces":[{"units":{"points":"meters"}}]});
         expect(v4).toEqual(true);
 
-        var v7 = modeling.utilities.detectUnits({"primitive":"polysurface",
+        var v7 = measure.detectUnits({"primitive":"polysurface",
             "surfaces":[{}]});
         expect(v5).toEqual(false);
 

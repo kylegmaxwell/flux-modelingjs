@@ -48,10 +48,11 @@ function submodules(obj) {
 module.exports = submodules({
     'measure':  './measure',
     'modeling': './modeling',
-    'uuid':     './uuid',
     'revit':    './revit-core',
     'schemas':  submodules({
         'pbw':  './schemas/psworker.json',
         'revit':'./schemas/flux-revit.json'
-    })
+    }),
+    'typecheck': './typecheck',
+    'uuid':     './uuid'
 });
