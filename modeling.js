@@ -19,10 +19,6 @@ if (typeof config !== 'object') {
     throw new FluxModelingError("config: expected object");
 }
 
-function defaulted(name, defvalue) {
-    return (name in config) ? config[name] : defvalue();
-}
-
 // Skip require for environments that don't support it (rollup)
 if (!config.skip) {
     var flux = require('./index');
