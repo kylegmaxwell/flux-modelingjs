@@ -30,31 +30,6 @@ describe("Query/Entity", function () {
         expect(typeof point.reference).toBe('object');
     });
 
-    it("should set polygon set's boundaries and holes with addBoundary, addHole", function () {
-        var poly = modeling.entities.polygonSet();
-        expect(typeof poly.addBoundary).toBe('function');
-        expect(typeof poly.addHole).toBe('function');
-        expect(typeof poly.boundary).toBe('undefined');
-        expect(typeof poly.hole).toBe('undefined');
-
-        poly.addBoundary(
-            [0, 0, 0],
-            [1, 0, 0],
-            [1, 1, 0],
-            [0, 1, 0]
-        ).addHole(
-            [0.2, 0.2, 0],
-            [0.4, 0.2, 0],
-            [0.2, 0.4, 0]
-        );
-
-        expect(typeof poly.addBoundary).toBe('function');
-        expect(typeof poly.addHole).toBe('function');
-        expect(typeof poly.boundary).toBe('undefined');
-        expect(typeof poly.hole).toBe('undefined');
-        expect(typeof poly.polygons).toBe('object');
-    });
-
     it("should add vertices to mesh via addVertex/addVertices", function () {
         var mesh = modeling.entities.mesh();
         expect(typeof mesh.addVertex).toBe('function');

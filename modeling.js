@@ -858,42 +858,6 @@ inherit(Affine, Entity,
      }
 });
 
-/** Use {@link entities.polygonSet} to construct
- *  @class
- *  @extends Sheet
- *  @classdesc Entity which represents set of polygons
- */
-function PolygonSet() { Sheet.apply(this, arguments); }
-// inherit PolygonSet from Entity
-inherit(PolygonSet, Sheet,
-/** @lends PolygonSet.prototype */
-{
-    /** Adds new outer boundary loop polygon to set
-     *
-     *  @function
-     *  @param  {...(number[]|Point)} points - a set of points representing polygon
-     *  @return {this}                 this, for chaining
-     */
-    addBoundary: function () { // add polygon to set
-        this.polygons.push({
-            boundary: mapCoords(arguments),
-            holes: []
-        });
-        return this;
-    },
-    /** Adds inner hole loop to the last polygon in a set
-     *
-     *  @function
-     *  @param  {...(number[]|Point)} points - a set of points representing hole
-     *  @return {this}                 this, for chaining
-     */
-    addHole: function() { // add hole to last polygon
-        var polys = this.polygons;
-        var last = polys[polys.length - 1];
-        last.holes.push(mapCoords(arguments));
-        return this;
-    }
-});
 /** Use {@link entities.mesh} to construct
  *  @class
  *  @extends Solid
@@ -1554,14 +1518,6 @@ var entities =
     // Sheet entities
     //******************************************************************************
 
-    /** Constructs polygon set
-     *
-     *  @function
-     *  @return {PolygonSet} polygon set entity
-     */
-    polygonSet: function () {
-        return primitive('polygonSet', { polygons: [] }, PolygonSet);
-    },
     /** Constructs NURBS surface
      *
      *  @function
