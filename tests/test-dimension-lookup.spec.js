@@ -2,7 +2,7 @@ describe("modeling/measure/lookupDimensions", function() {
     'use strict';
 
     it("Should look up field dimensions correctly", function(){
-        var lookupDimensions = require("../index").typecheck().measure.lookupFieldDimensions;
+        var lookupDimensions = require("../index").types().measure.lookupFieldDimensions;
         expect(lookupDimensions("point")).toEqual( { point: 'length' });
         expect(lookupDimensions("curve")).toEqual( { controlPoints: 'length' });
         expect(lookupDimensions("block")).toEqual( { origin: 'length', dimensions: 'length' });
@@ -42,7 +42,7 @@ describe("modeling/measure/constructors", function() {
 describe("modeling/measure/detectUnits", function() {
     'use strict';
 
-    var measure = require("../index").typecheck().measure;
+    var measure = require("../index").types().measure;
     it("should detect units correctly", function() {
         var v1 = measure.detectUnits({});
         expect(v1).toEqual(false);

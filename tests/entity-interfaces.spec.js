@@ -35,7 +35,7 @@ describe("Query/Entity", function () {
         expect(typeof mesh.addFace).toBe('function');
         expect(typeof mesh.addFaces).toBe('function');
 
-        mesh.addFace([0, 1, 2]);
+        mesh.addFace(0, 1, 2);
         mesh.addFaces(
             [ 0, 2, 1],
             [ 1, 2, 2],

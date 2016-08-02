@@ -4,7 +4,7 @@ describe("Schema test", function() {
     var fs    = require('fs');
     var flux  = require('../index');
     var schema = flux.schemas.pbw;
-    var modeling = flux.modeling({ schema: null, registry: null, genId: null });
+    var modeling = flux.modeling({registry: null, genId: null });
 
     var ajv = Ajv({ allErrors: true });
     ajv.addSchema(schema, "_");

@@ -950,12 +950,7 @@ function createPoint(obj) {
         pt = modeling.entities.point(obj);
     }
     catch(err) {
-        if (err.name !== "FluxModelingError") {
-            throw err;
-        }
-        else {
-            return {Error: "Invalid Point: " + err.message};
-        }
+        return {Error: err.message};
     }
 
     return pt;
@@ -967,12 +962,7 @@ function createVector(obj) {
         vec = modeling.entities.vector(obj);
     }
     catch(err) {
-        if (err.name !== "FluxModelingError") {
-            throw err;
-        }
-        else {
-            return {Error: "Invalid Vector: " + err.message};
-        }
+        return {Error: err.message};
     }
 
     return vec;

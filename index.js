@@ -49,10 +49,10 @@ module.exports = submodules({
     'measure':  './measure',
     'modeling': './modeling',
     'revit':    './revit-core',
-    'schemas':  submodules({
-        'pbw':  './schemas/psworker.json',
-        'revit':'./schemas/flux-revit.json'
-    }),
-    'typecheck': './typecheck',
+    'schemas':  {
+        'pbw':      require('./schemas/psworker.json'),
+        'revit':    require('./schemas/flux-revit.json')
+    },
+    'types': './types',
     'uuid':     './uuid'
 });

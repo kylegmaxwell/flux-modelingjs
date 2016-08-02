@@ -19,9 +19,11 @@ if (typeof config !== 'object') {
     throw new FluxModelingError("config: expected object");
 }
 
-var typecheck = require("./typecheck")()
+
+var flux = require('./index');
 
 // Skip require for environments that don't support it (rollup)
+// This only supports skipping loading the measure library.
 if (!config.skip) {
     // If a user of modelingjs is explicitly passing a falsey value for genId,
     // then default to a function that returns undefined, to avoid errors attempting
@@ -36,20 +38,20 @@ if (!config.skip) {
     })();
 }
 
-var eps = 1e-8;
 
-/* Generate uuid, that will be used as geometry id
-    By default, this generates undefined. Users who want to generate id's should
-    explicitly override the exported property on this module.
- */
+var eps = 1e-8;
+var DEFAULT_LINEAR_TOLERANCE = 0.1;
+var DEFAULT_ANGULAR_SIZE     = 30.0;
+
+var util = require("./util");
+
+var types = require("./types")();
+// Schema helpers
+var s = types.helpers;
 
 /* Converts any array-like object to actual array
    Used mostly with Arguments objects
  */
-
-var DEFAULT_LINEAR_TOLERANCE = 0.1;
-var DEFAULT_ANGULAR_SIZE     = 30.0;
-
 function toArray(obj) {
     return Array.prototype.slice.call(obj);
 }
@@ -74,20 +76,6 @@ function isInst(value, type) {
     if (isNone(value))
         return false;
     return (value instanceof type) || value.constructor == type;
-}
-
-// TODO(andrew): once https://vannevar.atlassian.net/browse/LIB3D-623 lands,
-// I think that we can remove all use of inherit and the remaining pseudoclasses.
-// Inherit one type from another, adding methods via prototype object
-function inherit(clazz, base, proto) {
-    clazz.prototype = Object.create(base.prototype);
-    clazz.prototype.constructor = clazz;
-    if (proto)
-        Object.keys(proto).forEach(
-            function (key) {
-                clazz.prototype[key] = proto[key];
-            }
-        );
 }
 
 function initObject(dest, source) {
@@ -565,7 +553,7 @@ function primitive(typeid, params, OptCtor) {
     var e = new OptCtor(typeid);
     initObject(e, params);
     e.primitive = typeid;
-    e.units = typecheck.measure.defaultUnits(typeid);
+    e.units = types.measure.defaultUnits(typeid);
     return e;
 }
 /** Helper function to extract point coordinates
@@ -581,8 +569,8 @@ function makeAdjustCoords(primitive, field) {
 
         if (obj !== undefined) {
             if (obj.units &&
-                obj.units[field] != typecheck.measure._defaultDimToUnits.length) {
-                obj = convertUnits(obj, typecheck.measure._defaultDimToUnits);
+                obj.units[field] != types.measure._defaultDimToUnits.length) {
+                obj = convertUnits(obj, types.measure._defaultDimToUnits);
             }
 
             if (obj.primitive === primitive) {
@@ -651,8 +639,8 @@ function applyMatrix(self, m) {
  *  @classdesc Entity which represents affine transformation matrix
  */
 function Affine() { Entity.apply(this, arguments); }
-// Inherit Affine from Entity
-inherit(Affine, Entity,
+// util.inherit Affine from Entity
+util.inherit(Affine, Entity,
 /** @lends Affine.prototype */
 {
     /** Adds 3D translation
@@ -773,7 +761,6 @@ inherit(Affine, Entity,
      }
 });
 
-
 /** Use {@link entities.mesh} to construct
  *  @class
  *  @extends Solid
@@ -781,7 +768,7 @@ inherit(Affine, Entity,
  */
 function Mesh() { Entity.apply(this, arguments); }
 // inherit Mesh from Entity
-inherit(Mesh, Entity,
+util.inherit(Mesh, Entity,
 /** @lends Mesh.prototype */
 {
     /** Adds vertex to mesh
@@ -791,15 +778,19 @@ inherit(Mesh, Entity,
      *  @return {this}           this, for chaining
      */
     addVertex: function (c) {
-        this.vertices.push(coords(c));
-        return this;
-    },
+            types.checkAllAndThrow(["Vertex", s.AnyOf(s.Type("position"), s.Entity("point")), c]),
+
+            this.vertices.push(coords(c));
+            return this;
+        },
     /** Adds multiple vertices to mesh
      *
      *  @function
      *  @param  {(number[]|Point)[]} coords
      *  @return {this}               this, for chaining
      */
+    // TODO(andrew): typecheck curve, following LIB3D-623
+    // https://vannevar.atlassian.net/browse/LIB3D-623
     addVertices: function () {
         for (var i = 0; i < arguments.length; ++i)
             this.addVertex(arguments[i]);
@@ -812,7 +803,9 @@ inherit(Mesh, Entity,
      *  @return {this}              this, for chaining
      */
     addFace: function() {
-        this.faces.push(toArray(arguments));
+        var args = toArray(arguments);
+        types.checkAllAndThrow(["Face", s.ArrayOf(s.Type("index")), args])
+        this.faces.push(args);
         return this;
     },
     /** Adds multiple faces to mesh composed of vertex indices
@@ -822,8 +815,10 @@ inherit(Mesh, Entity,
      *  @return {this}              this, for chaining
      */
     addFaces: function() {
+        var args = toArray(arguments);
+        types.checkAllAndThrow(["Faces", s.ArrayOf(s.ArrayOf(s.Type("index"))), args]);
         for (var i = 0; i < arguments.length; ++i)
-            this.faces.push(arguments[i])
+            this.faces.push(args)
         return this;
     }
 });
@@ -899,7 +894,7 @@ function appendVertex(ctxt, item) {
  */
 function Curve() { Entity.apply(this, arguments); }
 // inherit Curve from Wire
-inherit(Curve, Entity,
+util.inherit(Curve, Entity,
 /** @lends Curve.prototype */
 {
     /** Appends numbers to array of knots
@@ -945,9 +940,10 @@ inherit(Curve, Entity,
  *  @extends Sheet
  *  @classdesc Entity which represents NURBS surface
  */
+
 function Surface() { Entity.apply(this, arguments); }
-// inherit Surface from Sheet
-inherit(Surface, Entity,
+// util.inherit Surface from Sheet
+util.inherit(Surface, Entity,
 /** @lends Surface.prototype */
 {
     /** Appends numbers to array of U-axis knots
@@ -1245,7 +1241,7 @@ var utilities = {
 
 //******************************************************************************
 // Entities
-//******************************************************************************
+//*****************************∂chec*************************************************
 // var entities is used for self-call
 var entities =
 /** Entity constructors
@@ -1277,6 +1273,8 @@ var entities =
      *  @return {Vector}
      */
     vector: function (vec) {
+        types.checkAllAndThrow(
+            ["Components", s.AnyOf(s.Type("position"), s.Entity("vector")), vec])
         return primitive('vector', { coords: vecCoords(vec) });
     },
 
@@ -1292,6 +1290,9 @@ var entities =
      *  @return {Point}
      */
     point: function (point, id) {
+        types.checkAllAndThrow(
+            ["Point", s.AnyOf(s.Type("position"), s.Entity("point")), point],
+            ["Id", s.Maybe(s.String), id]);
         return primitive('point', {
             point: coords(point),
             id: id || genId()
@@ -1311,6 +1312,10 @@ var entities =
      *  @return {Wire}          line entity
      */
     line: function (start, end, id) {
+        types.checkAllAndThrow(
+            ["Start", s.AnyOf(s.Type("position"), s.Entity("point")), start],
+            ["End", s.AnyOf(s.Type("position"), s.Entity("point")), end],
+            ["Id", s.Maybe(s.String), id ]);
         return primitive('line', {
             start:   coords(start),
             end:     coords(end),
@@ -1325,6 +1330,9 @@ var entities =
      *  @param  {...number[]|Point} point - a set of points forming polyline
      *  @return {Wire}                      polyline entity
      */
+     // TODO(andrew): add typechecking to polyline. Consider passing an array of
+     // of points as a single arguement, rather than processing the array of
+     // arguments.
     polyline: function() {
         return primitive('polyline', {
             points: mapCoords(arguments)
@@ -1340,6 +1348,11 @@ var entities =
      *  @return {Wire}              arc entity
      */
     arc: function (start, middle, end, id) {
+        types.checkAllAndThrow(
+            ["Start", s.AnyOf(s.Type("position"), s.Entity("point")), start],
+            ["Middle", s.AnyOf(s.Type("position"), s.Entity("point")), middle],
+            ["End", s.AnyOf(s.Type("position"), s.Entity("point")), end],
+            ["Id", s.Maybe(s.String), id]);
         return primitive('arc', {
             start:    coords(start),
             middle:   coords(middle),
@@ -1357,6 +1370,8 @@ var entities =
      *  @param  {string} [id]   - optional, entity id
      *  @return {Curve}           curve entity
      */
+     // TODO(andrew): typecheck curve, following LIB3D-623
+     // https://vannevar.atlassian.net/browse/LIB3D-623
     curve: function(degree, id) {
         return primitive('curve', {
             degree: degree,
@@ -1374,6 +1389,10 @@ var entities =
      *  @return {Wire}            circle entity
      */
     circle: function (center, r, id) {
+        types.checkAllAndThrow(
+            ["Center", s.AnyOf(s.Type("position"), s.Entity("point")), center],
+            ["Radius", s.Type("distance"), r],
+            ["Id", s.Maybe(s.String), id]);
         return primitive('circle', {
             origin:   coords(center),
             originId: center.id || genId(),
@@ -1385,19 +1404,25 @@ var entities =
      *
      *  @function
      *  @param  {number[]|Point}  center
-     *  @param  {number}          rMajor - major radius
-     *  @param  {number}          rMinor - minor radius
+     *  @param  {number}          majorRadius - major radius
+     *  @param  {number}          minorRadius - minor radius
      *  @param  {number[]|Vector} dir    - major direction
      *  @param  {string}          [id]   - optional, entity id
      *  @return {Wire}
      */
-    ellipse: function (center, rMajor, rMinor, dir, id) {
+    ellipse: function (center, majorRadius, minorRadius, direction, id) {
+        types.checkAllAndThrow(
+            ["Center", s.AnyOf(s.Type("position"), s.Entity("point")), center],
+            ["MajorRadius", s.Type("distance"), majorRadius],
+            ["MinorRadius", s.Type("distance"), minorRadius],
+            ["Direction", s.AnyOf(s.Type("position"), s.Entity("vector")), direction],
+            ["Id", s.Maybe(s.String), id]);
         return primitive('ellipse', {
             origin:      coords(center),
             originId:    center.id || genId(),
-            majorRadius: rMajor,
-            minorRadius: rMinor,
-            direction:   (dir ? vecCoords(dir) : undefined),
+            majorRadius: majorRadius,
+            minorRadius: minorRadius,
+            direction:   (direction ? vecCoords(direction) : undefined),
             id:          id || genId()
         });
     },
@@ -1409,6 +1434,9 @@ var entities =
      *  @return {Wire}
      */
     rectangle: function (center, span) {
+        types.checkAllAndThrow(
+            ["Center", s.AnyOf(s.Type("position"), s.Entity("point")), center],
+            ["Span", s.AnyOf(s.ArrayOf(s.Number), s.Entity("vector")), span]);
         var c = vecCoords(span);
         if (c.length != 2) {
             throw new FluxModelingError("Expected rectangle dimensions to be 2-dimensional.");
@@ -1424,6 +1452,8 @@ var entities =
      *  @return {Wire}
      */
     polycurve: function (curves) {
+        types.checkAllAndThrow(
+            ["Curves", s.ArrayOf(s.Entity("curve")), curves]);
         return primitive('polycurve', { curves: curves });
     },
 
@@ -1438,6 +1468,8 @@ var entities =
      *  @param  {number}  vDegree - NURBS degree along V parameter
      *  @return {Surface}           NURBS surface entity
      */
+    // TODO(andrew): typecheck surface, following LIB3D-623
+    // https://vannevar.atlassian.net/browse/LIB3D-623
     surface: function(uDegree, vDegree) {
         return primitive('surface', {
             uDegree: uDegree,
@@ -1456,6 +1488,8 @@ var entities =
      *  @return {Sheet}
      */
     polysurface: function (surfaces) {
+        types.checkAllAndThrow(
+            ["Surfaces", s.ArrayOf(s.Entity("surface")), surfaces]);
         return primitive('polysurface', { surfaces: surfaces });
     },
 
@@ -1468,6 +1502,8 @@ var entities =
      *  @function
      *  @return {Mesh} mesh entity
      */
+    // TODO(andrew): typecheck mesh, following LIB3D-623
+    // https://vannevar.atlassian.net/browse/LIB3D-623
     mesh: function () {
         return primitive('mesh', { vertices: [], faces: [] }, Mesh);
     },
@@ -1479,6 +1515,9 @@ var entities =
      *  @return {Solid}
      */
     block: function (center, span) {
+        types.checkAllAndThrow(
+            ["Center", s.AnyOf(s.Type("position"), s.Entity("point")), center],
+            ["Dimensions", s.AnyOf(s.Type("position"), s.Entity("vector")), span]);
         return primitive('block', { origin: coords(center), dimensions: vecCoords(span) });
     },
 
@@ -1490,6 +1529,9 @@ var entities =
      *  @return {Solid}
      */
     sphere: function (c, r) {
+        types.checkAllAndThrow(
+            ["Center", s.AnyOf(s.Type("position"), s.Entity("point")), c],
+            ["Radius", s.Type("distance"), r]);
         return primitive('sphere', { origin: coords(c), radius: r });
     },
 
@@ -1509,6 +1551,8 @@ var entities =
              0, 0, 1, 0 ,
              0, 0, 0, 1
         ];
+        types.checkAllAndThrow(
+            ["Matrix", s.ArrayOf(s.Number), optMatrix])
         return primitive('affineTransform', { mat: optMatrix }, Affine);
     },
     /** Constructs infinite plane
@@ -1519,10 +1563,13 @@ var entities =
      *  @return {Plane}
      */
     plane: function (o, n) {
+        types.checkAllAndThrow(
+            ["Origin", s.AnyOf(s.Type("position"), s.Entity("point")), o],
+            ["Normal", s.AnyOf(s.Type("position"), s.Entity("vector")), n]);
         return primitive('plane', {
             origin: coords(o),
             normal: vecCoords(n)
-        });
+        })
     }
 };
 
