@@ -76,7 +76,7 @@ SceneValidator.prototype._validateAssembly = function(assembly, json){
         return _error('Assembly must have array of children');
     }
 
-    for(var i = 0; i < assembly.children.length; ++i){
+    for(var i = 0; i < assembly.children.length; i++){
         var nodeID = assembly.children[i];
         var node = _findObjectByField('id', nodeID, json);
         if (!node) return _invalidId(nodeID);
@@ -146,7 +146,7 @@ function _primitiveError() {
  * @return {SceneValidatorResults}  The results
  */
 function _validateLayer(layer, json){
-    for(var i = 0; i < layer.elements.length; ++i){
+    for(var i = 0; i < layer.elements.length; i++){
         var nodeKey = layer.elements[i];
         var node = _findObjectByField('id', nodeKey, json);
         if (!node) return _invalidId(nodeKey);
@@ -171,6 +171,77 @@ SceneValidator.isScene = function (json) {
 }
 
 /**
+ * Enumeration to store assembly states
+ * @type {Object}
+ */
+var STATES = {
+    PROCESSING: 1,
+    VALID: 2
+};
+
+/**
+ * Determine whether the graph structure of assemblies has any cycles.
+ * Cyclical links in assemblies can not be rendered and are invalid.
+ * @param  {Object}  assemblies Map from id to assembly data
+ * @return {Boolean}            True if there are no cycles and the assemblies are valid
+ */
+function _isAcyclic(assemblies) {
+    var stack = [];
+    var parent = {};
+    var states = {};
+    for (var a in assemblies) {
+        stack.push(assemblies[a].id);
+    }
+    // Depth first search
+    while (stack.length > 0) {
+        var id = stack.pop();
+        var assembly = assemblies[id];
+        // Skip repeatedly processing nodes in chains that do not have cycles
+        if (states[id]===STATES.VALID) {
+            continue;
+        } else if (states[id] === STATES.PROCESSING) {
+            return false;
+        } else {
+            states[id] = STATES.PROCESSING;
+        }
+        var numChildren = 0;
+        for(var i = 0; i < assembly.children.length; i++){
+            var childId = assembly.children[i];
+            // Only check children that are assemblies
+            if (assemblies[childId] && states[childId] !== STATES.VALID) {
+                stack.push(childId);
+                parent[childId] = id;
+                numChildren++;
+            }
+        }
+        // Leaf node has no cycles
+        if (numChildren === 0) {
+            var validId = id;
+            // Mark parents as valid as long as they are satisfied
+            while (validId && states[validId]===STATES.PROCESSING) {
+                // A node is satisfied when all of it's children have been processed
+                var satisfied = true;
+                var children = assemblies[validId].children;
+                // Check if any of the children that are assemblies are not yet valid
+                for(var i = 0; i < children.length; i++){
+                    if (assemblies[children[i]] && states[children[i]]!==STATES.VALID) {
+                        satisfied = false;
+                    }
+                }
+                if (satisfied) {
+                    states[validId] = STATES.VALID;
+                    validId = parent[validId];
+                } else {
+                    validId = null;
+                }
+
+            }
+        }
+    }
+    return true;
+}
+
+/**
  * Determine if some arbitrary json is a valid scene
  * @param  {Object} json JSON data of a potential scene
  * @return {SceneValidatorResults}      The result
@@ -182,6 +253,7 @@ SceneValidator.prototype.validateJSON = function (json)
     if (!SceneValidator.isScene(json)) {
         return _error('The element is not a scene');
     }
+    var assemblies = {};
     var layerCount = 0;
     for (var i=0;i<json.elements.length;i++){
         var obj = json.elements[i];
@@ -207,6 +279,7 @@ SceneValidator.prototype.validateJSON = function (json)
             if (!res.getResult()) {
                 return res;
             }
+            assemblies[obj.id] = obj;
         }
 
         // check layer reference only assemblies and instances
@@ -220,6 +293,9 @@ SceneValidator.prototype.validateJSON = function (json)
     }
     if (layerCount < 1) {
         return _error('Scene has no layers');
+    }
+    if (!_isAcyclic(assemblies)) {
+        return _error('Cycle found in assemblies');
     }
     return _ok();
 }
