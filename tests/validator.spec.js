@@ -5,37 +5,53 @@ describe("Scene validator test", function() {
     'use strict';
 
     var SceneValidator = require('../SceneValidator.js');
-    var badLayerScene = require('./data/scene/badLayerScene.json');
-    var basicScene = require('./data/scene/basicScene.json');
-    var maxRectangles = require('./data/scene/maxRectangles.json');
-    var validAssembly = require('./data/scene/validAssembly.json');
 
-    it ("Bad layer scene should error", function() {
-        var validator = new SceneValidator();
-        var results = validator.validateJSON(badLayerScene);
-        expect(results.getResult()).toEqual(false);
-        expect(results.getMessage().indexOf('element')).not.toEqual(-1);
-    });
+    var fixture = [{
+        scene: 'badLayerScene',
+        message: 'element'
+    },{
+        scene: 'basicScene',
+        message: ''
+    },{
+        scene: 'maxRectangles',
+        message: ''
+    },{
+        scene: 'validAssembly',
+        message: ''
+    },{
+        scene: 'linkedAssembly',
+        message: ''
+    },{
+        scene: 'linkedAssembly2',
+        message: ''
+    },{
+        scene: 'cyclicAssembly',
+        message: 'Cycle'
+    },{
+        scene: 'cyclicAssembly2',
+        message: 'Cycle'
+    },{
+        scene: 'cyclicAssembly3',
+        message: 'Cycle'
+    },{
+        scene: 'cyclicAssembly4',
+        message: 'equal to parent'
+    }
+    ];
 
-    it ("Basic scene should validate", function() {
-        var validator = new SceneValidator();
-        var results = validator.validateJSON(basicScene);
-        expect(results.getResult()).toEqual(true);
-        expect(results.getMessage()).toEqual('');
-    });
-
-    it ("Rectangles scene should validate", function() {
-        var validator = new SceneValidator();
-        var results = validator.validateJSON(maxRectangles);
-        expect(results.getResult()).toEqual(true);
-        expect(results.getMessage()).toEqual('');
-    });
-
-    it ("Assembly scene should validate", function() {
-        var validator = new SceneValidator();
-        var results = validator.validateJSON(validAssembly);
-        expect(results.getResult()).toEqual(true);
-        expect(results.getMessage()).toEqual('');
+    fixture.forEach(function (testData) {
+        it (testData.scene, function() {
+            console.log(testData.scene)
+            var validator = new SceneValidator();
+            var results = validator.validateJSON(require('./data/scene/'+testData.scene+'.json'));
+            var valid = testData.message === '';
+            expect(results.getResult()).toEqual(valid);
+            if (testData.message === '') {
+                expect(results.getMessage()).toEqual(testData.message);
+            } else {
+                expect(results.getMessage()).toContain(testData.message);
+            }
+        });
     });
 
 });

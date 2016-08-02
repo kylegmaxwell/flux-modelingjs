@@ -1,0 +1,27 @@
+{
+    "primitive": "scene",
+    "version":"0.0.1",
+    "elements":[
+        {
+            "id": "C",
+            "primitive": "assembly",
+            "children": ["A"]
+        },
+        {
+            "id": "B",
+            "primitive": "assembly",
+            "children": ["C"]
+        },
+        {
+            "id": "A",
+            "primitive": "assembly",
+            "children": ["B"]
+        },
+        {
+            "id": "plants",
+            "primitive": "layer",
+            "color": "green",
+            "elements": ["A"]
+        }
+    ]
+}
