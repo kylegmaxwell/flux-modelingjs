@@ -776,7 +776,7 @@ function detectUnits(entity) {
     @private
     @param  {string}   typeid  - name of entity type, value for 'primitive' property
     @param  {any}      params  - additional parameters of entity
-    @param  {function} OptCtor - optional, constructor function; {@link Entity} if undefined
+    @param  {function} [OptCtor] - optional, constructor function; {@link Entity} if undefined
     @return {Entity}             Entity or any other type specified by OptCtor
 */
 function primitive(typeid, params, OptCtor) {
@@ -791,7 +791,7 @@ function primitive(typeid, params, OptCtor) {
 
     @private
     @param  {any}   obj  - entity or array
-    @param  {string} dimToUnits - optional, desired units of resulting
+    @param  {string} [dimToUnits] - optional, desired units of resulting
         vector. Only used if the input object is an entity, and if this module
         has been init'd with a units of measure registry.
     @return {Array}             Coordinate array
@@ -830,7 +830,7 @@ function mapCoords(vec) {
 
     @private
     @param  {any}   obj  - entity or array
-    @param  {string} dimToUnits - optional, desired units of resulting
+    @param  {string} [dimToUnits] - optional, desired units of resulting
         vector. Only used if the input object is an entity, and if this module
         has been init'd with a units of measure registry.
     @return {Array}             Component array
@@ -1549,14 +1549,14 @@ var entities =
     /** Constructs point entity
      *
      *  @function
-     *  @param  {number[]|Point} coords - array with point coordinates
-     *  @param  {string}         name   - optional, entity id
+     *  @param  {number[]|Point} point - array with point coordinates
+     *  @param  {string}         [id]   - optional, entity id
      *  @return {Point}
      */
-    point: function (pt, name) {
+    point: function (point, id) {
         return primitive('point', {
-            point: coords(pt),
-            id: name || genId()
+            point: coords(point),
+            id: id || genId()
         }, Point);
     },
 
@@ -1569,16 +1569,16 @@ var entities =
      *  @function
      *  @param  {number[]|Point} start - starting point
      *  @param  {number[]|Point} end   - end point
-     *  @param  {string}         name  - optional, entity id
+     *  @param  {string}         [id]  - optional, entity id
      *  @return {Wire}          line entity
      */
-    line: function (start, end, name) {
+    line: function (start, end, id) {
         return primitive('line', {
             start:   coords(start),
             end:     coords(end),
             startId: start.id || genId(),
             endId:   end.id || genId(),
-            id:      name || genId()
+            id:      id || genId()
         }, Wire);
     },
     /** Constructs polyline entity
@@ -1598,10 +1598,10 @@ var entities =
      *  @param  {number[]|Point}    start  - start point
      *  @param  {number[]|Point}    middle - middle point
      *  @param  {number[]|Point}    end    - end point
-     *  @param  {string}            name   - optional, entity id
+     *  @param  {string}            [id]   - optional, entity id
      *  @return {Wire}              arc entity
      */
-    arc: function (start, middle, end, name) {
+    arc: function (start, middle, end, id) {
         return primitive('arc', {
             start:    coords(start),
             middle:   coords(middle),
@@ -1609,22 +1609,22 @@ var entities =
             startId:  start.id || genId(),
             endId:    end.id || genId(),
             originId: genId(),
-            id:       name || genId()
+            id:       id || genId()
         }, Wire);
     },
     /** Constructs NURBS curve entity
      *
      *  @function
      *  @param  {number} degree - curve's NURBS degree
-     *  @param  {string} name   - optional, entity id
+     *  @param  {string} [id]   - optional, entity id
      *  @return {Curve}           curve entity
      */
-    curve: function(degree, name) {
+    curve: function(degree, id) {
         return primitive('curve', {
             degree: degree,
             knots: [],
             controlPoints: [],
-            id: name || genId()
+            id: id || genId()
         },
         Curve);
     },
@@ -1633,15 +1633,15 @@ var entities =
      *  @function
      *  @param  {number[]|Point}    center - circle center
      *  @param  {number}            r      - radius
-     *  @param  {string}            name   - optional, entity id
+     *  @param  {string}            [id]   - optional, entity id
      *  @return {Wire}            circle entity
      */
-    circle: function (center, r, name) {
+    circle: function (center, r, id) {
         return primitive('circle', {
             origin:   coords(center),
             originId: center.id || genId(),
             radius:   r,
-            id:       name || genId()
+            id:       id || genId()
         },
         Wire);
     },
@@ -1652,17 +1652,17 @@ var entities =
      *  @param  {number}          rMajor - major radius
      *  @param  {number}          rMinor - minor radius
      *  @param  {number[]|Vector} dir    - major direction
-     *  @param  {string}          name   - optional, entity id
+     *  @param  {string}          [id]   - optional, entity id
      *  @return {Wire}
      */
-    ellipse: function (center, rMajor, rMinor, dir, name) {
+    ellipse: function (center, rMajor, rMinor, dir, id) {
         return primitive('ellipse', {
             origin:      coords(center),
             originId:    center.id || genId(),
             majorRadius: rMajor,
             minorRadius: rMinor,
             direction:   (dir ? vecCoords(dir) : undefined),
-            id:          name || genId()
+            id:          id || genId()
         },
         Wire);
     },
