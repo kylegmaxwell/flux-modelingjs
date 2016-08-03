@@ -75,6 +75,9 @@ function isInst(value, type) {
         return false;
     return (value instanceof type) || value.constructor == type;
 }
+
+// TODO(andrew): once https://vannevar.atlassian.net/browse/LIB3D-623 lands,
+// I think that we can remove all use of inherit and the remaining pseudoclasses.
 // Inherit one type from another, adding methods via prototype object
 function inherit(clazz, base, proto) {
     clazz.prototype = Object.create(base.prototype);
@@ -548,94 +551,6 @@ Entity.prototype.addAttribute = function(keyobj, value) {
     this.attributes[key] = value;
     return this;
 };
-//******************************************************************************/
-// Pseudo-classes representing entity categories
-
-/**
- *  @class
- *  @extends Entity
- *  @classdesc Represents any limited embodied geometry
- */
-function Body() { Entity.apply(this, arguments); }
-// Inherit Body from Entity
-inherit(Body, Entity,
-/** @lends Body.prototype */
-{
-    /** Adds axis vector to the body
-    *   @param {number[]|Vector} a - axis vector
-    *   @return {this}               this, for chaining
-    */
-    setAxis: function (a) {
-        this.axis = vecCoords(a);
-        return this;
-    },
-    /** Adds reference vector to the body
-    *   @param {number[]|Vector} ref - reference vector
-    *   @return {this}                 this, for chaining
-    */
-    setReference: function (ref) {
-        this.reference = vecCoords(ref);
-        return this;
-    }
-});
-/**
- *  @class
- *  @extends Body
- *  @classdesc Represents 3D point
- */
-function Point() { Body.apply(this, arguments); }
-inherit(Point, Body);
-/**
- *  @class
- *  @extends Body
- *  @classdesc Wire entities, i.e. polylines, curves, ellipses
- */
-function Wire() { Body.apply(this, arguments); }
-inherit(Wire, Body);
-/**
- *  @class
- *  @extends Body
- *  @classdesc Sheet entities, i.e. polygon sets, surfaces
- */
-function Sheet() { Body.apply(this, arguments); }
-inherit(Sheet, Body);
-/**
- *  @class
- *  @extends Body
- *  @classdesc Solid entities, i.e. meshes, spheres, boxes
- */
-function Solid() { Body.apply(this, arguments); }
-inherit(Solid, Body);
-/**
- *  @class
- *  @extends Body
- *  @classdesc General bodies; can be received only as a result of some operation
- */
-function General() { Body.apply(this, arguments); }
-inherit(General, Body);
-
-/**
- *  @class
- *  @extends Entity
- *  @classdesc Analytical geometry entities
- */
-function Geometry() { Entity.apply(this, arguments); }
-inherit(Geometry, Entity);
-/**
- *  @class
- *  @extends Geometry
- *  @classdesc Infinite plane
- */
-function Plane() { Geometry.apply(this, arguments); }
-inherit(Plane, Geometry);
-/**
- *  @class
- *  @extends Geometry
- *  @classdesc 3D direction vector
- */
-function Vector() { Geometry.apply(this, arguments); }
-inherit(Vector, Geometry);
-
 
 /** Helper function
 
@@ -659,7 +574,7 @@ function primitive(typeid, params, OptCtor) {
     @param  {any}   obj  - entity or array
     @return {Array}             Coordinate array
 */
-function makeAdjustCoords(type, primitive, field) {
+function makeAdjustCoords(primitive, field) {
     return function coords(obj) {
         if (Array.isArray(obj))
             return obj;
@@ -674,11 +589,11 @@ function makeAdjustCoords(type, primitive, field) {
                 return obj[field];
             }
         }
-        throw new FluxModelingError("expected array of numbers or " + type.name + " entity");
+        throw new FluxModelingError("expected array of numbers or " + primitive + " entity");
     };
 }
 
-var coords = makeAdjustCoords(Point, "point", "point");
+var coords = makeAdjustCoords("point", "point");
 
 function mapCoords(vec) {
     var out = [];
@@ -697,7 +612,7 @@ function mapCoords(vec) {
     @return {Array}             Component array
 */
 
-var vecCoords = makeAdjustCoords(Vector, "vector", "coords");
+var vecCoords = makeAdjustCoords("vector", "coords");
 
 function mapVecCoords(vec) {
     var out = [];
@@ -858,14 +773,15 @@ inherit(Affine, Entity,
      }
 });
 
+
 /** Use {@link entities.mesh} to construct
  *  @class
  *  @extends Solid
  *  @classdesc Entity which represents 3D polygonal mesh
  */
-function Mesh() { Solid.apply(this, arguments); }
+function Mesh() { Entity.apply(this, arguments); }
 // inherit Mesh from Entity
-inherit(Mesh, Solid,
+inherit(Mesh, Entity,
 /** @lends Mesh.prototype */
 {
     /** Adds vertex to mesh
@@ -947,7 +863,7 @@ function canonicVertex(item) {
             // repr #2
             return [item.slice(0, 3), item[3]];
     }
-    else if (item instanceof Point || item.primitive == "point") // Point case
+    else if (item.primitive === "point") // Point case
         // repr #3, #6
         return [coords(item), undefined];
     // Didn't match anything, so just throw
@@ -981,9 +897,9 @@ function appendVertex(ctxt, item) {
  *  @extends Wire
  *  @classdesc Entity which represents NURBS curve
  */
-function Curve() { Wire.apply(this, arguments); }
+function Curve() { Entity.apply(this, arguments); }
 // inherit Curve from Wire
-inherit(Curve, Wire,
+inherit(Curve, Entity,
 /** @lends Curve.prototype */
 {
     /** Appends numbers to array of knots
@@ -1029,9 +945,9 @@ inherit(Curve, Wire,
  *  @extends Sheet
  *  @classdesc Entity which represents NURBS surface
  */
-function Surface() { Sheet.apply(this, arguments); }
+function Surface() { Entity.apply(this, arguments); }
 // inherit Surface from Sheet
-inherit(Surface, Sheet,
+inherit(Surface, Entity,
 /** @lends Surface.prototype */
 {
     /** Appends numbers to array of U-axis knots
@@ -1361,7 +1277,7 @@ var entities =
      *  @return {Vector}
      */
     vector: function (vec) {
-        return primitive('vector', { coords: vecCoords(vec) }, Vector);
+        return primitive('vector', { coords: vecCoords(vec) });
     },
 
     //******************************************************************************
@@ -1379,7 +1295,7 @@ var entities =
         return primitive('point', {
             point: coords(point),
             id: id || genId()
-        }, Point);
+        });
     },
 
     //******************************************************************************
@@ -1401,7 +1317,7 @@ var entities =
             startId: start.id || genId(),
             endId:   end.id || genId(),
             id:      id || genId()
-        }, Wire);
+        });
     },
     /** Constructs polyline entity
      *
@@ -1412,7 +1328,7 @@ var entities =
     polyline: function() {
         return primitive('polyline', {
             points: mapCoords(arguments)
-        }, Wire);
+        });
     },
     /** Constructs arc entity
      *
@@ -1432,7 +1348,7 @@ var entities =
             endId:    end.id || genId(),
             originId: genId(),
             id:       id || genId()
-        }, Wire);
+        });
     },
     /** Constructs NURBS curve entity
      *
@@ -1447,8 +1363,7 @@ var entities =
             knots: [],
             controlPoints: [],
             id: id || genId()
-        },
-        Curve);
+        }, Curve);
     },
     /** Constructs circle entity
      *
@@ -1464,8 +1379,7 @@ var entities =
             originId: center.id || genId(),
             radius:   r,
             id:       id || genId()
-        },
-        Wire);
+        });
     },
     /** Constructs ellipse entity
      *
@@ -1485,8 +1399,7 @@ var entities =
             minorRadius: rMinor,
             direction:   (dir ? vecCoords(dir) : undefined),
             id:          id || genId()
-        },
-        Wire);
+        });
     },
     /** Constructs rectangle entity
      *
@@ -1500,7 +1413,7 @@ var entities =
         if (c.length != 2) {
             throw new FluxModelingError("Expected rectangle dimensions to be 2-dimensional.");
         }
-        return primitive('rectangle', { origin: coords(center), dimensions: c }, Wire);
+        return primitive('rectangle', { origin: coords(center), dimensions: c });
     },
     /** Constructs polycurve entity
      *
@@ -1511,7 +1424,7 @@ var entities =
      *  @return {Wire}
      */
     polycurve: function (curves) {
-        return primitive('polycurve', { curves: curves }, Wire);
+        return primitive('polycurve', { curves: curves });
     },
 
     //******************************************************************************
@@ -1543,7 +1456,7 @@ var entities =
      *  @return {Sheet}
      */
     polysurface: function (surfaces) {
-        return primitive('polysurface', { surfaces: surfaces }, Sheet);
+        return primitive('polysurface', { surfaces: surfaces });
     },
 
     //******************************************************************************
@@ -1566,7 +1479,7 @@ var entities =
      *  @return {Solid}
      */
     block: function (center, span) {
-        return primitive('block', { origin: coords(center), dimensions: vecCoords(span) }, Solid);
+        return primitive('block', { origin: coords(center), dimensions: vecCoords(span) });
     },
 
     /** Constructs sphere
@@ -1577,7 +1490,7 @@ var entities =
      *  @return {Solid}
      */
     sphere: function (c, r) {
-        return primitive('sphere', { origin: coords(c), radius: r }, Solid);
+        return primitive('sphere', { origin: coords(c), radius: r });
     },
 
     //******************************************************************************

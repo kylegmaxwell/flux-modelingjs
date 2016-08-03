@@ -14,22 +14,6 @@ describe("Query/Entity", function () {
         expect(typeof point.addAttribute).toBe('function');
     });
 
-    it("should set body's axis with setAxis", function () {
-        var point = modeling.entities.point([2, 0.5, 4]);
-        expect(typeof point.setAxis).toBe('function');
-        point.setAxis([1, 0, 1]);
-        expect(typeof point.setAxis).toBe('function');
-        expect(typeof point.axis).toBe('object');
-    });
-
-    it("should set body's reference with setReference", function () {
-        var point = modeling.entities.point([2, 0.5, 4]);
-        expect(typeof point.setReference).toBe('function');
-        point.setReference([1, 0, 1]);
-        expect(typeof point.setReference).toBe('function');
-        expect(typeof point.reference).toBe('object');
-    });
-
     it("should add vertices to mesh via addVertex/addVertices", function () {
         var mesh = modeling.entities.mesh();
         expect(typeof mesh.addVertex).toBe('function');
@@ -60,6 +44,7 @@ describe("Query/Entity", function () {
         expect(typeof mesh.addFace).toBe('function');
         expect(typeof mesh.addFaces).toBe('function');
         expect(typeof mesh.faces).toBe('object');
+        expect(mesh.faces.length).toEqual(4);
     });
 
     it("should add knots to curve via addKnots", function () {
@@ -68,6 +53,7 @@ describe("Query/Entity", function () {
         curve.addKnots(0, 0, 1, 1);
         expect(typeof curve.addKnots).toBe('function');
         expect(typeof curve.knots).toBe('object');
+        expect(curve.knots.length).toEqual(4);
     });
 
     it("should add vertices to curve via addVertex, addVertices", function () {
@@ -82,6 +68,7 @@ describe("Query/Entity", function () {
         expect(typeof curve.addVertex).toBe('function');
         expect(typeof curve.addVertices).toBe('function');
         expect(typeof curve.controlPoints).toBe('object');
+        expect(curve.controlPoints.length).toEqual(3);
     });
 
     it("adds knots to surface via addUKnots, addVKnots", function () {
@@ -94,6 +81,8 @@ describe("Query/Entity", function () {
         expect(typeof surf.addVKnots).toBe('function');
         expect(typeof surf.uKnots).toBe('object');
         expect(typeof surf.vKnots).toBe('object');
+        expect(surf.uKnots.length).toEqual(4);
+        expect(surf.vKnots.length).toEqual(4);
     });
 
     it("adds vertices to surface via addRow, addPoints", function () {
@@ -109,6 +98,8 @@ describe("Query/Entity", function () {
         expect(typeof surf.addRow).toBe('function');
         expect(typeof surf.addPoints).toBe('function');
         expect(typeof surf.controlPoints).toBe('object');
+        expect(surf.controlPoints.length).toEqual(2);
+        expect(surf.controlPoints[0].length).toEqual(2);
     });
 
     it("sets material properties via set* methods", function () {
