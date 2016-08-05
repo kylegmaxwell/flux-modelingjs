@@ -21,9 +21,9 @@ if (typeof config !== 'object') {
 
 
 var flux = require('./index');
+var types, s;
 
 // Skip require for environments that don't support it (rollup)
-// This only supports skipping loading the measure library.
 if (!config.skip) {
     // If a user of modelingjs is explicitly passing a falsey value for genId,
     // then default to a function that returns undefined, to avoid errors attempting
@@ -36,18 +36,16 @@ if (!config.skip) {
             ? registry.ConvertUnits.bind(registry)
             : function (obj, dimUnits) { return obj; };
     })();
+    types = require("./types")();
+    // Schema helpers
+    s = types.helpers;
 }
-
 
 var eps = 1e-8;
 var DEFAULT_LINEAR_TOLERANCE = 0.1;
 var DEFAULT_ANGULAR_SIZE     = 30.0;
 
 var util = require("./util");
-
-var types = require("./types")();
-// Schema helpers
-var s = types.helpers;
 
 /* Converts any array-like object to actual array
    Used mostly with Arguments objects
