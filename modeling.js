@@ -1,5 +1,5 @@
 /** @file Helper functions and classes to generate valid JSON queries to Geometry Worker server.
- *  Use {@link scene} as a starting point
+ *  Use {@link query} as a starting point
  *  @author Igor Baidiuk <ibaidiuk@amcbridge.com>
  */
 
@@ -54,26 +54,9 @@ function toArray(obj) {
     return Array.prototype.slice.call(obj);
 }
 
-function notImplemented() {
-    throw new FluxModelingError('not implemented');
-}
-
 function normalize(arr) {
     var m = Math.sqrt(arr[0]*arr[0] + arr[1]*arr[1]  + arr[2]*arr[2]);
     return [arr[0]/m, arr[1]/m, arr[2]/m];
-}
-
-function xor(l, r) { return l ? !r : r; }
-// Common dump function, returns text representation
-// check for both null and undefined
-function isNone(value) { return value === null || value === undefined; }
-
-function isInst(value, type) {
-    if (!(type instanceof Function))
-        throw new FluxModelingError('type: constructor expected');
-    if (isNone(value))
-        return false;
-    return (value instanceof type) || value.constructor == type;
 }
 
 function initObject(dest, source) {
@@ -257,251 +240,6 @@ Query.prototype.add = function(name, obj) {
 };
 
 //******************************************************************************
-/** Use factory function {@link dcmScene}
- *  @class
- *  @classdesc Represents block query as scene, with geometrical entities, constraints, variables, equations and operations over there
- */
-function DCMScene() {
-    this.entities   = {};
-    this.constraints = {};
-    this.variables = {};
-    this.equations = {};
-    this.operations = [];
-}
-
-// Adds array of elements to scene
-DCMScene.prototype.addMultiple = function (elements) {
-    for (var key in elements)
-        this.add(elements[key], key);
-};
-
-/** Creates new scene object
- *  @param  {Object} value - optional, object with entities, constraints, etc.., to initialize scene
- *
- *  @return {DCMScene} new scene object
- */
-var dcmScene = function (value) {
-    var scene = new DCMScene();
-    if (value) {
-        for (var key in value)
-            scene.addMultiple(value[key]);
-    }
-
-    return scene;
-};
-/** Converts DCMScene object to JSON representation
- *  Adds custom-conversion support for {@link JSON.stringify}
- *
- *  @return {*} JSON-ready object
- */
-DCMScene.prototype.toJSON  = function () {
-    var ops  = dumpDCMOperations(this);
-    return {
-        Entities:       this.entities,
-        Constraints:    this.constraints,
-        Variables:      this.variables,
-        Equations:      this.equations,
-        Operations:     ops
-    };
-};
-
-/* Resolves Entity, Constraint, Variable, Equation or Operation object into its name in query
-   Entities, Constraints, Variables and Equations without a name are assigned with guid
-   Operations without a name return no name and thus expanded in-place
-
-   @param  {Entity|Constraint|Variable|Equation|Operation}  object to be resolved
-   @param  {number}                                         index of current operation block, used to block forward lookups
-   @return {string}                                         item name, if any
- */
-function resolveDCMItem(self, e, opIndex) {
-    var key;
-    if (e instanceof Entity) {
-        Object.keys(self.entities).forEach(function (k) {
-            if (!key && self.entities[k] === e) {
-                key = k;
-            }
-        });
-        if (!key) {
-            key = e.id || genId();
-            self.entities[key] = e;
-        }
-    }
-    else if (e instanceof Operation) {
-        var ops = self.operations;
-        var i;
-
-        // find latest binding
-        for (i = opIndex - 1; i >= 0; i -= 1) {
-            var item = ops[i];
-            if (item.operation === e) {
-                key = item.name;
-                break;
-            }
-        }
-        // check if binding wasn't overridden later
-        if (key)
-            for (var j = opIndex - 1; j > i; j -= 1)
-                if (ops[j].name === key)
-                    return undefined;
-    }
-    return key;
-}
-
-function dumpDCMOperations(self) {
-    function resolver(index) {
-        return function (e) { return resolveDCMItem(self, e, index); };
-    }
-
-    return self.operations.map(
-        function (item, index) {
-            return withResolver(
-                resolver(index),
-                function () {
-                    return item.toJSON();
-                }
-            );
-        }
-    );
-}
-
-DCMScene.prototype.hasEntity = function (name) {
-    return name in this.entities;
-};
-
-DCMScene.prototype.hasConstraint = function (name) {
-    return name in this.constraints;
-};
-
-DCMScene.prototype.hasVariable = function (name) {
-    return name in this.variables;
-};
-
-DCMScene.prototype.hasEquation = function (name) {
-    return name in this.equations;
-};
-
-// Helper function. Switches all ids in entity fields to new guids
-function updateEntityIds (elem) {
-    if (elem) {
-        var idFields = ['startId', 'endId', 'originId'];
-        idFields.forEach(function(field){
-            if (elem.hasOwnProperty(field)) {
-                elem[field] = genId();
-            }
-        });
-
-        // 'id' field is obligatory
-        elem.id = genId();
-    }
-
-    return elem;
-}
-
-DCMScene.prototype.updateEntity = function (old) {
-    var name = old.id;
-    if (!this.hasEntity(name))
-        throw new FluxModelingError("Entity " + name + " is not present in scene");
-    var e = this.entities[name];
-    updateEntityIds(e);
-    return e;
-};
-
-// Generates entities related to given one (e.g. end points
-// of the line), adds them and entity itself to scene
-DCMScene.prototype.addEntity = function(entity, name) {
-    var self = this;
-    var initId = function (name, value) {
-        var nameId = name + 'Id';
-        var valueId = entity[nameId];
-        if (!self.hasEntity(valueId))
-            self.addEntity(
-                entities.point(value || entity[name], valueId),
-                valueId
-            );
-    }
-
-    switch (entity.primitive)
-    {
-        case 'point':
-        case 'curve':
-            // Entity is self-sufficient, so need to add only entity itself
-            break;
-        case 'line':
-            initId('start');
-            initId('end');
-            break;
-        case 'circle':
-        case 'ellipse':
-            initId('origin');
-            break;
-        case 'arc':
-            initId('origin', getCircleCenterByThreePoints(entity.start, entity.middle, entity.end));
-            initId('start');
-            initId('end');
-            break;
-        case 'polyline':
-        case 'polycurve':
-            notImplemented(); // TODO Implement after polyline
-            break;
-        default:
-            throw new FluxModelingError("Entity with primitive " + entity.primitive + " can not be added to scene");
-    }
-
-    this.entities[name] = entity;
-};
-/** Adds entity/constraint/variable/equation/operation to scene
- *
- *  @param          obj  - either entity, constraint, variable, equation or operation being added
- *  @param {string} name - name of item being added
- *  @return              - this object, for chain of calls
- */
-DCMScene.prototype.add = function(obj, name) {
-    name = name || obj.id;
-    if (!isInst(name, String))
-        throw new FluxModelingError('name: string expected');
-    if (isInst(obj, Entity)) {
-        if (!this.hasEntity(name))
-            this.addEntity(obj, name);
-    }
-    else if (isInst(obj, Constraint)) {
-        if (this.hasConstraint(name))
-            throw new FluxModelingError('constraint "' + name + '" already defined');
-        this.constraints[name] = obj;
-    }
-    else if (isInst(obj, Variable)) {
-        if (this.hasVariable(name))
-            throw new FluxModelingError('variable "' + name + '" already defined');
-        this.variables[name] = obj;
-    }
-    else if (isInst(obj, Equation)) {
-        if (this.hasEquation(name))
-            throw new FluxModelingError('equation "' + name + '" already defined');
-        this.equations[name] = obj;
-    }
-    else if (obj.primitive !== undefined) {
-        if (!this.hasEntity(name))
-            this.addEntity(entities.raw(obj), name);
-    }
-    else if (obj.type !== undefined) {
-        if (this.hasConstraint(name))
-            throw new FluxModelingError('constraint "' + name + '" already defined');
-        this.constraints[name] = constraints.raw(obj);
-    }
-    else if (obj.name !== undefined && obj.value !== undefined) {
-        throw new FluxModelingError('Adding raw variable is not supported');
-    }
-    else if (obj.equation !== undefined) {
-        throw new FluxModelingError('Adding raw equation is not supported');
-    }
-    else if (isInst(obj, Operation)) {
-        this.operations.push(new OpSlot(name, obj));
-    }
-    else
-        throw new FluxModelingError('obj: either Entity, Constraint, Variable, Equation or Operation is expected');
-    return this;
-};
-
-//******************************************************************************
 /** Use functions from {@link entities} to construct
  *  @class
  *  @classdesc Represents entity in Flux protocol. These objects are added to the 'Entities' part of scene
@@ -592,68 +330,6 @@ function multMatrix(a, b) {
             c[i * dim + j] = s;
         }
     return c;
-}
-
-//******************************************************************************
-/** Use functions from {@link constraints} to construct
- *  @class
- *  @classdesc Represents constraint in Flux protocol. These objects are added to the 'Constraints' part of scene
- */
-function Constraint(id) { this.type = id; }
-
-/** Helper function
-
-    @private
-    @param  {string}   typeid  - name of constraint type, value for 'type' property
-    @param  {any}      params  - additional parameters of constraint
-    @return {Constraint}         Constraint
-*/
-function type(typeid, params) {
-    var e = new Constraint(typeid);
-    initObject(e, params);
-    e.type = typeid;
-    e.id = genId();
-    return e;
-}
-
-//******************************************************************************
-/** Use functions from {@link variables} to construct
- *  @class
- *  @classdesc Represents variable in Flux protocol. These objects are added to the 'Variables' part of scene
- */
-function Variable() {}
-
-/** Helper function
-
-    @private
-    @param  {any}      params - parameters of variable
-    @return {Variable}          Variable
-*/
-function variable(params) {
-    var v = new Variable();
-    initObject(v, params);
-    v.id = genId();
-    return v;
-}
-
-//******************************************************************************
-/** Use functions from {@link equations} to construct
- *  @class
- *  @classdesc Represents equation in Flux protocol. These objects are added to the 'Equations' part of scene
- */
-function Equation() {}
-
-/** Helper function
-
-    @private
-    @param  {any}      params - parameters of equation
-    @return {Equation}          Equation
-*/
-function equation(params) {
-    var e = new Equation();
-    initObject(e, params);
-    e.id = genId();
-    return e;
 }
 
 //******************************************************************************
@@ -1284,90 +960,6 @@ var entities =
     }
 };
 
-//******************************************************************************
-// Constraints
-//******************************************************************************
-// Helper functions to create json constraints
-function constr1(e) {
-    return { entity1: e.id };
-}
-function valueConstr1(val, e) {
-    return { value: val, entity1: e.id };
-}
-function constr2(e1, e2) {
-    return { entity1: e1.id, entity2: e2.id };
-}
-function valueConstr2(val, e1, e2) {
-    return { value: val, entity1: e1.id, entity2: e2.id };
-}
-function helpConstr2(e1, e2, h1, h2) {
-    return { entity1: e1.id, entity2: e2.id, help1: h1, help2: h2 };
-}
-function helpParamsConstr2(e1, e2, p1, p2) {
-    return { entity1: e1.id, entity2: e2.id, helpParam1: p1, helpParam2: p2 };
-}
-function valueHelpConstr2(val, e1, e2, h1, h2) {
-    return { value: val, entity1: e1.id, entity2: e2.id, help1: h1, help2: h2 };
-}
-function constr3(e1, e2, e3) {
-    return { entity1: e1.id, entity2: e2.id, entity3: e3.id };
-}
-function help(param) {
-    if (arguments.length !== 1)
-        throw new FluxModelingError("Invalid help parameter " + JSON.stringify(arguments));
-    if (Array.isArray(param)) {
-        if(param.length !== 0 && param.length !== 3) {
-            throw new FluxModelingError("Invalid help point " + JSON.stringify(param));
-        }
-        return param;
-    }
-    if (typeof param !== 'number')
-        throw new FluxModelingError("Invalid help parameter " + JSON.stringify(param));
-    return [param];
-}
-// var constraints is used for self-call
-var constraints =
-    /** Constraint constructors
-    *  @namespace constraints
-    */
-{
-    //******************************************************************************
-    // Raw constraint, specified directly as JSON
-    //******************************************************************************
-    /** Constructs constraint object from raw data. No checks for type value, body being object etc.
-     *
-     *  @param  {*}      body - any JavaScript value
-     *  @return {Constraint}
-     */
-    raw: function(body) {
-        var c = new Constraint(body.type);
-        initObject(c, body);
-        return c;
-    },
-    /** Constructs parallel constraint
-     *  Defined only for geometries with a direction
-     *  It implies that the directions of the geometries are parallel
-     *
-     *  @function
-     *  @param  {Entity} e1     - first entity
-     *  @param  {Entity} e2     - second entity
-     *  @return {Constraint}      parallel constraint
-     */
-    parallel: function(e1, e2) {
-        return type('parallel', constr2(e1, e2));
-    },
-    /** Constructs radius constraint
-     *  Defined only for circles
-     *
-     *  @function
-     *  @param  {Entity} val    - circle radius value
-     *  @param  {Entity} e      - circle entity
-     *  @return {Constraint}      radius constraint
-     */
-    radius: function(val, e) {
-        return type('radius', valueConstr1(val, e));
-    }
-};
 // Operations
 //******************************************************************************
 var ops =
@@ -1773,14 +1365,6 @@ var ops =
      *  @return {Sheet}   profile
      */
     createResilientProfiles: op('createResilientProfiles', 1),
-    /** 'eval' operation
-     *  Evaluates entire scene inside DCM-Worker
-     *  @function
-     *  @return {DCM/Scene} scene
-     */
-    eval: function() {
-        return new Operation('eval');
-    },
     /** 'evalBoundingBox' operation
      *  Calculates axis-aligned bounding box of an array of entities
      *  @function
@@ -1830,10 +1414,8 @@ FluxModelingError.prototype.constructor = FluxModelingError;
 
 return {
     query:      query,
-    dcmScene:   dcmScene,
     utilities:  utilities,
     entities:   entities,
-    constraints: constraints,
     operations: ops
 };
 
