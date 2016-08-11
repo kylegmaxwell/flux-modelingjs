@@ -22,7 +22,11 @@ var helpers = {
     Null: specification({ "type": "null" }, "null"),
     String: specification({"type": "string"}, "a string"),
     Number: specification({"type": "number"}, "a number"),
-
+    PositiveInteger: specification({
+            "type":    "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+        }, "a positive integer"),
 
     /** Convenience method for constructing a specification based on an entity
      * sub-schema inside the parasolid worker geomtry entity schema.

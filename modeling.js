@@ -759,68 +759,6 @@ util.inherit(Affine, Entity,
      }
 });
 
-/** Use {@link entities.mesh} to construct
- *  @class
- *  @extends Solid
- *  @classdesc Entity which represents 3D polygonal mesh
- */
-function Mesh() { Entity.apply(this, arguments); }
-// inherit Mesh from Entity
-util.inherit(Mesh, Entity,
-/** @lends Mesh.prototype */
-{
-    /** Adds vertex to mesh
-     *
-     *  @function
-     *  @param  {number[]|Point} coords
-     *  @return {this}           this, for chaining
-     */
-    addVertex: function (c) {
-            types.checkAllAndThrow(["Vertex", s.AnyOf(s.Type("position"), s.Entity("point")), c]),
-
-            this.vertices.push(coords(c));
-            return this;
-        },
-    /** Adds multiple vertices to mesh
-     *
-     *  @function
-     *  @param  {(number[]|Point)[]} coords
-     *  @return {this}               this, for chaining
-     */
-    // TODO(andrew): typecheck curve, following LIB3D-623
-    // https://vannevar.atlassian.net/browse/LIB3D-623
-    addVertices: function () {
-        for (var i = 0; i < arguments.length; ++i)
-            this.addVertex(arguments[i]);
-        return this;
-    },
-    /** Builds new face in mesh from vertex indices
-     *
-     *  @function
-     *  @param  {...number} index - indices of vertices constituting face
-     *  @return {this}              this, for chaining
-     */
-    addFace: function() {
-        var args = toArray(arguments);
-        types.checkAllAndThrow(["Face", s.ArrayOf(s.Type("index")), args])
-        this.faces.push(args);
-        return this;
-    },
-    /** Adds multiple faces to mesh composed of vertex indices
-     *
-     *  @function
-     *  @param  {...number} index - indices of vertices constituting face
-     *  @return {this}              this, for chaining
-     */
-    addFaces: function() {
-        var args = toArray(arguments);
-        types.checkAllAndThrow(["Faces", s.ArrayOf(s.ArrayOf(s.Type("index"))), args]);
-        for (var i = 0; i < arguments.length; ++i)
-            this.faces.push(args)
-        return this;
-    }
-});
-
 function appendToField(field) {
     return function() {
         var self = this;
@@ -884,108 +822,6 @@ function appendVertex(ctxt, item) {
     }
     // NB: case where points are empty, and weights are not, isn't an error - because weights are in a linear array, and points aren't always
 }
-
-/** Use {@link entities.curve} to construct
- *  @class
- *  @extends Wire
- *  @classdesc Entity which represents NURBS curve
- */
-function Curve() { Entity.apply(this, arguments); }
-// inherit Curve from Wire
-util.inherit(Curve, Entity,
-/** @lends Curve.prototype */
-{
-    /** Appends numbers to array of knots
-     *
-     *  @function
-     *  @param  {...number} knot - knot values
-     *  @return {this}             this, for chaining
-     */
-    addKnots:  appendToField('knots'),
-    /** Adds curve vertex, either weighted or weightless
-     *
-     *  Weightless vertices are specified in one of the following formats:
-     *  - 3 numbers
-     *  - 1 Point
-     *  - array of 3 numbers
-     *  Weighted vertices are specified in one of the following formats:
-     *  - 4 numbers
-     *  - 1 Point, 1 number
-     *  - array of 3 numbers, 1 number
-     *  Also, any of these sets of arguments can be passed as a single argument, packed into array
-     *  @function
-     *  @return {this}                      this, for chaining
-     */
-    addVertex: function () {
-        var ctxt = { points: this.controlPoints, weights: this.weights };
-        appendVertex(ctxt, toArray(arguments));
-        this.controlPoints = ctxt.points;
-        this.weights       = ctxt.weights;
-        return this;
-    },
-    /** Adds multiple vertices to curve, passed argv style
-
-     */
-    addVertices: function () {
-        for (var i = 0; i < arguments.length; ++i)
-            this.addVertex.apply(this, Array.isArray(arguments[i]) ? arguments[i] : [ arguments[i] ])
-        return this;
-    }
-});
-
-/** Use {@link entities.surface} to construct
- *  @class
- *  @extends Sheet
- *  @classdesc Entity which represents NURBS surface
- */
-
-function Surface() { Entity.apply(this, arguments); }
-// util.inherit Surface from Sheet
-util.inherit(Surface, Entity,
-/** @lends Surface.prototype */
-{
-    /** Appends numbers to array of U-axis knots
-     *
-     *  @function
-     *  @param  {...number} knot - knot values
-     *  @return {this}             this, for chaining
-     */
-    addUKnots: appendToField('uKnots'),
-    /** Appends numbers to array of V-axis knots
-     *
-     *  @function
-     *  @param  {...number} knot - knot values
-     *  @return {this}             this, for chaining
-     */
-    addVKnots: appendToField('vKnots'),
-    /** Appends separate row (along surface's U axis) of control points to surface
-     *
-     *  @function
-     *  @param  {...any} point - control points; for supported point representations, see {@link Curve#vertex}, except each vertex is passed as a single argument
-     *  @return {this}           this, for chaining
-     */
-    addRow: function() {
-        var ctxt = { points: [], weights: this.weights };
-
-        for (var i = 0, e = arguments.length; i < e; ++i)
-            appendVertex(ctxt, toArray(arguments[i]));
-
-        this.controlPoints.push(ctxt.points);
-        this.weights = ctxt.weights;
-        return this;
-    },
-    /** Appends multiple rows of control points to surface
-     *
-     *  @function
-     *  @param  {...any[]} row - rows of control points; see {@link Surface#row} for exact row structure
-     *  @return {this}           this, for chaining
-     */
-    addPoints: function() {
-        for (var i = 0, e = arguments.length; i < e; ++i)
-            this.addRow.apply(this, arguments[i]);
-        return this;
-    }
-});
 
 //******************************************************************************
 /** Use functions from {@link constraints} to construct
@@ -1368,15 +1204,34 @@ var entities =
      *  @param  {string} [id]   - optional, entity id
      *  @return {Curve}           curve entity
      */
-     // TODO(andrew): typecheck curve, following LIB3D-623
-     // https://vannevar.atlassian.net/browse/LIB3D-623
-    curve: function(degree, id) {
+    curve: function(degree, controlPoints, knots, weights, id) {
+        types.checkAllAndThrow(
+            ["Degree", s.PositiveInteger, degree],
+            ["ControlPoints", s.ArrayOf(s.AnyOf(s.Entity("point"), s.Type("position"))), controlPoints],
+            ["Knots", s.ArrayOf(s.Number), knots],
+            ["Weights", s.Maybe(s.ArrayOf(s.Number)), weights],
+            ["Id", s.Maybe(s.String), id]);
+
+        if (knots.length != controlPoints.length + degree + 1) {
+            throw Error("Expect number of input knots (" + knots.length +
+                ") to equal the number of control points (" + controlPoints.length +
+                ") the degree of the curve (" + degree +
+                ")+ 1, which is "+(controlPoints.length + degree + 1));
+        }
+
+        if (weights && weights.length != controlPoints.length) {
+            throw Error("Expect weights to have length (got "+ weights.length +
+                        ") that is the same as controlPoints (got " + controlPoints.Length +
+                        ").");
+        }
+
         return primitive('curve', {
             degree: degree,
-            knots: [],
-            controlPoints: [],
+            knots: knots,
+            controlPoints: mapCoords(controlPoints),
+            weights: weights,
             id: id || genId()
-        }, Curve);
+        });
     },
     /** Constructs circle entity
      *
@@ -1466,16 +1321,52 @@ var entities =
      *  @param  {number}  vDegree - NURBS degree along V parameter
      *  @return {Surface}           NURBS surface entity
      */
-    // TODO(andrew): typecheck surface, following LIB3D-623
-    // https://vannevar.atlassian.net/browse/LIB3D-623
-    surface: function(uDegree, vDegree) {
+    surface: function(uDegree, vDegree, controlPoints, uKnots, vKnots, weights) {
+        types.checkAllAndThrow(
+            ["UDegree", s.PositiveInteger, uDegree],
+            ["VDegree", s.PositiveInteger, vDegree],
+            ["ControlPoints", s.ArrayOf(
+                s.ArrayOf(s.AnyOf(s.Entity("point"), s.Type("position")))), controlPoints],
+            ["UKnots", s.ArrayOf(s.Number), uKnots],
+            ["VKnots", s.ArrayOf(s.Number), vKnots],
+            ["Weights", s.Maybe(s.ArrayOf(s.ArrayOf(s.Number))), weights]);
+        var M = controlPoints.length;
+        var N = controlPoints[0].length;
+
+        if (uKnots.length != M + uDegree + 1) {
+            throw Error("In the u-direction, expect number of input knots (" + uKnots.length +
+                ") to equal the number of control points (" + M +
+                ") the degree of the curve (" + uDegree +
+                ") + 1, which is "+ (M + uDegree + 1));
+        }
+        if (vKnots.length != N + vDegree + 1) {
+            throw Error("In the v-direction, expect number of input knots (" + vKnots.length +
+                ") to equal the number of control points (" + N +
+                ") the degree of the curve (" + vDegree +
+                ") + 1, which is "+ (N + vDegree + 1));
+        }
+
+        // Check that all rows have the right length and unpack point entities
+        // into their coordinate vectors.
+        for (var i = 0; i < controlPoints.length; i++) {
+            var row = controlPoints[i];
+            if(row.length != N) {
+                throw Error("Not all rows of control points are of equal length. Got " + row.length +
+                    " but expected " + N);
+            }
+            controlPoints[i] = mapCoords(row);
+        }
+
+        // TODO(andrew): assert that weights have the same shape as controlPoints.
+
         return primitive('surface', {
             uDegree: uDegree,
             vDegree: vDegree,
-            uKnots: [],
-            vKnots: [],
-            controlPoints: []
-        }, Surface);
+            uKnots: uKnots,
+            vKnots: vKnots,
+            controlPoints: controlPoints,
+            weights: weights
+        });
     },
     /** Constructs polysurface entity
      *
@@ -1500,10 +1391,11 @@ var entities =
      *  @function
      *  @return {Mesh} mesh entity
      */
-    // TODO(andrew): typecheck mesh, following LIB3D-623
-    // https://vannevar.atlassian.net/browse/LIB3D-623
-    mesh: function () {
-        return primitive('mesh', { vertices: [], faces: [] }, Mesh);
+    mesh: function (vertices, faces) {
+        types.checkAllAndThrow(
+            ["Vertices", s.ArrayOf(s.AnyOf(s.Entity("point"), s.Type("position"))), vertices],
+            ["Faces", s.ArrayOf(s.ArrayOf(s.Type("index"))), faces]);
+        return primitive('mesh', { vertices: mapCoords(vertices), faces: faces });
     },
     /** Constructs 3D solid block
      *
