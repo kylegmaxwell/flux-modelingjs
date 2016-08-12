@@ -1761,12 +1761,12 @@ var ops =
      *  @param  {number}  [angularSize]      - the angle, in degrees, which provided body occupies in field of view
      *  @return {Mesh}
      */
-    tesselate: function() {
+    tessellate: function() {
         var r = new Operation('tessellate');
         r.args = [ arguments[0], arguments[1] || DEFAULT_LINEAR_TOLERANCE, arguments[2] || DEFAULT_ANGULAR_SIZE ];
         return r;
     },
-    /** 'tesselateStl' operation
+    /** 'tessellateStl' operation
      *  Constructs STL representation of specified BREP
      *  @function
      *  @param  {Body}    body      - body being tessellated
@@ -1774,7 +1774,7 @@ var ops =
      *  @return {Entity}  BREP
      */
     tessellateStl: op('tessellateStl', 2),
-    /** 'tesselateJson' operation
+    /** 'tessellateJson' operation
      *  Constructs JSON representation of specified BREP
      *  @function
      *  @param  {Body}    body      - body being tessellated
