@@ -41,7 +41,6 @@ describe("Scene validator test", function() {
 
     fixture.forEach(function (testData) {
         it (testData.scene, function() {
-            console.log(testData.scene)
             var validator = new SceneValidator();
             var results = validator.validateJSON(require('./data/scene/'+testData.scene+'.json'));
             var valid = testData.message === '';

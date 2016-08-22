@@ -35,7 +35,6 @@
                 { "$ref": "#/entities/rectangle" },
                 { "$ref": "#/entities/polycurve" },
 
-                { "$ref": "#/entities/polygonSet" },
                 { "$ref": "#/entities/surface" },
                 { "$ref": "#/entities/polysurface" },
 
@@ -75,6 +74,11 @@
             "items": { "type": "number" },
             "minItems": 3,
             "maxItems": 3
+        },
+        "unitNumber": {
+            "type":    "number",
+            "minimum": 0,
+            "maximum": 1
         },
         "fluxid": {
             "type": "string"
@@ -140,15 +144,10 @@
             "maxItems": 16
         },
         "color":{
-            "anyOf": [
-                {
-                    "type": "array",
-                    "items": {"$ref": "#/types/indexNonzero"},
-                    "minItems": 3,
-                    "maxItems": 3
-                },
-                {"type": "string" }
-            ]
+            "type": "array",
+            "items": {"type": "number"},
+            "minItems": 3,
+            "maxItems": 3
         }
     },
     "entities": {
@@ -393,38 +392,6 @@
             "required": [ "primitive", "curves" ]
         },
 
-        "polygonSet": {
-            "type": "object",
-            "properties": {
-                "primitive":    { "enum": [ "polygonSet" ] },
-                "__repr__":     { "type": "string" },
-                "attributes":   {},
-                "units":        { "$ref": "#/types/units" },
-
-                "polygons":     {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "boundary": { "$ref" : "#/entities/polygonSet/polygon" },
-                            "holes":    {
-                                "type": "array",
-                                "items": { "$ref" : "#/entities/polygonSet/polygon" }
-                            }
-                        },
-                        "required": [ "boundary", "holes" ],
-                        "additionalProperties": false
-                    },
-                    "minItems": 1
-                }
-            },
-            "required": [ "primitive", "polygons" ],
-            "polygon": {
-                "type": "array",
-                "items": { "$ref": "#/types/position" },
-                "minItems": 3
-            }
-        },
         "surface": {
             "type": "object",
             "properties": {
@@ -460,7 +427,6 @@
                 "surfaces": {
                     "type": "array",
                     "items": { "oneOf": [
-                        { "$ref": "#/entities/polygonSet" },
                         { "$ref": "#/entities/surface" }
                     ]},
                     "minItems": 1

@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "materialProperties": {
+        "type": "object",
+        "properties": {
+            "color":            { "$ref": "flux-entity#/types/color" },
+            "reflectivity":     { "$ref": "flux-entity#/types/unitNumber" },
+            "glossiness":       { "$ref": "flux-entity#/types/unitNumber" },
+            "transparency":     { "$ref": "flux-entity#/types/unitNumber" },
+            "transparencyIOR":      {
+                "type":     "number",
+                "minimum":  0
+            },
+            "emissionColor":    { "$ref": "flux-entity#/types/color" },
+            "transparencyColor":{ "$ref": "flux-entity#/types/color" },
+            "reflectivityColor":{ "$ref": "flux-entity#/types/color" }
+        },
+        "additionalProperties": true
+    }
+}

@@ -10,7 +10,7 @@
         {
             "id": "plants",
             "primitive": "layer",
-            "color": "green",
+            "color": [0,1,0],
             "elements": ["A"]
         }
     ]

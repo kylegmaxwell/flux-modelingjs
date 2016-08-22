@@ -46,6 +46,7 @@ function submodules(obj) {
     and loading it on each script run impacts interpreter.
  */
 module.exports = submodules({
+    'materials': './src/materials',
     'measure':  './measure',
     'modeling': './modeling',
     'revit':    './revit-core',
