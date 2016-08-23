@@ -562,7 +562,8 @@
                         "items":    { "$ref": "#/types/index" },
                         "minItems": 3
                     }
-                }
+                },
+                "isSolid": { "type": "boolean" }
             },
             "required": [ "primitive", "vertices", "faces" ]
         }
