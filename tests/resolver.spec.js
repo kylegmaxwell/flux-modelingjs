@@ -95,19 +95,6 @@ var multipleOpsSameObjectQuery = {
       "units": {
         "coords": "meters"
       }
-    },
-    "circle@3": {
-      "primitive": "circle",
-      "origin": [
-        0,
-        1,
-        2
-      ],
-      "radius": 10,
-      "units": {
-        "origin": "meters",
-        "radius": "meters"
-      }
     }
   },
   "Operations": [
@@ -124,7 +111,7 @@ var multipleOpsSameObjectQuery = {
       "name": "circleProps",
       "op": [
         "evalMassProps",
-        "circle@3"
+        "circle@1"
       ]
     }
   ]
@@ -233,12 +220,6 @@ var cases = [
         },
         expected: nestedOperationsQuery
     },
-    // NOTE: if you inspect the expected result for this test
-    // (multipleOpsSameObjectQuery), you will see that two copies of of the
-    // circle entity are added to the query. This is a flaw in the current
-    // implementation of resolution and potentially wasteful. This test serves
-    // to document the current behavior, not the intended or best behavior.
-    // TODO(andrew): fix resolution to handle things that aren't Entities well.
     {
         name: "multipleOpsSameObject",
         makeQuery: function(modeling) {

@@ -145,7 +145,7 @@ Query.prototype.toJSON  = function () {
  */
 function resolveItem(self, e, opIndex) {
     var key;
-    if (e instanceof Entity) {
+    if (isEntity(e)) {
         Object.keys(self.entities).forEach(function (k) {
             if (!key && self.entities[k] === e) {
                 key = k;
@@ -220,16 +220,13 @@ OpSlot.prototype.toJSON = function () {
 Query.prototype.add = function(name, obj) {
     if (typeof name !== 'string')
         throw new FluxModelingError('name: string expected');
-    if (obj instanceof Entity) {
+    if (isEntity(obj)) {
         if (this.entities[name] !== undefined)
             throw new FluxModelingError('entity "' + name + '" already defined');
         this.entities[name] = obj;
     }
     else if (obj instanceof Operation) {
         this.operations.push(new OpSlot(name, obj));
-    }
-    else if (obj.primitive !== undefined) {
-        this.add(name, entities.raw(obj));
     }
     else if (Array.isArray(obj)) { // Raw operation
         this.add(name, operations.raw(obj));
@@ -239,13 +236,6 @@ Query.prototype.add = function(name, obj) {
     return this;
 };
 
-//******************************************************************************
-/** Use functions from {@link entities} to construct
- *  @class
- *  @classdesc Represents entity in Flux protocol. These objects are added to the 'Entities' part of scene
- */
-function Entity(id) { this.primitive = id; }
-
 /** Helper function
 
     @private
@@ -254,12 +244,23 @@ function Entity(id) { this.primitive = id; }
     @return {Entity}             Entity or any other type specified by OptCtor
 */
 function primitive(typeid, params) {
-    var e = new Entity(typeid);
+    var e = {primitive: typeid};
     initObject(e, params);
     e.primitive = typeid;
     e.units = types.measure.defaultUnits(typeid);
     return e;
 }
+
+/** Helper function to defermine if an object is an entity. Does not validate
+    the entity.
+    @private
+    @param  {object}   object  - potential entity
+    @return {bool}             Entity or any other type specified by OptCtor
+*/
+function isEntity(obj) {
+    return obj.primitive != null;
+}
+
 /** Helper function to extract point coordinates
 
     @private
@@ -271,7 +272,7 @@ function makeAdjustCoords(primitive, field) {
         if (Array.isArray(obj))
             return obj;
 
-        if (obj !== undefined) {
+        if (isEntity(obj)) {
             if (obj.units &&
                 obj.units[field] != types.measure._defaultDimToUnits.length) {
                 obj = convertUnits(obj, types.measure._defaultDimToUnits);
@@ -349,16 +350,10 @@ Operation.prototype.toJSON = function () {
     var r = (this.args || []).map(function (item) {
         if (item instanceof Operation)
             return resolve(item) || item.toJSON();
-        if (item instanceof Entity) { // locate bound entity by name
+        if (isEntity(item)) {
             var entity = resolve(item);
             if (!entity)
-                throw Error("Failed to resolve entity");
-            return entity;
-        }
-        if (item.primitive !== undefined) {
-            var entity = resolve(entities.raw(item));
-            if (!entity)
-                throw Error("Failed to resolve entity-like object");
+                throw Error("Failed to resolve entity object");
             return entity;
         }
 
@@ -439,20 +434,6 @@ var entities =
  *  @namespace entities
  */
 {
-    //******************************************************************************
-    // Raw entity, specified directly as JSON
-    //******************************************************************************
-    /** Constructs entity object from raw data. No checks for primitive value, body being object etc.
-     *
-     *  @param  {*}      body - any JavaScript value
-     *  @return {Entity}
-     */
-    raw: function(body) {
-        var e = new Entity(body.primitive);
-        initObject(e, body);
-        return e;
-    },
-
     //******************************************************************************
     // Vector entity
     //******************************************************************************
