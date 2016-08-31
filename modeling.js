@@ -371,7 +371,11 @@ Operation.prototype.toJSON = function () {
 function op(id, nargs) {
     return function() {
         var r = new Operation(id);
-        r.args = toArray(arguments).slice(0, nargs);
+        var args = toArray(arguments);
+        if (args.length != nargs) {
+            throw new Error("Expected "+nargs+ "arguments", "got "+args.length);
+        }
+        r.args = args.slice(0, nargs);
         return r;
     };
 }
