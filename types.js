@@ -153,7 +153,7 @@ function recurseToDimension(subSchema) {
  * This is a very limited implementation that only supports units scoped a
  * single-field deep, and does not support indexing into composite entities
  * (eg, polycurve and polysurface). It does work for the existing set of
- * entities as described in psworker.json, but extensions to that may require
+ * entities as described in flux-entity.json, but extensions to that may require
  * revisiting this implementation.
  *
  *  @param  {string}    typeid  - name of entity type, value for 'primitive' property

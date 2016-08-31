@@ -51,7 +51,7 @@ module.exports = submodules({
     'modeling': './modeling',
     'revit':    './revit-core',
     'schemas':  {
-        'pbw':      require('./schemas/psworker.json'),
+        'pbw':      require('./schemas/flux-entity.json'),
         'revit':    require('./schemas/flux-revit.json')
     },
     'types': './types',

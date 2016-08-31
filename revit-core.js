@@ -66,7 +66,7 @@ function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeP
 * Function to create a revit Model Line.
 *
 * @param {object} [modelCurve] Input curve.
-* @returns {{Out: revit-modelLine}} The created revit model line.
+* @returns {{Out: revitModelLine}} The created revit model line.
 */
 function createModelLine(fluxId, modelCurve) {
     var familyInfo = {
@@ -104,7 +104,7 @@ function createModelLine(fluxId, modelCurve) {
 * @param {vector} [cutVector] Vector perpendicular to vector from bubbleEnd to freeEnd, tangent to the reference plane.
 * @param {string} [name] Name of the reference plane.
 * @param {boolean} [wallClosure] If reference plane is wall closure.
-* @returns {{Out: revit-referencePlane}} The created revit reference plane.
+* @returns {{Out: revitReferencePlane}} The created revit reference plane.
 */
 function createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, name, wallClosure) {
     var familyInfo = {
@@ -160,7 +160,7 @@ function createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, name, wallC
 * @param {string} [name] Name of the level.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
-* @returns {{Out: revit-level}} The created revit level.
+* @returns {{Out: revitLevel}} The created revit level.
 */
 function createLevel(fluxId, levelType, elevation, name, instanceParams, customParams) {
     var familyInfo = {
@@ -197,7 +197,7 @@ function createLevel(fluxId, levelType, elevation, name, instanceParams, customP
 * @param {string} [gridName] Name of the grid.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
-* @returns {{Out: revit-level}} The created revit grid.
+* @returns {{Out: revitLevel}} The created revit grid.
 */
 function createGrid(fluxId, gridType, gridCurve, gridName, instanceParams, customParams) {
     var familyInfo = {
@@ -235,7 +235,7 @@ function createGrid(fluxId, gridType, gridCurve, gridName, instanceParams, custo
 * @param {string} [name] Name of the room.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
-* @returns {{Out: revit-room}} The created revit room.
+* @returns {{Out: revitRoom}} The created revit room.
 */
 function createRoom(fluxId, location, level, name, instParamMap, custParamMap) {
     var familyInfo = {
@@ -282,7 +282,7 @@ function createRoom(fluxId, location, level, name, instParamMap, custParamMap) {
 * @param {boolean} [flipped] True of wall is flipped, false otherwise.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
-* @returns {{Out: revit-wall}} The created revit wall.
+* @returns {{Out: revitWall}} The created revit wall.
 */
 function createWall(fluxId, family, type, profile, level, structural, flipped, instParamMap, custParamMap) {
     var familyInfo = {
@@ -325,7 +325,7 @@ function createWall(fluxId, family, type, profile, level, structural, flipped, i
 * @param {boolean} [structural] True of floor is structural, false otherwise.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
-* @returns {{Out: revit-floor}} The created revit floor.
+* @returns {{Out: revitFloor}} The created revit floor.
 */
 function createFloor(fluxId, type, profile, level, structural, instanceParams, customParams) {
     var familyInfo = {
@@ -371,7 +371,7 @@ function createFloor(fluxId, type, profile, level, structural, instanceParams, c
 * @param {boolean} [handFlipped] True if the family instance if hand flipped, false otherwise.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
-* @returns {{Out: revit-oneLevelFamilyInstance}} The created revit family instance.
+* @returns {{Out: revitOneLevelFamilyInstance}} The created revit family instance.
 */
 function createOneLevelFamilyInstance(fluxId, category, family, type, location,
         level,  structuraltype, faceflipped, handflipped, instanceParams, customParams) {
@@ -422,14 +422,14 @@ function createOneLevelFamilyInstance(fluxId, category, family, type, location,
 * @param {string} [family] Family of of the family instance.
 * @param {string} [type] Type of the family insance.
 * @param {object} [location] Location of the family instance.
-* @param {string|revit-level} [baseLevel] Base level of the family instance.
-* @param {string|revit-level} [topLevel] Top level of the family instance.
+* @param {string|revitLevel} [baseLevel] Base level of the family instance.
+* @param {string|revitLevel} [topLevel] Top level of the family instance.
 * @param {string} [structuralType] Structural Type of the family insance.
 * @param {boolean} [faceFlipped] True if the family instance if face flipped. false otherwise.
 * @param {boolean} [handFlipped] True if the family instance if hand flipped, false otherwise.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
-* @returns {{Out: revit-twoLevelFamilyInstance}} The created revit family instance.
+* @returns {{Out: revitTwoLevelFamilyInstance}} The created revit family instance.
 */
 function createTwoLevelFamilyInstance(fluxId, category, family, type, location,
         baselevel, toplevel, structuraltype, faceflipped, handflipped, instanceParams, customParams) {
@@ -481,14 +481,14 @@ function createTwoLevelFamilyInstance(fluxId, category, family, type, location,
 * @param {string} [family] Family of of the family instance.
 * @param {string} [type] Type of the family insance.
 * @param {object} [location] Location of the family instance.
-* @param {string|revit-level} [level] Level of the family instance.
+* @param {string|revitLevel} [level] Level of the family instance.
 * @param {string|object} [host] Host element of the family insance.
 * @param {string} [structuralType] Structural Type of the family insance.
 * @param {boolean} [faceFlipped] True if the family instance if face flipped. false otherwise.
 * @param {boolean} [handFlipped] True if the family instance if hand flipped, false otherwise.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
-* @returns {{Out: revit-twoLevelFamilyInstance}} The created revit family instance.
+* @returns {{Out: revitTwoLevelFamilyInstance}} The created revit family instance.
 */
 function createOneLevelHostedFamilyInstance(fluxId, category, family, type, location,
         host, level,  structuraltype, faceflipped, handflipped, instanceParams, customParams) {
@@ -983,4 +983,3 @@ module.exports = {
     createTwoLevelFamilyInstance: createTwoLevelFamilyInstance,
     createOneLevelHostedFamilyInstance: createOneLevelHostedFamilyInstance
 }
-

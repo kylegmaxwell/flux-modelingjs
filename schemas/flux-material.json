@@ -3,17 +3,17 @@
     "materialProperties": {
         "type": "object",
         "properties": {
-            "color":            { "$ref": "flux-entity#/types/color" },
-            "reflectivity":     { "$ref": "flux-entity#/types/unitNumber" },
-            "glossiness":       { "$ref": "flux-entity#/types/unitNumber" },
-            "transparency":     { "$ref": "flux-entity#/types/unitNumber" },
+            "color":            { "$ref": "fluxEntity#/types/color" },
+            "reflectivity":     { "$ref": "fluxEntity#/types/unitNumber" },
+            "glossiness":       { "$ref": "fluxEntity#/types/unitNumber" },
+            "transparency":     { "$ref": "fluxEntity#/types/unitNumber" },
             "transparencyIOR":      {
                 "type":     "number",
                 "minimum":  0
             },
-            "emissionColor":    { "$ref": "flux-entity#/types/color" },
-            "transparencyColor":{ "$ref": "flux-entity#/types/color" },
-            "reflectivityColor":{ "$ref": "flux-entity#/types/color" }
+            "emissionColor":    { "$ref": "fluxEntity#/types/color" },
+            "transparencyColor":{ "$ref": "fluxEntity#/types/color" },
+            "reflectivityColor":{ "$ref": "fluxEntity#/types/color" }
         },
         "additionalProperties": true
     }

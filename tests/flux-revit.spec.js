@@ -1,4 +1,4 @@
-describe("flux-revit schema test", function() {
+describe("fluxRevit schema test", function() {
     'use strict';
     var Ajv   = require("ajv");
     var fs    = require("fs");
@@ -11,14 +11,14 @@ describe("flux-revit schema test", function() {
         allErrors: true
     });
 
-    ajv.addSchema(fluxEntitySchema, "flux-entity");
-    ajv.addSchema(fluxRevitSchema, "flux-revit");
+    ajv.addSchema(fluxEntitySchema, "fluxEntity");
+    ajv.addSchema(fluxRevitSchema, "fluxRevit");
 
-    describe("revit-wall schema", function() {
-        var schemaId = "flux-revit#/revit-wall";
+    describe("revitWall schema", function() {
+        var schemaId = "fluxRevit#/revitWall";
         var validate = ajv.compile({ $ref: schemaId });
 
-        it ("Library created revit-wall should validate", function() {
+        it ("Library created revitWall should validate", function() {
             var profile = [{
               "units": {
                     "end": "feet",
@@ -175,13 +175,13 @@ describe("flux-revit schema test", function() {
             expect(isValid).toEqual(false);
         });
 
-        it ("Valid revit-wall with extra parameters should validate", function() {
+        it ("Valid revitWall with extra parameters should validate", function() {
             var validWall = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-wall.json"));
             var isValid = validate(validWall);
             expect(isValid).toEqual(true);
         });
 
-        it ("Invalid revit-wall should fail", function() {
+        it ("Invalid revitWall should fail", function() {
             var invalidWall = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-wall.json"));
             var isValid = validate(invalidWall);
             expect(isValid).toEqual(false);
@@ -189,8 +189,8 @@ describe("flux-revit schema test", function() {
     });
 
 
-    describe("revit-room schema", function() {
-        var schemaId = "flux-revit#/revit-room";
+    describe("revitRoom schema", function() {
+        var schemaId = "fluxRevit#/revitRoom";
         var validate = ajv.compile({ $ref: schemaId });
         var uv = {
             "primitive": "point",
@@ -200,7 +200,7 @@ describe("flux-revit schema test", function() {
             }
         }
 
-        it ("Library created revit-room should validate", function() {
+        it ("Library created revitRoom should validate", function() {
             var validRoom = revit.createRoom(null, uv, "Level-1", "Room-1", {}, {});
             var isValid = validate(validRoom.Out);
             if (!isValid) {
@@ -209,13 +209,13 @@ describe("flux-revit schema test", function() {
             expect(isValid).toEqual(true);
         });
 
-        it ("Valid revit-room with extra parameers should validate", function() {
+        it ("Valid revitRoom with extra parameers should validate", function() {
             var validRoom = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-room.json"));
             var isValid = validate(validRoom);
             expect(isValid).toEqual(true);
         });
 
-        it ("Invalid revit-room should fail", function() {
+        it ("Invalid revitRoom should fail", function() {
             var invalidRoom = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-room.json"));
             var isValid = validate(invalidRoom.Out);
             expect(isValid).toEqual(false);
@@ -223,11 +223,11 @@ describe("flux-revit schema test", function() {
      });
 
 
-    describe("revit-reference-plane schema", function() {
-        var schemaId = "flux-revit#/revit-referencePlane";
+    describe("revitReferencePlane schema", function() {
+        var schemaId = "fluxRevit#/revitReferencePlane";
         var validate = ajv.compile({ $ref: schemaId });
 
-        it ("Library created revit-reference-plane should validate", function() {
+        it ("Library created revitReferencePlane should validate", function() {
             var point = {
                 "primitive": "point",
                 "point": [ 0, 0, 0],
@@ -251,24 +251,24 @@ describe("flux-revit schema test", function() {
             expect(isValid).toEqual(true);
         });
 
-        it ("Valid revit-reference-plane with extra parameters should validate", function() {
+        it ("Valid revitReferencePlane with extra parameters should validate", function() {
             var validRefPlane = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-referencePlane.json"));
             var isValid = validate(validRefPlane);
             expect(isValid).toEqual(true);
         });
 
-        it ("Invalid revit-reference-plane should fail", function() {
+        it ("Invalid revitReferencePlane should fail", function() {
             var invalidRefPlane = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-referencePlane.json"));
             var isValid = validate(invalidRefPlane);
             expect(isValid).toEqual(false);
         });
     });
 
-    describe("revit-model-curve schema", function() {
-        var schemaId = "flux-revit#/revit-modelCurve";
+    describe("revitModelCurve schema", function() {
+        var schemaId = "fluxRevit#/revitModelCurve";
         var validate = ajv.compile({ $ref: schemaId });
 
-        it ("Library created revit-model-curve should validate", function() {
+        it ("Library created revitModelCurve should validate", function() {
             var curve = {
                 "primitive": "line",
                 "start": [ 0.0, 0.0, 0.0],
@@ -282,24 +282,24 @@ describe("flux-revit schema test", function() {
             expect(isValid).toEqual(true);
         });
 
-        it ("Valid revit-model-curve should validate", function() {
+        it ("Valid revitModelCurve should validate", function() {
             var validCurve = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-modelCurve.json"));
             var isValid = validate(validCurve);
             expect(isValid).toEqual(true);
         });
 
-        it ("Invalid revit-model-curve should fail", function() {
+        it ("Invalid revitModelCurve should fail", function() {
             var invalidCurve = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-modelCurve.json"));
             var isValid = validate(invalidCurve);
             expect(isValid).toEqual(false);
         });
     });
 
-    describe("revit-level schema", function() {
-        var schemaId = "flux-revit#/revit-level";
+    describe("revitLevel schema", function() {
+        var schemaId = "fluxRevit#/revitLevel";
         var validate = ajv.compile({ $ref: schemaId });
 
-        it ("Library created revit-level should validate", function() {
+        it ("Library created revitLevel should validate", function() {
             var validLevel = revit.createLevel("Id-1", "LevelType-1", 10, "Level-1",
                 {i1:"InstanceParam 1", i2:"InstanceParam 2"}, {c1: "CustomParam 1", c2:"CustomParam 2"});
             var isValid = validate(validLevel.Out);
@@ -310,23 +310,23 @@ describe("flux-revit schema test", function() {
             expect(isValid).toEqual(true);
         });
 
-        it ("Valid revit-level with extra parameters should validate", function() {
+        it ("Valid revitLevel with extra parameters should validate", function() {
             var validLevel = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-level.json"));
             var isValid = validate(validLevel);
             expect(isValid).toEqual(true);
         });
 
-        it ("Invalid revit-level should fail", function() {
+        it ("Invalid revitLevel should fail", function() {
             var invalidLevel = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-level.json"));
             var isValid = validate(invalidLevel);
             expect(isValid).toEqual(false);
         });
     });
 
-    describe("revit-floor schema", function() {
-        var schemaId = "flux-revit#/revit-floor";
+    describe("revitFloor schema", function() {
+        var schemaId = "fluxRevit#/revitFloor";
         var validate = ajv.compile({ $ref: schemaId });
-        it ("Valid revit-floor should validate", function() {
+        it ("Valid revitFloor should validate", function() {
             var profile = [{
               "units": {
                     "end": "feet",
@@ -345,13 +345,13 @@ describe("flux-revit schema test", function() {
             expect(isValid).toEqual(true);
         });
 
-        it ("Valid revit-floor with extra parameters should validate", function() {
+        it ("Valid revitFloor with extra parameters should validate", function() {
             var validFloor = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-floor.json"));
             var isValid = validate(validFloor);
             expect(isValid).toEqual(true);
         });
 
-        it ("Invalid revit-floor should fail", function() {
+        it ("Invalid revitFloor should fail", function() {
             var invalidFloor = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-floor.json"));
             var isValid = validate(invalidFloor);
             expect(isValid).toEqual(false);
@@ -359,7 +359,7 @@ describe("flux-revit schema test", function() {
     });
 
     describe("revit-one-level-familyinstance schema", function() {
-        var schemaId = "flux-revit#/revit-oneLevelFamilyInstance";
+        var schemaId = "fluxRevit#/revitOneLevelFamilyInstance";
         var validate = ajv.compile({ $ref: schemaId });
 
         it ("Library created revit-one-level-familyInstance should validate", function() {
@@ -393,7 +393,7 @@ describe("flux-revit schema test", function() {
     });
 
     describe("revit-two-level-familyinstance schema", function() {
-        var schemaId = "flux-revit#/revit-twoLevelFamilyInstance";
+        var schemaId = "fluxRevit#/revitTwoLevelFamilyInstance";
         var validate = ajv.compile({ $ref: schemaId });
 
         it ("Library created revit-two-level-familyinstance should validate", function() {
@@ -422,7 +422,7 @@ describe("flux-revit schema test", function() {
     });
 
     describe("revit-one-level-hosted-familyinstance", function() {
-        var schemaId = "flux-revit#/revit-oneLevelHostedFamilyInstance";
+        var schemaId = "fluxRevit#/revitOneLevelHostedFamilyInstance";
         var validate = ajv.compile({ $ref: schemaId });
 
         it ("Library created revit-one-level-hosted-familyinstance should validate", function() {

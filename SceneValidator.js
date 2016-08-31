@@ -20,6 +20,7 @@ function SceneValidator() {
  */
 function _findObjectByField(field, value, json) {
     for(var key in json.elements) {
+        if (json.elements[key] == null) continue;
         if (json.elements[key][field] === value) {
             return json.elements[key];
         }
@@ -54,7 +55,7 @@ function _validateNode(node, parentID, bannedPrimitives){
  */
 function _validateInstance(instance, json){
     var node = _findObjectByField('id', instance.entity, json);
-    if (!node) return _invalidId(instance.node);
+    if (!node) return _invalidId(instance.entity);
     if (!node.primitive) return _primitiveError();
 
     var result = _validateNode(node, instance.id, ['instance', 'assembly', 'layer']);
@@ -257,6 +258,7 @@ SceneValidator.prototype.validateJSON = function (json)
     var layerCount = 0;
     for (var i=0;i<json.elements.length;i++){
         var obj = json.elements[i];
+        if (obj == null) continue;
 
         // check for unique id
         if (allIDs.indexOf(obj.id) != -1) {
@@ -292,7 +294,7 @@ SceneValidator.prototype.validateJSON = function (json)
         }
     }
     if (layerCount < 1) {
-        return _error('Scene has no layers');
+        return _error('Scene has no valid layers');
     }
     if (!_isAcyclic(assemblies)) {
         return _error('Cycle found in assemblies');
