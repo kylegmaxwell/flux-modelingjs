@@ -508,47 +508,15 @@ DCMScene.prototype.add = function(obj, name) {
  */
 function Entity(id) { this.primitive = id; }
 
-/** Add attribute to entity
- *  If first argument is a string, it's treated as attribute type,
- *  and second argument is treated as attribute value.
- *  Otherwise, first argument is treated as full attribute object.
- *  Its type key is retrieved via type() method,
- *  and the whole object is used as attribute value.
- *  See {@link attributes} for known attribute types
- *
- *  @param  {*|string} objkey  - either attribute key (string) or full attribute object (*)
- *  @param  {*}        [value] - raw attribute value
- *  @return {this}               this, for chaining
- */
-Entity.prototype.addAttribute = function(keyobj, value) {
-    var key;
-    if (typeof(keyobj) === "string")
-        key = keyobj;
-    else
-    {
-        key = keyobj.type();
-        value = keyobj;
-    }
-
-    if (!this.attributes)
-        this.attributes = {};
-    if (key in this.attributes)
-        throw new FluxModelingError("attribute of type '" + key + "' already defined");
-    this.attributes[key] = value;
-    return this;
-};
-
 /** Helper function
 
     @private
     @param  {string}   typeid  - name of entity type, value for 'primitive' property
     @param  {any}      params  - additional parameters of entity
-    @param  {function} [OptCtor] - optional, constructor function; {@link Entity} if undefined
     @return {Entity}             Entity or any other type specified by OptCtor
 */
-function primitive(typeid, params, OptCtor) {
-    OptCtor = OptCtor || Entity;
-    var e = new OptCtor(typeid);
+function primitive(typeid, params) {
+    var e = new Entity(typeid);
     initObject(e, params);
     e.primitive = typeid;
     e.units = types.measure.defaultUnits(typeid);
@@ -624,203 +592,6 @@ function multMatrix(a, b) {
             c[i * dim + j] = s;
         }
     return c;
-}
-// Applies additional affine transform by pre-multiplying
-function applyMatrix(self, m) {
-    self.mat = multMatrix(m, self.mat);
-    return self;
-}
-
-/** Use {@link entities.affine} to construct
- *  @class
- *  @extends Entity
- *  @classdesc Entity which represents affine transformation matrix
- */
-function Affine() { Entity.apply(this, arguments); }
-// util.inherit Affine from Entity
-util.inherit(Affine, Entity,
-/** @lends Affine.prototype */
-{
-    /** Adds 3D translation
-     *  @param  {number[]|Vector} delta - translation vector
-     *  @return {this}                    this, for chaining
-     */
-    translate: function (d) {
-        d = vecCoords(d);
-        return applyMatrix(this, [
-             1,  0,  0, d[0],
-             0,  1,  0, d[1],
-             0,  0,  1, d[2],
-             0,  0,  0,  1
-        ]);
-    },
-    /** Adds 3D rotation around X axis
-     *  @param  {number} phi - rotation angle, in degrees
-     *  @return {this}         this, for chaining
-     */
-    rotateX: function (phi) {
-        phi = phi * Math.PI / 180;
-        var sin = Math.sin(phi), cos = Math.cos(phi);
-        return applyMatrix(this, [
-             1,    0,    0, 0,
-             0,  cos,  sin, 0,
-             0, -sin,  cos, 0,
-             0,    0,    0, 1
-        ]);
-    },
-    /** Adds 3D rotation around Y axis
-     *  @param  {number} phi - rotation angle, in degrees
-     *  @return {this}         this, for chaining
-     */
-    rotateY: function (phi) {
-        phi = phi * Math.PI / 180;
-        var sin = Math.sin(phi), cos = Math.cos(phi);
-        return applyMatrix(this, [
-              cos, 0, -sin, 0,
-                0, 1,    0, 0,
-              sin, 0,  cos, 0,
-                0, 0,    0, 1
-        ]);
-    },
-    /** Adds 3D rotation around Z axis
-     *  @param  {number} phi - rotation angle, in degrees
-     *  @return {this}         this, for chaining
-     */
-    rotateZ: function (phi) {
-        phi = phi * Math.PI / 180;
-        var sin = Math.sin(phi), cos = Math.cos(phi);
-        return applyMatrix(this, [
-              cos,  sin, 0, 0,
-             -sin,  cos, 0, 0,
-                0,    0, 1, 0,
-                0,    0, 0, 1
-        ]);
-    },
-    /** Adds 3D scaling
-     *  @param  {number[]|Vector} scale - scaling vector
-     *  @return {this}                    this, for chaining
-     */
-    scale: function(s) {
-        s = vecCoords(s);
-        return applyMatrix(this, [
-             s[0],  0,   0,  0,
-               0, s[1],  0,  0,
-               0,   0, s[2], 0,
-               0,   0,   0,  1
-        ]);
-    },
-    /** Rotate around arbitrary vector
-     *  @param  {number[]|Vector} axis - rotation axis
-     *  @param  {number}          phi  - rotation angle, in degrees
-     *  @return {this}                   this, for chaining
-     */
-    rotateAboutAxis: function (a, phi) {
-        phi = phi * Math.PI / 180;
-        var sin = Math.sin(phi), cos = Math.cos(phi);
-        a = vecCoords(a);
-        a = normalize(a);
-        var x = a[0], y = a[1], z = a[2];
-        return applyMatrix(this, [
-            cos+x*x*(1-cos),    x*y*(1-cos)-z*sin, y*sin+x*z*(1-cos),  0,
-            z*sin+x*y*(1-cos),  cos+y*y*(1-cos),   -x*sin+y*z*(1-cos), 0,
-            -y*sin+x*z*(1-cos), x*sin+y*z*(1-cos), cos+z*z*(1-cos),    0,
-            0,                  0,                 0,                  1
-        ]);
-    },
-    /** Reflect against specified plane
-     *  @param  {number[]|Point} normal - plane's normal vector
-     *  @param  {number[]|Point} origin - in-plane point
-     *  @return {this}        this, for chaining
-     */
-    reflect: function (n, p) {
-        n = vecCoords(n);
-        p = coords(p);
-        var nx = n[0], ny = n[1], nz = n[2],
-            px = p[0], py = p[1], pz = p[2];
-
-        var len = Math.sqrt(nx*nx + ny*ny + nz*nz);
-        nx /= len; ny /= len; nz /= len;
-
-        var d = -nx * px - ny * py - nz * pz;
-
-        return applyMatrix(this, [
-            1.0 - 2 * nx * nx,  -2 * nx * ny,       -2 * nx * nz,       -2 * nx * d,
-            -2 * nx * ny,       1.0 - 2 * ny * ny,  -2 * ny * nz,       -2 * ny * d,
-            -2 * nx * nz,       -2 * ny * nz,       1.0 - 2 * nz * nz,  -2 * nz * d,
-            0,                  0,                  0,                  1
-        ]);
-    },
-
-    /** Compose with another transformation
-     *  @param {affine} t - transformation to compose with.
-     */
-     compose: function (t) {
-        return applyMatrix(this, t.mat);
-     }
-});
-
-function appendToField(field) {
-    return function() {
-        var self = this;
-        toArray(arguments).forEach(function (i) {
-            self[field].push(i);
-        });
-        return this;
-    };
-}
-// Transforms incoming data item to 'canonical' weighted vertex form
-// Canonical form is a 2-element array, with first element being 3-element array with point coordinates
-// and second being either weight noumber or 'undefined'
-//
-// Supported forms are:
-// 1. 3-number array  - unweighted
-// 2. 4-number array  - weighted
-// 3. Point           - unweighted
-// 4. [Point]         - unweighted
-// 5. [Point, number] - weighted
-// 6. Point.toJSON()  - unweighted
-function canonicVertex(item) {
-    if (Array.isArray(item)) {       // one of array cases
-        if (item.length == 1)
-            // repr #4 - unpack single array element and try to treat it as item
-            return canonicVertex(item[0]);
-        if (item.length == 2)
-            // repr #5
-            return [coords(item[0]), item[1]];
-        if (item.length == 3)
-            // repr #1
-            return [item, undefined];
-        if (item.length == 4)
-            // repr #2
-            return [item.slice(0, 3), item[3]];
-    }
-    else if (item.primitive === "point") // Point case
-        // repr #3, #6
-        return [coords(item), undefined];
-    // Didn't match anything, so just throw
-    throw new FluxModelingError("Unsupported vertex representation");
-}
-
-function appendVertex(ctxt, item) {
-    item = canonicVertex(item);
-    var pt = item[0], w = item[1];
-
-    if (ctxt.weights === undefined) {
-        if (w !== undefined) {
-            if (ctxt.points.length === 0)
-                ctxt.weights = [ w ];
-            else
-                throw new FluxModelingError('Cannot add weighted vertex because previous vertices were weightless');
-        }
-        ctxt.points.push(pt);
-    }
-    else {
-        if (w === undefined)
-            throw new FluxModelingError('Vertex must have weight specified');
-        ctxt.weights.push(w);
-        ctxt.points.push(pt);
-    }
-    // NB: case where points are empty, and weights are not, isn't an error - because weights are in a linear array, and points aren't always
 }
 
 //******************************************************************************
@@ -931,101 +702,8 @@ function op(id, nargs) {
 //******************************************************************************
 // Attributes
 //******************************************************************************
-
-/** Use {@link attributes.material} to construct
- *  @class
- *  @classdesc Material attribute
- */
-function Material() { }
-/** @lends Material.prototype */
-Material.prototype = {
-    constructor: Material,
-    /** Returns "material" for attribute type name
-     *  @return {string} "material"
-     */
-    type: function() { return "material"; },
-    /** Converts material to JSON object. Adds support for {@link JSON.stringify}
-     *  @return {*} JSON-ready object
-     */
-    toJSON: function() {
-        return {
-            ambient:  this.ambient,
-            diffuse:  this.diffuse,
-            specular: this.specular,
-            power:    this.power
-        };
-    },
-    /** Sets ambient, diffuse and specular color values
-     *
-     *  @function
-     *  @param  {number} - red
-     *  @param  {number} - green
-     *  @param  {number} - blue
-     *  @return {this}     this, for chaining
-     */
-    setColor: function (r, g, b) {
-        return this.setAmbient(r, g, b).setDiffuse(r, g, b).setSpecular(r, g, b).setPower(1);
-    },
-    /** Sets ambient color
-     *
-     *  @function
-     *  @param  {number} - red
-     *  @param  {number} - green
-     *  @param  {number} - blue
-     *  @return {this}     this, for chaining
-     */
-    setAmbient: function (r, g, b) {
-        this.ambient = [r, g, b];
-        return this;
-    },
-    /** Sets specular color
-     *
-     *  @function
-     *  @param  {number} - red
-     *  @param  {number} - green
-     *  @param  {number} - blue
-     *  @return {this}     this, for chaining
-     */
-    setSpecular: function (r, g, b) {
-        this.specular = [r, g, b];
-        return this;
-    },
-    /** Sets diffuse color
-     *
-     *  @function
-     *  @param  {number} - red
-     *  @param  {number} - green
-     *  @param  {number} - blue
-     *  @return {this}     this, for chaining
-     */
-    setDiffuse: function (r, g, b) {
-        this.diffuse = [r, g, b];
-        return this;
-    },
-    /** Sets specular power
-     *
-     *  @function
-     *  @param  {number} power
-     *  @return {this}   this, for chaining
-     */
-    setPower: function (s) {
-        this.power = s;
-        return this;
-    }
-};
-
-var attributes =
-/** Attribute constructors.
- *  Attributes are added to entities via {@link Entity#attribute Entity.addAttribute}
- *  @namespace attributes
- */
-{
-    /** Constructs material attribute
-     *  @function
-     *  @return {Material}
-     */
-    material: function () { return new Material(); }
-};
+// TODO(andrew): consider making these return a cloned and modified entity,
+// rather than mutating the passed entity.
 
 /** Sets entity attribute on either a list of entities, raw object or instance of entity.
  *
@@ -1041,10 +719,9 @@ var setEntityAttribute = function(entity, property, value) {
             setEntityAttribute(elt, property, value);
         });
     }
-    if (!(entity instanceof Entity))
-        entity = entities.raw(entity);
 
-    return entity.addAttribute(property, value);
+    entity.attributes = entity.attributes || {};
+    entity.attributes[property] = value;
 };
 
 /** Gets entity attribute on either raw object or instance of entity.
@@ -1428,23 +1105,167 @@ var entities =
     //******************************************************************************
     // Other entities
     //******************************************************************************
-    /** Constructs affine transformation matrix
-     *
-     *  @function
-     *  @param  {number[]} [matrix] - initial matrix, default is identity matrix
-     *  @return {Affine}              affine transformation matrix entity
-     */
-    affine: function (optMatrix) {
-        optMatrix = optMatrix || [
-             1, 0, 0, 0 ,
-             0, 1, 0, 0 ,
-             0, 0, 1, 0 ,
-             0, 0, 0, 1
-        ];
-        types.checkAllAndThrow(
-            ["Matrix", s.ArrayOf(s.Number), optMatrix])
-        return primitive('affineTransform', { mat: optMatrix }, Affine);
+    affine: {
+        /** Constructs affine transformation matrix
+         *
+         *  @function
+         *  @param  {number[]} matrix - initial matrix
+         *  @return {Affine}              affine transformation matrix entity
+         */
+        byMatrix: function(matrix) {
+            types.checkAllAndThrow(
+                ["Matrix", s.ArrayOf(s.Number), matrix])
+            return primitive('affineTransform', { mat: matrix });
+        },
+        /** Compose two transformations
+         *
+         *  @function
+         *  @param  {number[]|Affine} [a] - first matrix
+         *  @param  {number[]|Affine} [b] - second matrix
+         *  @return {Affine}              affine transformation matrix entity
+         */
+        byComposition: function(a, b) {
+            //TODO(andrew): make sure that both matrices have the same units.
+            // Requires https://vannevar.atlassian.net/browse/LIB3D-362
+            types.checkAllAndThrow(
+                ["A", s.AnyOf(s.ArrayOf(s.Number), s.Entity("affineTransform")), a],
+                ["B", s.AnyOf(s.ArrayOf(s.Number), s.Entity("affineTransform")), b]
+                );
+            if(a.primitive) {
+                a = a.mat;
+            }
+            if(b.primitive) {
+                b = b.mat;
+            }
+            return primitive('affineTransform', {mat: multMatrix(a, b)});
+        },
+        /** Rotation around X axis
+         *  @param  {number} phi - rotation angle, in degrees
+         *  @return {this}         this, for chaining
+         */
+        rotateX:function (phi) {
+            types.checkAllAndThrow(
+                ["XRotation", s.Number, phi]);
+            phi = phi * Math.PI / 180;
+            var sin = Math.sin(phi), cos = Math.cos(phi);
+            return primitive('affineTransform', {mat: [
+                 1,    0,    0, 0,
+                 0,  cos,  sin, 0,
+                 0, -sin,  cos, 0,
+                 0,    0,    0, 1
+            ]});
+        },
+        /** Rotation around Y axis
+         *  @param  {number} phi - rotation angle, in degrees
+         *  @return {this}         this, for chaining
+         */
+        rotateY: function (phi) {
+            types.checkAllAndThrow(
+                ["YRotation", s.Number, phi]);
+            phi = phi * Math.PI / 180;
+            var sin = Math.sin(phi), cos = Math.cos(phi);
+            return primitive('affineTransform', {mat: [
+                  cos, 0, -sin, 0,
+                    0, 1,    0, 0,
+                  sin, 0,  cos, 0,
+                    0, 0,    0, 1
+            ]});
+        },
+        /** Rotation around Z axis
+         *  @param  {number} phi - rotation angle, in degrees
+         *  @return {this}         this, for chaining
+         */
+        rotateZ: function (phi) {
+            types.checkAllAndThrow(
+                ["ZRotation", s.Number, phi]);
+            phi = phi * Math.PI / 180;
+            var sin = Math.sin(phi), cos = Math.cos(phi);
+            return primitive('affineTransform', {mat: [
+                  cos,  sin, 0, 0,
+                 -sin,  cos, 0, 0,
+                    0,    0, 1, 0,
+                    0,    0, 0, 1
+            ]});
+        },
+        /** Reflect against specified plane
+         *  @param  {number[]|Point} normal - plane's normal vector
+         *  @param  {number[]|Point} origin - in-plane point
+         *  @return {object}                - affineTransform entity
+         */
+        reflect: function (n, p) {
+            types.checkAllAndThrow(
+                ["Normal", s.AnyOf(s.Entity('vector'), s.Type('position')), n],
+                ["Point", s.AnyOf(s.Entity('point'), s.Type('position')), n]);
+            n = vecCoords(n);
+            p = coords(p);
+            var nx = n[0], ny = n[1], nz = n[2],
+                px = p[0], py = p[1], pz = p[2];
+
+            var len = Math.sqrt(nx*nx + ny*ny + nz*nz);
+            nx /= len; ny /= len; nz /= len;
+
+            var d = -nx * px - ny * py - nz * pz;
+
+            return primitive('affineTransform', {mat: [
+                1.0 - 2 * nx * nx,  -2 * nx * ny,       -2 * nx * nz,       -2 * nx * d,
+                -2 * nx * ny,       1.0 - 2 * ny * ny,  -2 * ny * nz,       -2 * ny * d,
+                -2 * nx * nz,       -2 * ny * nz,       1.0 - 2 * nz * nz,  -2 * nz * d,
+                0,                  0,                  0,                  1
+            ]});
+        },
+        /** Rotate around arbitrary vector
+         *  @param  {number[]|Vector} axis - rotation axis
+         *  @param  {number}          phi  - rotation angle, in degrees
+         *  @return {object}                - affineTransform entity
+         */
+        rotateAboutAxis: function (a, phi) {
+            types.checkAllAndThrow(
+                ["Axis", s.AnyOf(s.Entity('vector'), s.Type('position')), a],
+                ["Rotation", s.Number, phi]);
+            phi = phi * Math.PI / 180;
+            var sin = Math.sin(phi), cos = Math.cos(phi);
+            a = vecCoords(a);
+            a = normalize(a);
+            var x = a[0], y = a[1], z = a[2];
+            return primitive('affineTransform', {mat: [
+                cos+x*x*(1-cos),    x*y*(1-cos)-z*sin, y*sin+x*z*(1-cos),  0,
+                z*sin+x*y*(1-cos),  cos+y*y*(1-cos),   -x*sin+y*z*(1-cos), 0,
+                -y*sin+x*z*(1-cos), x*sin+y*z*(1-cos), cos+z*z*(1-cos),    0,
+                0,                  0,                 0,                  1
+            ]});
+        },
+        /** 3D scaling
+         *  @param  {number[]|Vector} scale - scaling vector
+         *  @return {object}                - affineTransform entity
+         */
+        scale: function(scale) {
+            types.checkAllAndThrow(
+                ["Scale", s.AnyOf(s.Entity('vector'), s.Type('position')), scale]);
+            scale = vecCoords(scale);
+            return primitive('affineTransform', {mat: [
+                scale[0],   0,          0,          0,
+                   0,       scale[1],   0,          0,
+                   0,       0,          scale[2],   0,
+                   0,       0,          0,          1
+            ]});
+        },
+        /** 3D translation
+         *  @param  {number[]|Vector} scale - displacement vector
+         *  @return {object}                - affineTransform entity
+         */
+        translate: function (d) {
+            types.checkAllAndThrow(
+                ["Displacement", s.AnyOf(s.Entity('vector'), s.Type('position')), d]);
+            d = vecCoords(d);
+            return primitive('affineTransform', {mat: [
+                 1,  0,  0, d[0],
+                 0,  1,  0, d[1],
+                 0,  0,  1, d[2],
+                 0,  0,  0,  1
+            ]});
+        }
     },
+
     /** Constructs infinite plane
      *
      *  @function
@@ -2010,7 +1831,6 @@ FluxModelingError.prototype.constructor = FluxModelingError;
 return {
     query:      query,
     dcmScene:   dcmScene,
-    attributes: attributes,
     utilities:  utilities,
     entities:   entities,
     constraints: constraints,

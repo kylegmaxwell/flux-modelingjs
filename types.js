@@ -31,7 +31,7 @@ var helpers = {
     /** Convenience method for constructing a specification based on an entity
      * sub-schema inside the parasolid worker geomtry entity schema.
      *
-     * @param name {String}     - Name of the entity, e.g, 'point'
+     * @param name {String}          - Name of the entity, e.g, 'point'
      * @return {Object}         - Specification
      */
     Entity: function(name) {
