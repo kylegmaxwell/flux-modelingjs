@@ -1,4 +1,5 @@
-var UoM = require('./measure_inner.js');
+'use strict';
+import UoM from '../lib/measure_inner.js';
 
 // Helper functions
 function toMapStringInt(components) {
@@ -17,7 +18,7 @@ function toMapStringInt(components) {
 }
 
 function unitComponentsToDictionary(components) {
-    var ret = {}
+    var ret = {};
     for(var i = 0; i < components.units.size(); ++i) {
         ret[components.units.get(i)] = components.powers.get(i);
     }
@@ -25,7 +26,7 @@ function unitComponentsToDictionary(components) {
 }
 
 function dimensionComponentsToDictionary(components) {
-    var ret = {}
+    var ret = {};
     for(var i = 0; i < components.dimensions.size(); ++i) {
         ret[components.dimensions.get(i)] = components.powers.get(i);
     }
@@ -38,23 +39,23 @@ function dimensionComponentsToDictionary(components) {
 // and for building conversion functions between scalars denoted in
 // different sets of units. Registry has predefined
 // set of standard units and conversions.
-function Registry() {
+export function Registry() {
     this.impl = UoM.NewStandardRegistry();
 }
 
 // Clear should be called to properly destroy Registry inner resources
 Registry.prototype.Clear = function() {
     UoM.DeleteRegistry(this.impl);
-}
+};
 
 // AddConcreteDimension defines a new primitive dimension.
 Registry.prototype.AddConcreteDimension = function(dimension) {
     var err = UoM.AddConcreteDimension(this.impl, dimension);
     if(err.ok != true)
         throw new Error(err.err);
-}
+};
 
-// A composite Dimension (eg, area) is really shorthand for some other set 
+// A composite Dimension (eg, area) is really shorthand for some other set
 // of component dimensions (area : length * length, etc).
 Registry.prototype.AddCompositeDimension = function(dim, components) {
     var comps = toMapStringInt(components);
@@ -66,7 +67,7 @@ Registry.prototype.AddCompositeDimension = function(dim, components) {
     finally {
         comps.delete();
     }
-}
+};
 
 // AddUnit defines a unit and provides it's dimension.
 Registry.prototype.AddUnit = function(unit, dim, aliases) {
@@ -82,19 +83,19 @@ Registry.prototype.AddUnit = function(unit, dim, aliases) {
     finally {
         als.delete();
     }
-}
+};
 
 Registry.prototype.AddScaledRelationship = function(fromUnit, toUnit, scale) {
     var err = UoM.AddScaledRelationship(this.impl, fromUnit, toUnit, scale);
     if(err.ok != true)
         throw new Error(err.err);
-}
+};
 
 Registry.prototype.AddAffineRelationship = function(fromUnit, toUnit, scale, offset) {
     var err = UoM.AddAffineRelationship(this.impl, fromUnit, toUnit, scale, offset);
     if(err.ok != true)
         throw new Error(err.err);
-}
+};
 
 // Handles checks that units' components are well defined.
 Registry.prototype.Handles = function(components) {
@@ -107,7 +108,7 @@ Registry.prototype.Handles = function(components) {
     finally {
         comps.delete();
     }
-}
+};
 
 // Determine whether a given set of units match dimensions.
 // Each pair of quantities passed into 'convert' should be verified with
@@ -132,7 +133,7 @@ Registry.prototype.DimensionsMatch = function(left, right) {
     }
 
     return match;
-}
+};
 
 // ToCanonical strips out aliased units. This does not check for unit validity.
 Registry.prototype.ToCanonical = function(units) {
@@ -155,7 +156,7 @@ Registry.prototype.ToCanonical = function(units) {
     }
 
     return ret;
-}
+};
 
 // ToDimension transforms a unit components into the corresponding dimension components
 Registry.prototype.ToDimension = function(units) {
@@ -178,28 +179,28 @@ Registry.prototype.ToDimension = function(units) {
     }
 
     return ret;
-}
+};
 
 Registry.prototype.DefinesUnit = function(unit) {
     var bt = UoM.DefinesUnit(this.impl, unit);
     if(bt.ok != true)
         throw new Error(bt.err);
     return bt.value;
-}
+};
 
 Registry.prototype.DefinesDimension = function(dim) {
     var bt = UoM.DefinesDimension(this.impl, dim);
     if(bt.ok != true)
         throw new Error(bt.err);
     return bt.value;
-}
+};
 
 Registry.prototype.IsCompositeDimension = function(dim) {
     var bt = UoM.IsCompositeDimension(this.impl, dim);
     if(bt.ok != true)
         throw new Error(bt.err);
     return bt.value;
-}
+};
 
 // Convert given value from quantities in one set of units to another.
 Registry.prototype.Convert = function(fromUnits, toUnits, value) {
@@ -222,7 +223,7 @@ Registry.prototype.Convert = function(fromUnits, toUnits, value) {
     }
 
     return ret;
-}
+};
 
 // Convert units in jsonData using rules in dimToUnitsJson.
 // Returns new json with replaced units and values.
@@ -246,10 +247,10 @@ Registry.prototype.ConvertUnits = function(jsonData, dimToUnitsJson) {
     if(result.ok != true)
         throw new Error(result.err);
     return JSON.parse(result.str);
-}
+};
 
 // Parses a string that of the format 'u1*u2*u3/u4'
-function ParseUnits(units) {
+export function ParseUnits(units) {
     var comps = UoM.ParseUnits(units);
     try {
         if(comps.ok != true)
@@ -262,6 +263,39 @@ function ParseUnits(units) {
     }
 }
 
-// Module exports
-exports.Registry = Registry;
-exports.ParseUnits = ParseUnits;
+
+/** Determines whether or not an entity has units information attached
+ *
+ *  @param  {object}    entity  name of entity type, value for 'primitive' property
+ *  @return {object}            map from field to unit, appropriate for setting
+ *                              as the "units" field of an entity.
+ */
+export function detectUnits(entity) {
+    // If units are defined, return true
+    if (entity.units) {
+        return true;
+    }
+
+    // Brep entities have implicit units.
+    if (entity.primitive === "brep") {
+        return true;
+    }
+
+    // For polycurve and polysurface entities, loop through subentities;
+    if (entity.primitive === "polycurve") {
+        for (var i = 0; i < entity.curves.length; i++) {
+            if (detectUnits(entity.curves[i])) {
+                return true;
+            }
+        }
+    }
+    if (entity.primitive === "polysurface") {
+        for (var j = 0; j < entity.surfaces.length; j++) {
+            if (detectUnits(entity.surfaces[j])) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}

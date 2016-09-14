@@ -4,7 +4,7 @@
 describe("Scene validator test", function() {
     'use strict';
 
-    var SceneValidator = require('../SceneValidator.js');
+    var Validator = require('../dist/index.js').scene.Validator;
 
     var fixture = [{
         scene: 'badLayerScene',
@@ -41,7 +41,7 @@ describe("Scene validator test", function() {
 
     fixture.forEach(function (testData) {
         it (testData.scene, function() {
-            var validator = new SceneValidator();
+            var validator = new Validator();
             var results = validator.validateJSON(require('./data/scene/'+testData.scene+'.json'));
             var valid = testData.message === '';
             expect(results.getResult()).toEqual(valid);

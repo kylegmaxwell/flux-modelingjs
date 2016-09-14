@@ -1,4 +1,4 @@
-'use-strict';
+'use strict';
 
 // Lookup map for conversion from CSS colors to RGB
 // Source: https://github.com/mrdoob/three.js/blob/dev/src/math/Color.js
@@ -32,7 +32,7 @@ var colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0
  * @param  {String} colorName   The CSS color string
  * @return {Array.<Number>}     The values [r,g,b]
  */
-function colorToArray(colorName) {
+export default function colorToArray(colorName) {
     if (typeof colorName !== 'string') {
         return colorName;
     }
@@ -50,7 +50,3 @@ function colorToArray(colorName) {
     }
     return [r, g, b];
 }
-
-module.exports = {
-    colorToArray: colorToArray
-};

@@ -4,7 +4,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import replace from 'rollup-plugin-replace';
 
 export default ({
-    entry: 'tests/rollup-test.js',
+    entry: 'src/index-lite.js',
     external: ['three'],
     globals: ['three:THREE'],
     plugins: [json(), nodeResolve(), commonjs(),

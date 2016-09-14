@@ -1,0 +1,27 @@
+{
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "templateStrings": true,
+            "forOf": true,
+            "modules": true,
+            "classes": true
+        }
+    },
+    "env": {
+        "es6": true,
+        "node": true
+    },
+    "globals": {
+        "THREE": true
+    },
+    "rules": {
+        "valid-jsdoc": [2, {
+            "requireReturn": false
+        }],
+        dot-notation: 2,
+        semi: [2, "always"]
+    }
+}

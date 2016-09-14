@@ -1,19 +1,19 @@
 describe("Operations", function() {
     'use strict';
-    var modeling = require("../index").modeling();
+    var modeling = require("../dist/index.js");
 
-    describe("should throw errors when given the wrong number of arguments",
+    it("should throw errors when given the wrong number of arguments",
         function() {
             expect(
-                function() { var o = modeling.operations.evalMassProps();}
+                function() { var o = modeling.Operation.evalMassProps();}
             ).toThrow();
 
             expect(
-                function() { var o = modeling.operations.evalMassProps(1, 2, 3);}
+                function() { var o = modeling.Operation.evalMassProps(1, 2, 3);}
             ).toThrow();
 
             // Shouldn't throw
-            var o = modeling.operations.evalMassProps(1);
+            var o = modeling.Operation.evalMassProps(1);
         });
 
 })

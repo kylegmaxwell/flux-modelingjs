@@ -1,11 +1,11 @@
 'use strict';
-// additional rules for validator
-var SceneValidatorResults = require('./SceneValidatorResults.js');
+
+import ValidatorResults from './ValidatorResults.js';
 
 /**
  * Class to manage calls to check if JSON matches the scene spec
  */
-function SceneValidator() {
+export default function Validator() {
     // instances that are already used in assemblies
     this.usedInstanceIDs = [];
 }
@@ -42,7 +42,7 @@ function _validateNode(node, parentID, bannedPrimitives){
     var searchRes = bannedPrimitives.indexOf(node.primitive);
     if (searchRes !== -1) {
         return 'Node ' + node.id +
-        ' has a primitive type ('+bannedPrimitives[searchRes]+') that is not allowed with its current parent.'
+        ' has a primitive type ('+bannedPrimitives[searchRes]+') that is not allowed with its current parent.';
     }
     return null;
 }
@@ -51,7 +51,7 @@ function _validateNode(node, parentID, bannedPrimitives){
  * Determine if the instance is used properly in the scene
  * @param  {Object} instance        Flux element JSON
  * @param  {Object} json            Full scene JSON
- * @return {SceneValidatorResults}  The results
+ * @return {ValidatorResults}  The results
  */
 function _validateInstance(instance, json){
     var node = _findObjectByField('id', instance.entity, json);
@@ -70,9 +70,9 @@ function _validateInstance(instance, json){
  * Determine if the assembly is used properly in the scene
  * @param  {Object} assembly        Flux element JSON
  * @param  {Object} json            Full scene JSON
- * @return {SceneValidatorResults}  The Results
+ * @return {ValidatorResults}  The Results
  */
-SceneValidator.prototype._validateAssembly = function(assembly, json){
+Validator.prototype._validateAssembly = function(assembly, json){
     if (!assembly.children || assembly.children.constructor !== Array) {
         return _error('Assembly must have array of children');
     }
@@ -109,7 +109,7 @@ SceneValidator.prototype._validateAssembly = function(assembly, json){
 /**
  * Create a message for an invalid id
  * @param  {String} id The id that was invalid
- * @return {SceneValidatorResults}    The results
+ * @return {ValidatorResults}    The results
  */
 function _invalidId(id) {
     return _error('No element found with ID=' + id);
@@ -118,23 +118,23 @@ function _invalidId(id) {
 /**
  * Create an error message object
  * @param  {String} message         Description of the message
- * @return {SceneValidatorResults}  The results object
+ * @return {ValidatorResults}  The results object
  */
 function _error(message) {
-    return new SceneValidatorResults(false, message);
+    return new ValidatorResults(false, message);
 }
 
 /**
  * Create a results object that represents successful validation
- * @return {SceneValidatorResults}  The results object
+ * @return {ValidatorResults}  The results object
  */
 function _ok() {
-    return new SceneValidatorResults(true);
+    return new ValidatorResults(true);
 }
 
 /**
  * Error message for objects missing the primitive attribute
- * @return {SceneValidatorResults}  The results object
+ * @return {ValidatorResults}  The results object
  */
 function _primitiveError() {
     return _error('Element referenced by ID has no primitive attribute');
@@ -144,7 +144,7 @@ function _primitiveError() {
  * Determine if the layer is used properly in the scene
  * @param  {Object} layer           Flux element JSON
  * @param  {Object} json            Full scene JSON
- * @return {SceneValidatorResults}  The results
+ * @return {ValidatorResults}  The results
  */
 function _validateLayer(layer, json){
     for(var i = 0; i < layer.elements.length; i++){
@@ -166,10 +166,10 @@ function _validateLayer(layer, json){
  * @param  {Object}  json The scene JSON
  * @return {Boolean}      True if it is a scene
  */
-SceneValidator.isScene = function (json) {
+Validator.isScene = function (json) {
     return json && json.primitive && json.primitive === 'scene' &&
             json.elements && json.elements.constructor === Array;
-}
+};
 
 /**
  * Enumeration to store assembly states
@@ -206,7 +206,8 @@ function _isAcyclic(assemblies) {
             states[id] = STATES.PROCESSING;
         }
         var numChildren = 0;
-        for(var i = 0; i < assembly.children.length; i++){
+        var i;
+        for(i = 0; i < assembly.children.length; i++){
             var childId = assembly.children[i];
             // Only check children that are assemblies
             if (assemblies[childId] && states[childId] !== STATES.VALID) {
@@ -224,7 +225,7 @@ function _isAcyclic(assemblies) {
                 var satisfied = true;
                 var children = assemblies[validId].children;
                 // Check if any of the children that are assemblies are not yet valid
-                for(var i = 0; i < children.length; i++){
+                for(i = 0; i < children.length; i++){
                     if (assemblies[children[i]] && states[children[i]]!==STATES.VALID) {
                         satisfied = false;
                     }
@@ -245,13 +246,13 @@ function _isAcyclic(assemblies) {
 /**
  * Determine if some arbitrary json is a valid scene
  * @param  {Object} json JSON data of a potential scene
- * @return {SceneValidatorResults}      The result
+ * @return {ValidatorResults}      The result
  */
-SceneValidator.prototype.validateJSON = function (json)
+Validator.prototype.validateJSON = function (json)
 {
     var allIDs = [];
 
-    if (!SceneValidator.isScene(json)) {
+    if (!Validator.isScene(json)) {
         return _error('The element is not a scene');
     }
     var assemblies = {};
@@ -267,9 +268,10 @@ SceneValidator.prototype.validateJSON = function (json)
             allIDs.push(obj.id);
         }
 
+        var res;
         // check instance reference only valid entity
         if (obj.primitive === 'instance'){
-            var res = _validateInstance(obj, json);
+            res = _validateInstance(obj, json);
             if (!res.getResult()) {
                 return res;
             }
@@ -277,7 +279,7 @@ SceneValidator.prototype.validateJSON = function (json)
 
         // check assemblies reference only instances or other assemblies
         else if (obj.primitive === 'assembly'){
-            var res = this._validateAssembly(obj, json);
+            res = this._validateAssembly(obj, json);
             if (!res.getResult()) {
                 return res;
             }
@@ -286,7 +288,7 @@ SceneValidator.prototype.validateJSON = function (json)
 
         // check layer reference only assemblies and instances
         else if (obj.primitive === 'layer'){
-            var res = _validateLayer(obj, json);
+            res = _validateLayer(obj, json);
             if (!res.getResult()) {
                 return res;
             }
@@ -300,6 +302,4 @@ SceneValidator.prototype.validateJSON = function (json)
         return _error('Cycle found in assemblies');
     }
     return _ok();
-}
-
-module.exports = SceneValidator;
+};

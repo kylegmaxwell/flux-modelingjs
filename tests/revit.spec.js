@@ -15,10 +15,10 @@ function forceJSON(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
 
-describe("revit-core test", function () {
-    "use strict";
-    var revit = require('../index').revit;
-    var modeling = require('../index').modeling();
+describe("revit test", function () {
+    'use strict';
+    var modeling = require('../dist/index.js');
+    var revit = modeling.revit;
 
     describe("createElement", function() {
         var info = {
@@ -137,9 +137,9 @@ describe("revit-core test", function () {
                         placementType: "Invalid"
                     },
                     geometryParameters: {
-                        bubbleEnd: modeling.entities.point(bubbleEnd),
-                        freeEnd: modeling.entities.point(freeEnd),
-                        cutVector: modeling.entities.vector(cutVector),
+                        bubbleEnd: modeling.geometry.point(bubbleEnd),
+                        freeEnd: modeling.geometry.point(freeEnd),
+                        cutVector: modeling.geometry.vector(cutVector),
                         name: "RefPlane-1",
                         wallClosure: false
                     },
@@ -157,7 +157,7 @@ describe("revit-core test", function () {
     describe("createRoom", function() {
         var fluxId = "FluxId-1";
         var level = "Level-1";
-        var location = modeling.entities.point([1,1,1]);
+        var location = modeling.geometry.point([1,1,1]);
         var name = "Room-1";
         var instanceParamMap = {i1:"InstanceParam 1", i2:"InstanceParam 2"};
         var customParamMap = {c1: "CustomParam 1", c2:"CustomParam 2"};
@@ -186,7 +186,7 @@ describe("revit-core test", function () {
                         placementType: "Invalid"
                     },
                     geometryParameters: {
-                        "uv": modeling.entities.point(location),
+                        "uv": modeling.geometry.point(location),
                         "level": level,
                         "name": name
                     },
@@ -474,7 +474,7 @@ describe("revit-core test", function () {
     describe("createOneLevelFamilyInstance", function() {
         var instanceParamMap = {i1: "InstanceParam 1", i2: "InstanceParam 2"};
         var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};
-        var location = modeling.entities.point([1,2,3]);
+        var location = modeling.geometry.point([1,2,3]);
         var structuralType = "NonStructural";
 
 
@@ -505,7 +505,7 @@ describe("revit-core test", function () {
                         placementType: "OneLevelBased"
                     },
                     geometryParameters: {
-                        location: modeling.entities.point(location),
+                        location: modeling.geometry.point(location),
                         level: "Level-1",
                         structuralType: "NonStructural",
                         faceFlipped: false,
@@ -540,7 +540,7 @@ describe("revit-core test", function () {
     describe("createTwoLevelFamilyInstance", function() {
         var instanceParamMap = {i1: "InstanceParam 1", i2: "InstanceParam 2"};
         var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};
-        var location = modeling.entities.point([10,20,30]);
+        var location = modeling.geometry.point([10,20,30]);
         var structuralType = "NonStructural";
 
         it("should return error if required parameters are not provided.", function () {
@@ -575,7 +575,7 @@ describe("revit-core test", function () {
                         placementType: "TwoLevelsBased"
                     },
                     geometryParameters: {
-                        location: modeling.entities.point(location),
+                        location: modeling.geometry.point(location),
                         baseLevel: "Level-1",
                         topLevel: "Level-2",
                         structuralType: "NonStructural",
@@ -613,7 +613,7 @@ describe("revit-core test", function () {
     describe("createOneLevelHostedFamilyInstance", function() {
         var instanceParamMap = {i1: "InstanceParam 1", i2: "InstanceParam 2"};
         var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};
-        var location = modeling.entities.point([10.0, 11.0, 12.0]);
+        var location = modeling.geometry.point([10.0, 11.0, 12.0]);
         var structuralType = "NonStructural";
 
 
@@ -648,7 +648,7 @@ describe("revit-core test", function () {
                         placementType: "OneLevelBasedHosted"
                     },
                     geometryParameters: {
-                        location: modeling.entities.point(location),
+                        location: modeling.geometry.point(location),
                         hostId: "HostId-1",
                         level: "Level-1",
                         structuralType: "NonStructural",

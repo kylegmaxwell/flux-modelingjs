@@ -5,7 +5,7 @@
  * @param {Boolean} result  True if the scene is valid
  * @param {String} message  Description of error when invalid
  */
-function SceneValidatorResults(result, message) {
+export default function ValidatorResults(result, message) {
     this._result = result;
     if (message) {
         this._message = message;
@@ -18,16 +18,14 @@ function SceneValidatorResults(result, message) {
  * Expose result
  * @return {Boolean} True for valid scenes
  */
-SceneValidatorResults.prototype.getResult = function() {
+ValidatorResults.prototype.getResult = function() {
     return this._result;
-}
+};
 
 /**
  * Expose message
  * @return {String} Description of errors for bad scenes.
  */
-SceneValidatorResults.prototype.getMessage = function() {
+ValidatorResults.prototype.getMessage = function() {
     return this._message;
-}
-
-module.exports = SceneValidatorResults;
+};

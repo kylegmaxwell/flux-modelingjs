@@ -1,10 +1,9 @@
 describe("Schema test", function() {
     'use strict';
+
     var Ajv   = require('ajv');
-    var fs    = require('fs');
-    var flux  = require('../index');
-    var schema = flux.schemas.pbw;
-    var modeling = flux.modeling({registry: null, genId: null });
+    var modeling = require('../dist/index.js');
+    var schema = modeling.schema.entity;
 
     var ajv = Ajv({ allErrors: true });
     ajv.addSchema(schema, "_");
@@ -12,7 +11,7 @@ describe("Schema test", function() {
     it ("Sphere should work with the right schema", function() {
         var origin = [0,5,0];
         var radius = 1.25;
-        var sphereEntity = modeling.entities.sphere(origin,radius);
+        var sphereEntity = modeling.geometry.sphere(origin,radius);
         var sphere = JSON.parse(JSON.stringify(sphereEntity));
 
         var schemaId = "#/entities/circle";

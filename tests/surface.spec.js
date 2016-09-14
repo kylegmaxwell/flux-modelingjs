@@ -1,11 +1,12 @@
 describe("surface", function(){
     'use strict';
 
-    var modeling = require('../index.js').modeling();
-    var types = require('../index.js').types();
+    var modeling = require('../dist/index.js');
+    // Tests non public API
+    var types = require('../dist/types.js');
 
     it("Should work", function() {
-        var result = modeling.entities.surface(1,1,[[[0,0,0],[0,20,30]],
+        var result = modeling.geometry.surface(1,1,[[[0,0,0],[0,20,30]],
             [[10,0,0],[10,20,30]]], [0,0,1,1], [0,0,1,1]);
 
         expect(result.primitive).toEqual("surface");
@@ -22,14 +23,14 @@ describe("surface", function(){
     });
 
     it("Should throw when passed knots of the wrong length", function() {
-        expect(function(){modeling.entities.surface(
+        expect(function(){modeling.geometry.surface(
             1,
             1,
             [[[0,0,0],[0,20,30]],
                 [[10,0,0],[10,20,30]]],
             [0,0,1],
             [0,0,1,1])}).toThrow();
-        expect(function(){modeling.entities.surface(
+        expect(function(){modeling.geometry.surface(
             1,
             1,
             [[[0,0,0],[0,20,30]],
@@ -39,7 +40,7 @@ describe("surface", function(){
     });
 
     it("Should throw when passed misshappen controlpoints", function() {
-        expect(function(){modeling.entities.surface(
+        expect(function(){modeling.geometry.surface(
             1,
             1,
             [[[0,0,0],[0,20,30]],

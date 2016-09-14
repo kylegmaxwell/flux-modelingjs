@@ -1,11 +1,11 @@
-describe("modeling/toJSON", function() {
+describe("operation-toJSON", function() {
     'use strict';
 
-    var modeling = require("../index").modeling({genId: null});
+    var modeling = require("../dist/index.js");
 
-    it ("operation toJSON should work", function() {
-        var opJSON = ['tessellateStl', 'resultId-1', 1.2 ];
-        var tessOp = modeling.operations.tessellateStl("resultId-1", 1.2);
+    it ("operation tessellateJson should work", function() {
+        var opJSON = ['tessellateJson', 'resultId-1', 1.2, 1.0];
+        var tessOp = modeling.Operation.tessellateJson("resultId-1", 1.2, 1.0);
         expect(tessOp.toJSON()).toEqual(opJSON);
     });
 });

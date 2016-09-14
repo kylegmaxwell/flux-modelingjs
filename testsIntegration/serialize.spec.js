@@ -5,14 +5,13 @@
 describe("Serialize and rollup test", function() {
     'use strict';
 
-    var modules = require('../build/rollup-test.common.js');
-    var modeling = modules.getModeling();
-    var schemaJson = modules.getSchema();
+    var modeling = require('../build/rollup-test.common.js');
+    var schemaJson = modeling.schema.entity;
 
     it ("Scene should serialize to json", function() {
-        var scene = modeling.query();
+        var scene = new modeling.Query();
         scene.add("resultId", {"origin":[0,0,0],"primitive":"sphere","radius":10});
-        var tessOp = modeling.operations.tessellateStl("resultId",1);
+        var tessOp = modeling.Operation.tessellateJson("resultId", 1.4, 1.0);
         scene.add("resultId", tessOp);
         expect(JSON.parse(JSON.stringify(scene)))
         .toEqual({
@@ -25,7 +24,7 @@ describe("Serialize and rollup test", function() {
             },
             "Operations": [
                 {   "name": "resultId",
-                    "op": [ "tessellateStl", "resultId", 1 ]
+                    "op": [ "tessellateJson", "resultId", 1.4, 1.0 ]
                 }
             ]
         });

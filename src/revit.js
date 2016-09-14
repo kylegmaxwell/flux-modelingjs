@@ -1,7 +1,8 @@
 'use strict';
 
-var jsonpointer = require('json-pointer');
-var modeling = require('./index').modeling({genId: null});
+import * as jsonpointer from 'json-pointer';
+import * as entities from './geometry/entity.js';
+import * as print from './debugPrint.js';
 
 /**
 * Function to create a revit element.
@@ -14,7 +15,7 @@ var modeling = require('./index').modeling({genId: null});
 * @param {object} [customParamMap] Custom parameters of the element.
 * @returns {{Out: revit/Element}} The created revit model line.
 */
-function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeParamMap, customParamMap) {
+export function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeParamMap, customParamMap) {
     if (fluxId === undefined) {
         fluxId = null;
     }
@@ -24,7 +25,7 @@ function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeP
         return {Error: "Element could not be created: " + check.msg};
     }
 
-    if (!isInvalid(fluxId)) {
+    if (fluxId != null) {
         fluxId = String(fluxId);
     }
 
@@ -65,10 +66,11 @@ function createElement(fluxId, familyInfo, geomParamMap, instanceParamMap, typeP
 /**
 * Function to create a revit Model Line.
 *
+* @param {String} [fluxId] Unique identifier.
 * @param {object} [modelCurve] Input curve.
 * @returns {{Out: revitModelLine}} The created revit model line.
 */
-function createModelLine(fluxId, modelCurve) {
+export function createModelLine(fluxId, modelCurve) {
     var familyInfo = {
         category: "Lines",
         family: "ModelCurve",
@@ -99,6 +101,7 @@ function createModelLine(fluxId, modelCurve) {
 /**
 * Function to create a revit reference plane.
 *
+* @param {String} [fluxId] Unique identifier.
 * @param {position} [bubbleEnd] First point on reference plane.
 * @param {position} [freeEnd] Second point on reference plane.
 * @param {vector} [cutVector] Vector perpendicular to vector from bubbleEnd to freeEnd, tangent to the reference plane.
@@ -106,7 +109,7 @@ function createModelLine(fluxId, modelCurve) {
 * @param {boolean} [wallClosure] If reference plane is wall closure.
 * @returns {{Out: revitReferencePlane}} The created revit reference plane.
 */
-function createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, name, wallClosure) {
+export function createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, name, wallClosure) {
     var familyInfo = {
         category: "Reference Planes",
         family: "ReferencePlane",
@@ -133,7 +136,7 @@ function createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, name, wallC
         bubbleEnd: validBubbleEnd,
         freeEnd: validFreeEnd,
         cutVector: validCutVector,
-        name: isInvalid(name) ? null : name,
+        name: name == null ? null : name,
         wallClosure: !!wallClosure
     };
     var missingParams = checkForKeys(familyInfo, ["category", "family"]);
@@ -162,7 +165,7 @@ function createReferencePlane(fluxId, bubbleEnd, freeEnd, cutVector, name, wallC
 * @param {object} [customParams] Custom parameters to be assigned to this element.
 * @returns {{Out: revitLevel}} The created revit level.
 */
-function createLevel(fluxId, levelType, elevation, name, instanceParams, customParams) {
+export function createLevel(fluxId, levelType, elevation, name, instanceParams, customParams) {
     var familyInfo = {
         category: "Levels",
         family: "Level",
@@ -199,17 +202,17 @@ function createLevel(fluxId, levelType, elevation, name, instanceParams, customP
 * @param {object} [customParams] Custom parameters to be assigned to this element.
 * @returns {{Out: revitLevel}} The created revit grid.
 */
-function createGrid(fluxId, gridType, gridCurve, gridName, instanceParams, customParams) {
+export function createGrid(fluxId, gridType, gridCurve, gridName, instanceParams, customParams) {
     var familyInfo = {
         category: "Grids",
         family: "Grid",
         type: gridType,
         placementType: "Invalid"
-    }
+    };
     var geomParams = {
         name: gridName,
         curve: gridCurve
-    }
+    };
     var missingParams = checkForKeys(familyInfo, ["type"]);
     if (missingParams) {
         return {Error: "Grid element could not be created: Missing required familyinfo parameters " + missingParams.join(", ")};
@@ -233,11 +236,11 @@ function createGrid(fluxId, gridType, gridCurve, gridName, instanceParams, custo
 * @param {position} [location] Location of the room.
 * @param {string} [level] Level of the room.
 * @param {string} [name] Name of the room.
-* @param {object} [instanceParams] Instance parameters to be assigned to this element.
-* @param {object} [customParams] Custom parameters to be assigned to this element.
+* @param {object} [instParamMap] Instance parameters to be assigned to this element.
+* @param {object} [custParamMap] Custom parameters to be assigned to this element.
 * @returns {{Out: revitRoom}} The created revit room.
 */
-function createRoom(fluxId, location, level, name, instParamMap, custParamMap) {
+export function createRoom(fluxId, location, level, name, instParamMap, custParamMap) {
     var familyInfo = {
         category: "Rooms",
         family: "Room",
@@ -280,11 +283,11 @@ function createRoom(fluxId, location, level, name, instParamMap, custParamMap) {
 * @param {string|object} [level] Base level of the wall.
 * @param {boolean} [structural] True of wall is structural, false otherwise.
 * @param {boolean} [flipped] True of wall is flipped, false otherwise.
-* @param {object} [instanceParams] Instance parameters to be assigned to this element.
-* @param {object} [customParams] Custom parameters to be assigned to this element.
+* @param {object} [instParamMap] Instance parameters to be assigned to this element.
+* @param {object} [custParamMap] Custom parameters to be assigned to this element.
 * @returns {{Out: revitWall}} The created revit wall.
 */
-function createWall(fluxId, family, type, profile, level, structural, flipped, instParamMap, custParamMap) {
+export function createWall(fluxId, family, type, profile, level, structural, flipped, instParamMap, custParamMap) {
     var familyInfo = {
         category: "Walls",
         family: family,
@@ -327,7 +330,7 @@ function createWall(fluxId, family, type, profile, level, structural, flipped, i
 * @param {object} [customParams] Custom parameters to be assigned to this element.
 * @returns {{Out: revitFloor}} The created revit floor.
 */
-function createFloor(fluxId, type, profile, level, structural, instanceParams, customParams) {
+export function createFloor(fluxId, type, profile, level, structural, instanceParams, customParams) {
     var familyInfo = {
         category: "Floors",
         family: "Floor",
@@ -366,14 +369,14 @@ function createFloor(fluxId, type, profile, level, structural, instanceParams, c
 * @param {string} [type] Type of the family insance.
 * @param {object} [location] Location of the family instance.
 * @param {string|object} [level] Level of the family instance.
-* @param {string} [structuralType] Structural Type of the family insance.
-* @param {boolean} [faceFlipped] True if the family instance if face flipped. false otherwise.
-* @param {boolean} [handFlipped] True if the family instance if hand flipped, false otherwise.
+* @param {string} [structuraltype] Structural Type of the family insance.
+* @param {boolean} [faceflipped] True if the family instance if face flipped. false otherwise.
+* @param {boolean} [handflipped] True if the family instance if hand flipped, false otherwise.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
 * @returns {{Out: revitOneLevelFamilyInstance}} The created revit family instance.
 */
-function createOneLevelFamilyInstance(fluxId, category, family, type, location,
+export function createOneLevelFamilyInstance(fluxId, category, family, type, location,
         level,  structuraltype, faceflipped, handflipped, instanceParams, customParams) {
     var familyInfo = {
         category: category,
@@ -384,7 +387,7 @@ function createOneLevelFamilyInstance(fluxId, category, family, type, location,
 
     var validLocation = getLocation(location);
 
-    if (!isInvalid(validLocation) && validLocation.Error) {
+    if ((validLocation != null) && validLocation.Error) {
         return validLocation;
     }
 
@@ -422,16 +425,16 @@ function createOneLevelFamilyInstance(fluxId, category, family, type, location,
 * @param {string} [family] Family of of the family instance.
 * @param {string} [type] Type of the family insance.
 * @param {object} [location] Location of the family instance.
-* @param {string|revitLevel} [baseLevel] Base level of the family instance.
-* @param {string|revitLevel} [topLevel] Top level of the family instance.
-* @param {string} [structuralType] Structural Type of the family insance.
-* @param {boolean} [faceFlipped] True if the family instance if face flipped. false otherwise.
-* @param {boolean} [handFlipped] True if the family instance if hand flipped, false otherwise.
+* @param {string|revitLevel} [baselevel] Base level of the family instance.
+* @param {string|revitLevel} [toplevel] Top level of the family instance.
+* @param {string} [structuraltype] Structural Type of the family insance.
+* @param {boolean} [faceflipped] True if the family instance if face flipped. false otherwise.
+* @param {boolean} [handflipped] True if the family instance if hand flipped, false otherwise.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
 * @returns {{Out: revitTwoLevelFamilyInstance}} The created revit family instance.
 */
-function createTwoLevelFamilyInstance(fluxId, category, family, type, location,
+export function createTwoLevelFamilyInstance(fluxId, category, family, type, location,
         baselevel, toplevel, structuraltype, faceflipped, handflipped, instanceParams, customParams) {
     var familyInfo = {
         category: category,
@@ -442,7 +445,7 @@ function createTwoLevelFamilyInstance(fluxId, category, family, type, location,
 
     var validLocation = getLocation(location);
 
-    if (!isInvalid(validLocation) && validLocation.Error) {
+    if ((validLocation != null) && validLocation.Error) {
         return validLocation;
     }
 
@@ -480,17 +483,17 @@ function createTwoLevelFamilyInstance(fluxId, category, family, type, location,
 * @param {string} [category] Category of the family instance.
 * @param {string} [family] Family of of the family instance.
 * @param {string} [type] Type of the family insance.
-* @param {object} [location] Location of the family instance.
-* @param {string|revitLevel} [level] Level of the family instance.
+* @param {object} location [Location] of the family instance.
 * @param {string|object} [host] Host element of the family insance.
-* @param {string} [structuralType] Structural Type of the family insance.
-* @param {boolean} [faceFlipped] True if the family instance if face flipped. false otherwise.
-* @param {boolean} [handFlipped] True if the family instance if hand flipped, false otherwise.
+* @param {string|revitLevel} [level] Level of the family instance.
+* @param {string} [structuraltype] Structural Type of the family insance.
+* @param {boolean} [faceflipped] True if the family instance if face flipped. false otherwise.
+* @param {boolean} [handflipped] True if the family instance if hand flipped, false otherwise.
 * @param {object} [instanceParams] Instance parameters to be assigned to this element.
 * @param {object} [customParams] Custom parameters to be assigned to this element.
 * @returns {{Out: revitTwoLevelFamilyInstance}} The created revit family instance.
 */
-function createOneLevelHostedFamilyInstance(fluxId, category, family, type, location,
+export function createOneLevelHostedFamilyInstance(fluxId, category, family, type, location,
         host, level,  structuraltype, faceflipped, handflipped, instanceParams, customParams) {
     var familyInfo = {
         category: category,
@@ -501,7 +504,7 @@ function createOneLevelHostedFamilyInstance(fluxId, category, family, type, loca
 
     var validLocation = getLocation(location);
 
-    if (!isInvalid(validLocation) && validLocation.Error) {
+    if ((validLocation != null) && validLocation.Error) {
         return validLocation;
     }
 
@@ -543,7 +546,7 @@ function createOneLevelHostedFamilyInstance(fluxId, category, family, type, loca
 function getValidStructuralType(structuralType) {
     var defaultStructualType = "NonStructural";
 
-    if (isInvalid(structuralType)) {
+    if (structuralType == null) {
         return defaultStructualType;
     }
 
@@ -566,7 +569,7 @@ function getValidStructuralType(structuralType) {
     if (structuralType.toLowerCase() === "footing")
         return "Footing";
 
-    console.warn("Invalid StructrualType: %s provided. Defaulting to %s", structuralType, defaultStructualType);
+    print.warn("Invalid StructrualType: %s provided. Defaulting to %s", structuralType, defaultStructualType);
 
     return defaultStructualType;
 }
@@ -590,7 +593,7 @@ function extractFluxId(element) {
 /**
 * Function to extract name of a revit level.
 *
-* @param {object} [element] Valid revit level.
+* @param {object} [elementOrLevel] Valid revit element or level.
 * @returns {string} Name of the level element.
 */
 function extractLevelName(elementOrLevel) {
@@ -613,9 +616,9 @@ function extractLevelName(elementOrLevel) {
 *
 * @param {object} [element] Valid revit level.
 * @param {string} [parameter] Name of the parameter.
-* @returns {Out: object} Value of parameer if found.
+* @returns {{Out: object}} Value of parameer if found.
 */
-function selectParameter(element, parameter) {
+export function selectParameter(element, parameter) {
     // Then check in familyInfo.
     var value = get(element, "familyInfo/" + parameter);
     if (value.Found) {
@@ -659,9 +662,9 @@ function selectParameter(element, parameter) {
 *
 * @param {object} [element] Valid revit level.
 * @param {object} [newParameterMap] Key-value pair of parameters.
-* @returns {Out: object} Updated element.
+* @returns {{Out: object}} Updated element.
 */
-function updateParameters(element, newParameterMap) {
+export function updateParameters(element, newParameterMap) {
     var check = checkElement(element);
     if (!check.valid) {
         return {
@@ -701,7 +704,7 @@ function updateParameters(element, newParameterMap) {
         }
 
         // Check if we should update a Geometry Parameter
-        var value = get(element, "geometryParameters/" + param);
+        value = get(element, "geometryParameters/" + param);
         if (value.Found){
             set(element, "geometryParameters/" + param, val);
             continue;
@@ -748,7 +751,7 @@ function updateParameters(element, newParameterMap) {
 * Function to check if a given element is a revit element.
 *
 * @param {object} [element] Any object.
-* @returns {valid: boolean} True of valid revit element, false otherwise.
+* @returns {{valid: boolean}} True of valid revit element, false otherwise.
 */
 function checkElement(element) {
     if (!isRevitElement(element)) {
@@ -783,7 +786,7 @@ function checkElement(element) {
 * Function to check if a primitive==revitElement.
 *
 * @param {object} [element] Any object.
-* @returns {valid: boolean} True if promitive==revitelement, false otherwise.
+* @returns {{valid: boolean}} True if promitive==revitelement, false otherwise.
 */
 function isRevitElement(element) {
     var primitive = get(element, "primitive");
@@ -792,7 +795,7 @@ function isRevitElement(element) {
 
 // TODO check against schema.
 function checkParameterMap(parameterMap) {
-    if (isInvalid(parameterMap)) {
+    if (parameterMap == null) {
         return {valid: false, msg: "No parameter map provided."};
     }
     if (typeof parameterMap !== "object") {
@@ -804,7 +807,7 @@ function checkParameterMap(parameterMap) {
 // TODO check against schema.
 function checkFamilyInfo(info) {
     // check familyInfo is well-formed.
-    if (isInvalid(info)) {
+    if (info == null) {
         return {valid: false, msg: "No familyInfo field provided."};
     }
     if (typeof info !== "object") {
@@ -856,28 +859,11 @@ function checkValidPlacementType(info) {
 
 function checkForKeys(obj, keys) {
     var missingKeys = keys.filter(function(key) {
-        return !obj.hasOwnProperty(key) || isInvalid(obj[key]);
+        return !obj.hasOwnProperty(key) || (obj[key] == null);
     });
     if (missingKeys.length > 0) {
         return missingKeys;
     }
-}
-
-/**
- * @param {Object} x
- *
- * @return {Boolean} True if the input x is null or undefined, and false
- *   otherwise.
- *
- * Note: The reason this is called isInvalid instead of IsValid is
- * because it is meant to mirror IsNull.
- *
- * TODO(daishi): Confirm what value we want to test against. For now
- * check for both null and undefined.
- * (I think we need to resolve the invalid/null question first.)
- */
-function isInvalid(x) {
-    return x === null || x === undefined;
 }
 
 // Roughly maps to the corresponding JSON pointer functions.
@@ -924,7 +910,7 @@ function addRootSlashIfNecessary(path) {
 // This function returns back a valid location by converting
 // an array of numbers to point.
 function getLocation(obj) {
-    if (isInvalid(obj)) {
+    if (obj == null) {
         return obj;
     }
 
@@ -947,7 +933,7 @@ function getLocation(obj) {
 function createPoint(obj) {
     var pt;
     try {
-        pt = modeling.entities.point(obj);
+        pt = entities.point(obj);
     }
     catch(err) {
         return {Error: err.message};
@@ -959,27 +945,11 @@ function createPoint(obj) {
 function createVector(obj) {
     var vec;
     try {
-        vec = modeling.entities.vector(obj);
+        vec = entities.vector(obj);
     }
     catch(err) {
         return {Error: err.message};
     }
 
     return vec;
-}
-
-module.exports = {
-    createElement: createElement,
-    selectParameter: selectParameter,
-    updateParameters: updateParameters,
-    createModelLine: createModelLine,
-    createReferencePlane: createReferencePlane,
-    createRoom: createRoom,
-    createLevel: createLevel,
-    createGrid: createGrid,
-    createFloor: createFloor,
-    createWall: createWall,
-    createOneLevelFamilyInstance: createOneLevelFamilyInstance,
-    createTwoLevelFamilyInstance: createTwoLevelFamilyInstance,
-    createOneLevelHostedFamilyInstance: createOneLevelHostedFamilyInstance
 }

@@ -1,11 +1,10 @@
 describe("fluxRevit schema test", function() {
     'use strict';
     var Ajv   = require("ajv");
-    var fs    = require("fs");
-    var flux  = require('../index');
-    var revit = flux.revit;
-    var fluxEntitySchema = flux.schemas.pbw;
-    var fluxRevitSchema = flux.schemas.revit;
+    var modeling = require('../dist/index.js');
+    var revit = modeling.revit;
+    var fluxEntitySchema = modeling.schema.entity;
+    var fluxRevitSchema = modeling.schema.revit
 
     var ajv = Ajv({
         allErrors: true
@@ -176,13 +175,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revitWall with extra parameters should validate", function() {
-            var validWall = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-wall.json"));
+            var validWall = require("./data/revit/valid-revit-wall.json");
             var isValid = validate(validWall);
             expect(isValid).toEqual(true);
         });
 
         it ("Invalid revitWall should fail", function() {
-            var invalidWall = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-wall.json"));
+            var invalidWall = require("./data/revit/invalid-revit-wall.json");
             var isValid = validate(invalidWall);
             expect(isValid).toEqual(false);
         });
@@ -210,13 +209,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revitRoom with extra parameers should validate", function() {
-            var validRoom = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-room.json"));
+            var validRoom = require("./data/revit/valid-revit-room.json");
             var isValid = validate(validRoom);
             expect(isValid).toEqual(true);
         });
 
         it ("Invalid revitRoom should fail", function() {
-            var invalidRoom = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-room.json"));
+            var invalidRoom = require("./data/revit/invalid-revit-room.json");
             var isValid = validate(invalidRoom.Out);
             expect(isValid).toEqual(false);
         });
@@ -252,13 +251,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revitReferencePlane with extra parameters should validate", function() {
-            var validRefPlane = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-referencePlane.json"));
+            var validRefPlane = require("./data/revit/valid-revit-referencePlane.json");
             var isValid = validate(validRefPlane);
             expect(isValid).toEqual(true);
         });
 
         it ("Invalid revitReferencePlane should fail", function() {
-            var invalidRefPlane = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-referencePlane.json"));
+            var invalidRefPlane = require("./data/revit/invalid-revit-referencePlane.json");
             var isValid = validate(invalidRefPlane);
             expect(isValid).toEqual(false);
         });
@@ -283,13 +282,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revitModelCurve should validate", function() {
-            var validCurve = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-modelCurve.json"));
+            var validCurve = require("./data/revit/valid-revit-modelCurve.json");
             var isValid = validate(validCurve);
             expect(isValid).toEqual(true);
         });
 
         it ("Invalid revitModelCurve should fail", function() {
-            var invalidCurve = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-modelCurve.json"));
+            var invalidCurve = require("./data/revit/invalid-revit-modelCurve.json");
             var isValid = validate(invalidCurve);
             expect(isValid).toEqual(false);
         });
@@ -311,13 +310,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revitLevel with extra parameters should validate", function() {
-            var validLevel = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-level.json"));
+            var validLevel = require("./data/revit/valid-revit-level.json");
             var isValid = validate(validLevel);
             expect(isValid).toEqual(true);
         });
 
         it ("Invalid revitLevel should fail", function() {
-            var invalidLevel = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-level.json"));
+            var invalidLevel = require("./data/revit/invalid-revit-level.json");
             var isValid = validate(invalidLevel);
             expect(isValid).toEqual(false);
         });
@@ -346,13 +345,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revitFloor with extra parameters should validate", function() {
-            var validFloor = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-floor.json"));
+            var validFloor = require("./data/revit/valid-revit-floor.json");
             var isValid = validate(validFloor);
             expect(isValid).toEqual(true);
         });
 
         it ("Invalid revitFloor should fail", function() {
-            var invalidFloor = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-floor.json"));
+            var invalidFloor = require("./data/revit/invalid-revit-floor.json");
             var isValid = validate(invalidFloor);
             expect(isValid).toEqual(false);
         });
@@ -380,13 +379,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revit-one-level-familyinstance with extra parameters should validate", function() {
-            var validFamilyInstance = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-oneLevelFamilyInstance.json"));
+            var validFamilyInstance = require("./data/revit/valid-revit-oneLevelFamilyInstance.json");
             var isValid = validate(validFamilyInstance);
             expect(isValid).toEqual(true);
         });
 
         it ("Valid revit-one-level-familyinstance should fail", function() {
-            var invalidFamilyInstance = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-oneLevelFamilyInstance.json"));
+            var invalidFamilyInstance = require("./data/revit/invalid-revit-oneLevelFamilyInstance.json");
             var isValid = validate(invalidFamilyInstance);
             expect(isValid).toEqual(false);
         });
@@ -409,13 +408,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revit-two-level-familyinstance with extra parameters should validate", function() {
-            var validFamilyInstance = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-twoLevelFamilyInstance.json"));
+            var validFamilyInstance = require("./data/revit/valid-revit-twoLevelFamilyInstance.json");
             var isValid = validate(validFamilyInstance);
             expect(isValid).toEqual(true);
         });
 
         it ("Valid revit-two-level-familyinstance should fail", function() {
-            var invalidFamilyInstance = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-twoLevelFamilyInstance.json"));
+            var invalidFamilyInstance = require("./data/revit/invalid-revit-twoLevelFamilyInstance.json");
             var isValid = validate(invalidFamilyInstance);
             expect(isValid).toEqual(false);
         });
@@ -437,13 +436,13 @@ describe("fluxRevit schema test", function() {
         });
 
         it ("Valid revit-one-level-hosted-familyinstance with extra parameters should validate", function() {
-            var validFamilyInstance = JSON.parse(fs.readFileSync("./tests/data/revit/valid-revit-oneLevelHostedFamilyInstance.json"));
+            var validFamilyInstance = require("./data/revit/valid-revit-oneLevelHostedFamilyInstance.json");
             var isValid = validate(validFamilyInstance);
             expect(isValid).toEqual(true);
         });
 
         it ("Valid revit-one-level-hosted-familyinstance should fail", function() {
-            var invalidFamilyInstance = JSON.parse(fs.readFileSync("./tests/data/revit/invalid-revit-oneLevelHostedFamilyInstance.json"));
+            var invalidFamilyInstance = require("./data/revit/invalid-revit-oneLevelHostedFamilyInstance.json");
             var isValid = validate(invalidFamilyInstance);
             expect(isValid).toEqual(false);
         });
