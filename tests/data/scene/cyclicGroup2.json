@@ -1,0 +1,28 @@
+[
+    {
+        "id": "D",
+        "primitive": "group",
+        "children": ["C"]
+    },
+    {
+        "id": "C",
+        "primitive": "group",
+        "children": ["D"]
+    },
+    {
+        "id": "B",
+        "primitive": "group",
+        "children": ["C"]
+    },
+    {
+        "id": "A",
+        "primitive": "group",
+        "children": ["B"]
+    },
+    {
+        "id": "plants",
+        "primitive": "layer",
+        "color": [0,1,0],
+        "elements": ["A"]
+    }
+]

@@ -6,7 +6,7 @@ import ValidatorResults from './ValidatorResults.js';
  * Class to manage calls to check if JSON matches the scene spec
  */
 export default function Validator() {
-    // instances that are already used in assemblies
+    // instances that are already used in groups
     this.usedInstanceIDs = [];
 }
 
@@ -19,10 +19,10 @@ export default function Validator() {
  * @return {Object}       The object if it was foudn
  */
 function _findObjectByField(field, value, json) {
-    for(var key in json.elements) {
-        if (json.elements[key] == null) continue;
-        if (json.elements[key][field] === value) {
-            return json.elements[key];
+    for(var key in json) {
+        if (json[key] == null) continue;
+        if (json[key][field] === value) {
+            return json[key];
         }
     }
 }
@@ -58,7 +58,7 @@ function _validateInstance(instance, json){
     if (!node) return _invalidId(instance.entity);
     if (!node.primitive) return _primitiveError();
 
-    var result = _validateNode(node, instance.id, ['instance', 'assembly', 'layer']);
+    var result = _validateNode(node, instance.id, ['instance', 'group', 'layer']);
     if (result) {
         return _error(result);
     }
@@ -67,28 +67,28 @@ function _validateInstance(instance, json){
 }
 
 /**
- * Determine if the assembly is used properly in the scene
- * @param  {Object} assembly        Flux element JSON
+ * Determine if the group is used properly in the scene
+ * @param  {Object} group        Flux element JSON
  * @param  {Object} json            Full scene JSON
  * @return {ValidatorResults}  The Results
  */
-Validator.prototype._validateAssembly = function(assembly, json){
-    if (!assembly.children || assembly.children.constructor !== Array) {
-        return _error('Assembly must have array of children');
+Validator.prototype._validateGroup = function(group, json){
+    if (!group.children || group.children.constructor !== Array) {
+        return _error('Group must have array of children');
     }
 
-    for(var i = 0; i < assembly.children.length; i++){
-        var nodeID = assembly.children[i];
+    for(var i = 0; i < group.children.length; i++){
+        var nodeID = group.children[i];
         var node = _findObjectByField('id', nodeID, json);
         if (!node) return _invalidId(nodeID);
         if (!node.primitive) return _primitiveError();
 
-        var result = _validateNode(node, assembly.id, ['layer']);
+        var result = _validateNode(node, group.id, ['layer']);
         if (result) {
             return _error(result);
         }
 
-        // check instances are referenced by only a single assembly
+        // check instances are referenced by only a single group
         if (node.primitive === 'instance') {
             if (this.usedInstanceIDs.indexOf(node.id) != -1) {
                 return _error('Instance with id = ' + node.id + ' is referenced more than once');
@@ -96,8 +96,8 @@ Validator.prototype._validateAssembly = function(assembly, json){
                 this.usedInstanceIDs.push(node.id);
             }
         }
-        else if (node.primitive != 'assembly') {
-            var message = 'Assembly can only contain instances or assemblies: '
+        else if (node.primitive != 'group') {
+            var message = 'Group can only contain instances or groups: '
                 + node.id + ' has primitive ' +node.primitive;
             return _error(message);
         }
@@ -153,7 +153,7 @@ function _validateLayer(layer, json){
         if (!node) return _invalidId(nodeKey);
         if (!node.primitive) return _primitiveError();
         // Layers can contain any entity except scenes and layers
-        var result = _validateNode(node, layer.id, ['scene', 'layer']);
+        var result = _validateNode(node, layer.id, ['layer']);
         if (result) {
             return _error(result);
         }
@@ -162,17 +162,37 @@ function _validateLayer(layer, json){
 }
 
 /**
+ * Recursively search nested arrays for layer objects
+ * @param  {Array} arr  Source data
+ * @return {Boolean}    Whether there was a layer present
+ */
+function _hasLayer(arr) {
+    if (!arr || typeof arr !== 'object') {
+        return false;
+    }
+
+    if (arr.constructor !== Array) {
+        return arr.primitive && arr.primitive === 'layer';
+    } else {
+        for (var i=0;i<arr.length;i++) {
+            if (_hasLayer(arr[i])) {
+                return true;
+            }
+        }
+    }
+}
+
+/**
  * Check if an object is scene data
  * @param  {Object}  json The scene JSON
  * @return {Boolean}      True if it is a scene
  */
 Validator.isScene = function (json) {
-    return json && json.primitive && json.primitive === 'scene' &&
-            json.elements && json.elements.constructor === Array;
+    return _hasLayer(json);
 };
 
 /**
- * Enumeration to store assembly states
+ * Enumeration to store group states
  * @type {Object}
  */
 var STATES = {
@@ -181,22 +201,22 @@ var STATES = {
 };
 
 /**
- * Determine whether the graph structure of assemblies has any cycles.
- * Cyclical links in assemblies can not be rendered and are invalid.
- * @param  {Object}  assemblies Map from id to assembly data
- * @return {Boolean}            True if there are no cycles and the assemblies are valid
+ * Determine whether the graph structure of groups has any cycles.
+ * Cyclical links in groups can not be rendered and are invalid.
+ * @param  {Object}  groups Map from id to group data
+ * @return {Boolean}            True if there are no cycles and the groups are valid
  */
-function _isAcyclic(assemblies) {
+function _isAcyclic(groups) {
     var stack = [];
     var parent = {};
     var states = {};
-    for (var a in assemblies) {
-        stack.push(assemblies[a].id);
+    for (var a in groups) {
+        stack.push(groups[a].id);
     }
     // Depth first search
     while (stack.length > 0) {
         var id = stack.pop();
-        var assembly = assemblies[id];
+        var group = groups[id];
         // Skip repeatedly processing nodes in chains that do not have cycles
         if (states[id]===STATES.VALID) {
             continue;
@@ -207,10 +227,10 @@ function _isAcyclic(assemblies) {
         }
         var numChildren = 0;
         var i;
-        for(i = 0; i < assembly.children.length; i++){
-            var childId = assembly.children[i];
-            // Only check children that are assemblies
-            if (assemblies[childId] && states[childId] !== STATES.VALID) {
+        for(i = 0; i < group.children.length; i++){
+            var childId = group.children[i];
+            // Only check children that are groups
+            if (groups[childId] && states[childId] !== STATES.VALID) {
                 stack.push(childId);
                 parent[childId] = id;
                 numChildren++;
@@ -223,10 +243,10 @@ function _isAcyclic(assemblies) {
             while (validId && states[validId]===STATES.PROCESSING) {
                 // A node is satisfied when all of it's children have been processed
                 var satisfied = true;
-                var children = assemblies[validId].children;
-                // Check if any of the children that are assemblies are not yet valid
+                var children = groups[validId].children;
+                // Check if any of the children that are groups are not yet valid
                 for(i = 0; i < children.length; i++){
-                    if (assemblies[children[i]] && states[children[i]]!==STATES.VALID) {
+                    if (groups[children[i]] && states[children[i]]!==STATES.VALID) {
                         satisfied = false;
                     }
                 }
@@ -245,6 +265,7 @@ function _isAcyclic(assemblies) {
 
 /**
  * Determine if some arbitrary json is a valid scene
+ * Precondition: Parameter json is a flat array of data.
  * @param  {Object} json JSON data of a potential scene
  * @return {ValidatorResults}      The result
  */
@@ -255,10 +276,11 @@ Validator.prototype.validateJSON = function (json)
     if (!Validator.isScene(json)) {
         return _error('The element is not a scene');
     }
-    var assemblies = {};
+
+    var groups = {};
     var layerCount = 0;
-    for (var i=0;i<json.elements.length;i++){
-        var obj = json.elements[i];
+    for (var i=0;i<json.length;i++){
+        var obj = json[i];
         if (obj == null) continue;
 
         // check for unique id
@@ -277,29 +299,31 @@ Validator.prototype.validateJSON = function (json)
             }
         }
 
-        // check assemblies reference only instances or other assemblies
-        else if (obj.primitive === 'assembly'){
-            res = this._validateAssembly(obj, json);
+        // check groups reference only instances or other groups
+        else if (obj.primitive === 'group'){
+            res = this._validateGroup(obj, json);
             if (!res.getResult()) {
                 return res;
             }
-            assemblies[obj.id] = obj;
+            groups[obj.id] = obj;
         }
 
-        // check layer reference only assemblies and instances
+        // check layer reference only groups and instances
         else if (obj.primitive === 'layer'){
             res = _validateLayer(obj, json);
             if (!res.getResult()) {
                 return res;
             }
-            layerCount++;
+            if (obj.visible == null || obj.visible) {
+                layerCount++;
+            }
         }
     }
     if (layerCount < 1) {
-        return _error('Scene has no valid layers');
+        return _error('Scene has no visible or valid layers');
     }
-    if (!_isAcyclic(assemblies)) {
-        return _error('Cycle found in assemblies');
+    if (!_isAcyclic(groups)) {
+        return _error('Cycle found in groups');
     }
     return _ok();
 };

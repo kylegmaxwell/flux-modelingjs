@@ -50,7 +50,7 @@
             "anyOf": [
                 { "$ref": "#/scene/entity"  },
 
-                { "$ref": "#/assembly" },
+                { "$ref": "#/group" },
                 { "$ref": "#/instance" },
                 { "$ref": "#/alphaGeometryContainer" },
                 { "$ref": "#/layer" }
@@ -564,11 +564,11 @@
                 "additionalProperties": false
             }
         },
-    "assembly": {
+    "group": {
         "type": "object",
         "properties": {
             "attributes":   {},
-            "primitive":    { "enum":[ "assembly" ] },
+            "primitive":    { "enum":[ "group" ] },
             "id":           { "$ref": "#/types/fluxid" },
             "matrix":       { "$ref": "#/types/matrix" },
             "bbox":         { "$ref": "#/types/boundingBox" },

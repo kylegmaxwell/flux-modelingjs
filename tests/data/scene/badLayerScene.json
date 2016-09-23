@@ -1,18 +1,14 @@
-{
-    "primitive": "scene",
-    "version":"0.0.1",
-    "elements":[
-        {
-            "id":"ball",
-            "origin":[0,0,10],
-            "radius":10,
-            "primitive":"sphere"
-        },
-        {
-            "id": "plants",
-            "primitive": "layer",
-            "color": [0,1,0],
-            "elements": ["ball",2]
-        }
-    ]
-}
+[
+    {
+        "id":"ball",
+        "origin":[0,0,10],
+        "radius":10,
+        "primitive":"sphere"
+    },
+    {
+        "id": "plants",
+        "primitive": "layer",
+        "color": [0,1,0],
+        "elements": ["ball",2]
+    }
+]

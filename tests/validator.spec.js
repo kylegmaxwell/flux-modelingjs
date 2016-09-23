@@ -16,25 +16,25 @@ describe("Scene validator test", function() {
         scene: 'maxRectangles',
         message: ''
     },{
-        scene: 'validAssembly',
+        scene: 'validGroup',
         message: ''
     },{
-        scene: 'linkedAssembly',
+        scene: 'linkedGroup',
         message: ''
     },{
-        scene: 'linkedAssembly2',
+        scene: 'linkedGroup2',
         message: ''
     },{
-        scene: 'cyclicAssembly',
+        scene: 'cyclicGroup',
         message: 'Cycle'
     },{
-        scene: 'cyclicAssembly2',
+        scene: 'cyclicGroup2',
         message: 'Cycle'
     },{
-        scene: 'cyclicAssembly3',
+        scene: 'cyclicGroup3',
         message: 'Cycle'
     },{
-        scene: 'cyclicAssembly4',
+        scene: 'cyclicGroup4',
         message: 'equal to parent'
     }
     ];
