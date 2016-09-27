@@ -129,6 +129,15 @@ Operation.raw = function() {
  */
 Operation.repr = op('repr', 4);
 
+/**
+ * Convert a given body to a sheet or solid body
+ * @functions
+ * @param  {Body}           Input Body
+ * @param  {String}         Target body type "sheet" or "solid"
+ * @return {Sheet|Solid}    Input body converted to a sheet or solid
+ */
+ Operation.convertBodyType = op('convertBodyType', 2);
+
 /** 'union' operation
  *  Computes union of two geometries
  *  @function
