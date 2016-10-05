@@ -52,7 +52,7 @@
 
                 { "$ref": "#/group" },
                 { "$ref": "#/instance" },
-                { "$ref": "#/alphaGeometryContainer" },
+                { "$ref": "#/geometryList" },
                 { "$ref": "#/layer" }
             ]
         }
@@ -548,11 +548,11 @@
                 "required": [ "primitive", "id", "entity" ],
                 "additionalProperties": false
         },
-    "alphaGeometryContainer": {
+    "geometryList": {
             "type": "object",
             "properties": {
                 "attributes":   {},
-                "primitive":    { "enum": [ "alphaGeometryContainer" ] },
+                "primitive":    { "enum": [ "geometryList" ] },
                 "id":           { "$ref": "#/types/fluxid" },
                 "entity": {
                     "anyOf": [
