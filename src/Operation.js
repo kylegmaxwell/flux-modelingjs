@@ -201,16 +201,6 @@ Operation.evalMassProps = op('evalMassProps', 1);
  */
 Operation.trim = op('trim', 2);
 
-/** 'crossSection' operation
- *  Sections solid or sheet body with surface
- *  The result is a piece of surface which forms section
- *  @function
- *  @param  {Solid|Sheet} body    solid or sheet body to section
- *  @param  {Plane}       surface plane or cylinder surface to section with
- *  @return {Sheet}                 resulting cross-section
- */
-Operation.crossSection = op('crossSection', 2);
-
 /** 'extractSheetBoundary' operation
  *  Extracts a sheet body's boundary as a wire body.
  *  @function
@@ -219,27 +209,7 @@ Operation.crossSection = op('crossSection', 2);
 */
  Operation.extractSheetBoundary = op('extractSheetBoundary', 1);
 
-/** 'intersectBodyWithLine' operation
- *  Computes a list of points where line intersects faces of specified body
- *  Points are ordered by their position on the line, along line's main direction
- *  @function
- *  @param  {Sheet|Solid} body solid or sheet body to intersect
- *  @param  {Wire}        line intersection line
- *  @return {Point[]}            list of intersection points
- */
-Operation.intersectBodyWithLine = op('intersectBodyWithLine', 2);
-
 /** 'extrude' operation
- *  Extrudes body along direction, until second body is reached
- *  @function
- *  @param  {Point|Wire|Sheet} profile   extruded profile
- *  @param  {Sheet|Solid}      bound     bounding body
- *  @param  {Vector}           direction extrusion direction
- *  @return {Mesh}
- */
-Operation.extrude = op('extrude', 3);
-
-/** 'extrudeWithDistance' operation
  *  Extrudes body along direction for a specified distance
  *  @function
  *  @param  {Point|Wire|Sheet} body      extruded profile
@@ -247,7 +217,7 @@ Operation.extrude = op('extrude', 3);
  *  @param  {Vector}           direction extrusion direction
  *  @return {Mesh}
  */
-Operation.extrudeWithDistance = op('extrudeWithDistance', 3);
+Operation.extrude = op('extrude', 3);
 
 /** 'sweep' operation
  *  Sweeps wire or sheet profile along guide wire
@@ -279,14 +249,6 @@ Operation.loft = op('loft', 3);
  */
 Operation.revolve = op('revolve', 4);
 
-/** 'evalCurveLength' operation
- *  Computes curve length
- *  @function
- *  @param  {Curve}  curve
- *  @return {number}
- */
-Operation.evalCurveLength = op('evalCurveLength', 1);
-
 /** 'tessellateJson' operation
  *  Constructs JSON representation of specified BREP
  *  @function
@@ -305,41 +267,6 @@ Operation.tessellateJson = op('tessellateJson', 3);
  */
 Operation.createPolylineApprox = op('createPolylineApprox', 1);
 
-/** 'mirror' operation
- *  Produces entity that reflected about given origin and direction
- *  @function
- *  @param  {Point|Wire|Sheet|Solid} body
- *  @param  {Point}                  origin
- *  @param  {Vector}                 direction
- *  @return {Point|Wire|Sheet|Solid}
- */
-Operation.mirror = op('mirror', 3);
-
-/** 'createLinearPattern' operation
- *  Produces linear pattern of entity in the given direction
- *  that is separated by spacing parameter
- *  @function
- *  @param  {Point|Wire|Sheet|Solid}  pattern
- *  @param  {Vector}                  direction
- *  @param  {number}                  spacing   distance between pattern copies
- *  @param  {number}                  nEntities repetitions count
- *  @return {Point|Wire|Sheet|Solid}
- */
-Operation.createLinearPattern = op('createLinearPattern', 4);
-
-/** 'createCircularPattern' operation
- *  Produces circular pattern of entity in the given direction
- *  that is separated by angle between each instance
- *  @function
- *  @param  {Point|Wire|Sheet|Solid}  pattern
- *  @param  {Point}                   origin
- *  @param  {Vector}                  direction direction vector in which to create patterns
- *  @param  {number}                  angle     angle between instances
- *  @param  {number}                  nEntities repetitions count
- *  @return {Point|Wire|Sheet|Solid}
- */
-Operation.createCircularPattern = op('createCircularPattern', 5);
-
 /** 'createPlanarSheet' operation
  *  Creates a sheet body from a closed curve
  *  @function
@@ -356,14 +283,6 @@ Operation.createPlanarSheet = op('createPlanarSheet', 1);
  *  @return {Sheet|Solid} the piece of original body from 'back' tool side (opposite to where tool's normal points)
  */
 Operation.sectionBody = op('sectionBody', 2);
-
-/** 'joinCurves' operation
- *  Joins a closed set of wires to form a solitary wire
- *  @function
- *  @param  {...Wire} wire
- *  @return {Wire}
- */
-Operation.joinCurves = op('joinCurves', 1);
 
 /** 'evalCurve' operation
  *  Evaluates a point and derivatives at a given curve parameter
@@ -427,15 +346,6 @@ Operation.makeSubCurve = op('makeSubCurve', 3);
  */
 Operation.makeSubSurface = op('makeSubSurface', 5);
 
-/** 'intersectCurves' operation
- *  Finds all intersections between two curves
- *  @function
- *  @param  {Curve}   curve1
- *  @param  {Curve}   curve2
- *  @return {Point[]} intersections list
- */
-Operation.intersectCurves = op('intersectCurves', 2);
-
 /** 'offsetBody' operation
  *  'Bloats' sheet or solid body by offsetting all its faces by specified distance, using faces' normals as directions
  *  @function
@@ -463,17 +373,6 @@ Operation.offsetWire = op('offsetWire', 3);
  *  @return {Wire|Sheet}             cannot be exported, only usable as input for other operations
  */
 Operation.createProfiles = op('createProfiles', 2);
-
-/** 'compareCurves' operation
- *  Checks if two NURBS curves are equal
- *  Following wires are considered NURBS geometry: lines, polylines, arcs, curves, rectangles.
- *  Returns "1" if wires have equal knots, points and degrees, "0" otherwise.
- *  @function
- *  @param  {Curve}   curve1
- *  @param  {Curve}   curve2
- *  @return {Number}  "1" if equal, "0" otherwise
- */
-Operation.compareCurves = op('compareCurves', 2);
 
 /** 'createResilientProfiles' operation
  *  Creates profiles which inner loops are removed
