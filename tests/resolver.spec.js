@@ -60,7 +60,7 @@ var nestedOperationsQuery = {
       "op": [
         "evalMassProps",
         [
-          "extrudeWithDistance",
+          "extrude",
           "circle@1",
           "vector@2",
           20
@@ -101,7 +101,7 @@ var multipleOpsSameObjectQuery = {
     {
       "name": "extruded",
       "op": [
-        "extrudeWithDistance",
+        "extrude",
         "circle@1",
         "vector@2",
         20
@@ -203,7 +203,7 @@ var cases = [
         makeQuery: function() {
             var q = new Query();
             var c = modeling.geometry.circle([0,1,2], 10);
-            var s = Operation.extrudeWithDistance(c, modeling.geometry.vector([0,0,1]), 20);
+            var s = Operation.extrude(c, modeling.geometry.vector([0,0,1]), 20);
             var o = Operation.evalMassProps(s);
             q.add("result", o);
             return q;
@@ -216,7 +216,7 @@ var cases = [
             var q = new Query();
             var c = forceJSON(modeling.geometry.circle([0,1,2], 10));
             var v = forceJSON(modeling.geometry.vector([0,0,1]));
-            var s = Operation.extrudeWithDistance(c, v, 20);
+            var s = Operation.extrude(c, v, 20);
             var o = Operation.evalMassProps(s);
             q.add("result", o);
             return q;
@@ -229,7 +229,7 @@ var cases = [
             var q = new Query();
             var c = forceJSON(modeling.geometry.circle([0,1,2], 10));
             var v = forceJSON(modeling.geometry.vector([0,0,1]));
-            var s = Operation.extrudeWithDistance(c, v, 20);
+            var s = Operation.extrude(c, v, 20);
             var o = Operation.evalMassProps(c);
             q.add("extruded", s)
             q.add("circleProps", o);
@@ -238,8 +238,6 @@ var cases = [
         expected: multipleOpsSameObjectQuery
     },
 ];
-
-
 
 describe("Resolver test", function() {
 
