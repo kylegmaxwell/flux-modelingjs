@@ -1,6 +1,6 @@
 {
   "name": "flux-modelingjs",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Modeling entity constructors, measurement unit handlers, JSON schema validators etc.",
   "main": "dist/index.js",
   "jsnext:main": "src/index-lite.js",
@@ -8,9 +8,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "npm run lint && npm run all-tests",
+    "test": "npm run lint && npm run tests",
     "lint": "eslint src/**;",
-    "all-tests": "npm run clean && npm run unit-tests && npm run integration-tests",
+    "tests": "npm run clean && npm run unit-tests && npm run integration-tests",
     "clean": "rm -f ./{build,dist}/*.{js,map}",
     "unit-tests": "npm run build-common && npm run run-unit-tests",
     "build-common": "babel src -d dist -s",

@@ -1,6 +1,7 @@
 'use strict';
 
 import ValidatorResults from './ValidatorResults.js';
+import * as utils from './utils.js';
 
 /**
  * Class to manage calls to check if JSON matches the scene spec
@@ -161,35 +162,6 @@ function _validateLayer(layer, json){
     return _ok();
 }
 
-/**
- * Recursively search nested arrays for layer objects
- * @param  {Array} arr  Source data
- * @return {Boolean}    Whether there was a layer present
- */
-function _hasLayer(arr) {
-    if (!arr || typeof arr !== 'object') {
-        return false;
-    }
-
-    if (arr.constructor !== Array) {
-        return arr.primitive && arr.primitive === 'layer';
-    } else {
-        for (var i=0;i<arr.length;i++) {
-            if (_hasLayer(arr[i])) {
-                return true;
-            }
-        }
-    }
-}
-
-/**
- * Check if an object is scene data
- * @param  {Object}  json The scene JSON
- * @return {Boolean}      True if it is a scene
- */
-Validator.isScene = function (json) {
-    return _hasLayer(json);
-};
 
 /**
  * Enumeration to store group states
@@ -273,7 +245,7 @@ Validator.prototype.validateJSON = function (json)
 {
     var allIDs = [];
 
-    if (!Validator.isScene(json)) {
+    if (!utils.isScene(json)) {
         return _error('The element is not a scene');
     }
 

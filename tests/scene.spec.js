@@ -1,12 +1,13 @@
+'use strict';
+
+var scene = require('../dist/index.js').scene;
+
 /**
  * This test runs several scenes through the validator and checks the results.
  */
 describe("Scene validator test", function() {
-    'use strict';
 
-    var Validator = require('../dist/index.js').scene.Validator;
-
-    var fixture = [{
+    var fixtures = [{
         scene: 'badLayerScene',
         message: 'element'
     },{
@@ -39,9 +40,9 @@ describe("Scene validator test", function() {
     }
     ];
 
-    fixture.forEach(function (testData) {
+    fixtures.forEach(function (testData) {
         it (testData.scene, function() {
-            var validator = new Validator();
+            var validator = new scene.Validator();
             var results = validator.validateJSON(require('./data/scene/'+testData.scene+'.json'));
             var valid = testData.message === '';
             expect(results.getResult()).toEqual(valid);
@@ -53,4 +54,36 @@ describe("Scene validator test", function() {
         });
     });
 
+});
+
+describe("Scene utils test", function() {
+    var fixtures = [
+        {
+            "description": "String",
+            "value": "HELLO",
+            "geometry": false
+        },
+        {
+            "description": "Table",
+            "value": [[1,2,3],[4,5,6]],
+            "geometry": false
+        },
+        {
+            "description": "Sphere",
+            "value": {"origin":[0,0,0],"primitive":"sphere","radius":3},
+            "geometry": true
+        },
+        {
+            "description": "Rectangle List",
+            "value": [{"dimensions":[1,1],"origin":[0,0],"primitive":"rectangle"}],
+            "geometry": true
+        }
+    ];
+
+    fixtures.forEach(function (testData) {
+        it (testData.description, function() {
+            var valid = scene.isGeometry(testData.value);
+            expect(testData.geometry).toEqual(valid);
+        });
+    });
 });
