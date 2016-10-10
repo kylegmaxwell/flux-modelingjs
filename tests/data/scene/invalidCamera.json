@@ -1,0 +1,22 @@
+[
+    {
+        "id": "cameras",
+        "primitive": "layer",
+        "color": [0,1,0],
+        "elements": ["A"]
+    },
+    {
+        "id": "A",
+        "primitive": "instance",
+        "entity": "orthoCamera1",
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+    },
+    {
+        "id": "orthoCamera1",
+        "primitive": "camera",
+        "type": "orthographic",
+        "nearClip": 10,
+        "farClip": 50,
+        "focalLength": 25
+    }
+]

@@ -37,6 +37,12 @@ describe("Scene validator test", function() {
     },{
         scene: 'cyclicGroup4',
         message: 'equal to parent'
+    },{
+        scene: 'invalidCamera',
+        message: 'camera'
+    },{
+        scene: 'invalidLight',
+        message: 'light'
     }
     ];
 

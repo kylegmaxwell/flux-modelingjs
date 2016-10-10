@@ -113,7 +113,7 @@ Validator.prototype._validateGroup = function(group, json){
  * @return {ValidatorResults}    The results
  */
 function _invalidId(id) {
-    return _error('No element found with ID=' + id);
+    return _error('No element found with id=' + id);
 }
 
 /**
@@ -162,6 +162,35 @@ function _validateLayer(layer, json){
     return _ok();
 }
 
+/**
+* Determine if a camera is valid.
+* All required properties should already be validated by the
+* schema validator. Here we only check only a perspective camera
+* has a focalLength property.
+* @param {Object} camera        Flux element JSON
+* @return {ValidatorResults}  The results
+*/
+function _validateCamera(camera){
+    if (camera.type === "orthographic" && camera.focalLength != null) {
+        return _error("Orthographic camera cannot have focal length.");
+    }
+    return _ok();
+}
+
+/**
+* Determine if a light is valid.
+* All required properties should already be validated by the
+* schema validator. Here we only check that only spot light
+* has the coneAngle property.
+* @param {Object} light        Flux element JSON
+* @return {ValidatorResults}  The results
+*/
+function _validateLight(light){
+    if (light.type !== "spot" && light.coneAngle != null) {
+        return _error("Cone angle is valid only on spot light.");
+    }
+    return _ok();
+}
 
 /**
  * Enumeration to store group states
@@ -288,6 +317,22 @@ Validator.prototype.validateJSON = function (json)
             }
             if (obj.visible == null || obj.visible) {
                 layerCount++;
+            }
+        }
+
+        // Check valid camera
+        else if (obj.primitive === "camera"){
+            res = _validateCamera(obj);
+            if (!res.getResult()) {
+                return res;
+            }
+        }
+
+        // Check valid light
+        else if (obj.primitive === "light"){
+            res = _validateLight(obj);
+            if (!res.getResult()) {
+                return res;
             }
         }
     }

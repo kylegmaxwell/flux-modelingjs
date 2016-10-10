@@ -1,62 +1,5 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "scene": {
-        "type": "object",
-        "properties": {
-            "primitive":    {"enum" : ["scene"]},
-            "version":      {"type": "string"},
-            "elements":     { "$ref": "#/scene/elements"   }
-        },
-        "required": [ "elements", "version", "primitive" ],
-        "additionalProperties": false,
-        "elements": {
-            "type": "array",
-            "items": { "$ref": "#/scene/element" },
-            "additionalItems":  false
-        },
-        "entity": {
-            "anyOf": [
-                { "$ref": "#/entities/empty"  },
-                { "$ref": "#/entities/number" },
-                { "$ref": "#/entities/brep"   },
-                { "$ref": "#/entities/vector" },
-                { "$ref": "#/entities/point" },
-                { "$ref": "#/entities/plane" },
-
-                { "$ref": "#/entities/affineTransform" },
-                { "$ref": "#/entities/massProps" },
-
-                { "$ref": "#/entities/line" },
-                { "$ref": "#/entities/polyline" },
-                { "$ref": "#/entities/circle" },
-                { "$ref": "#/entities/ellipse" },
-                { "$ref": "#/entities/curve" },
-                { "$ref": "#/entities/arc" },
-                { "$ref": "#/entities/rectangle" },
-                { "$ref": "#/entities/polycurve" },
-
-                { "$ref": "#/entities/surface" },
-                { "$ref": "#/entities/polysurface" },
-
-                { "$ref": "#/entities/block" },
-                { "$ref": "#/entities/torus" },
-                { "$ref": "#/entities/sphere" },
-                { "$ref": "#/entities/cylinder" },
-                { "$ref": "#/entities/cone" },
-                { "$ref": "#/entities/mesh" }
-            ]
-        },
-        "element": {
-            "anyOf": [
-                { "$ref": "#/scene/entity"  },
-
-                { "$ref": "#/group" },
-                { "$ref": "#/instance" },
-                { "$ref": "#/geometryList" },
-                { "$ref": "#/layer" }
-            ]
-        }
-    },
     "types": {
         "brep_format": { "enum": [ "x_b", "x_t", "iges", "step", "sat", "sab", "stl" ] },
 
@@ -157,6 +100,7 @@
         "brep": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "brep" ] },
                 "content":      { "type": "string"   },
                 "format":       { "$ref": "#/types/brep_format" },
@@ -174,7 +118,7 @@
                         "minItems": 3
                     }
                 },
-                "attributes":   {}
+                "attributes":   { "type":  "object" }
             },
             "required": [ "primitive", "content", "format" ]
         },
@@ -182,9 +126,10 @@
         "vector": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "vector" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "coords":       { "$ref": "#/types/position" }
@@ -194,9 +139,10 @@
         "point": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "point" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "point":       { "$ref": "#/types/position" }
@@ -207,9 +153,10 @@
         "plane": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "plane" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position"  },
@@ -220,9 +167,10 @@
         "affineTransform": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "affineTransform" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "mat":          {
@@ -239,9 +187,10 @@
         "massProps": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "massProps" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "mass":         { "$ref": "#/types/distance" },
@@ -265,9 +214,10 @@
         "line": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "line" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "start":        { "$ref": "#/types/position" },
@@ -278,9 +228,10 @@
         "polyline": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "polyline" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "points":       {
@@ -294,9 +245,10 @@
         "circle": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "circle" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
@@ -308,9 +260,10 @@
         "ellipse": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "ellipse" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
@@ -324,9 +277,10 @@
         "curve": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "curve" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "degree":       { "$ref": "#/types/indexNonzero" },
@@ -339,9 +293,10 @@
         "arc": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "arc" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "start":        { "$ref": "#/types/position" },
@@ -353,9 +308,10 @@
         "rectangle": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "rectangle" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
@@ -374,10 +330,10 @@
         "polycurve": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "polycurve" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
-
+                "attributes":   { "type":  "object" },
                 "curves":       {
                     "type":  "array",
                     "minItems": 1,
@@ -395,9 +351,10 @@
         "surface": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "surface" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "uDegree":      { "$ref": "#/types/indexNonzero" },
@@ -420,10 +377,10 @@
         "polysurface": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "polysurface" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
-
+                "attributes":   { "type":  "object" },
                 "surfaces": {
                     "type": "array",
                     "items": { "oneOf": [
@@ -438,11 +395,11 @@
         "block": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "block" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
-
                 "origin":       { "$ref": "#/types/position" },
                 "dimensions":   { "$ref": "#/types/dimensions" },
                 "axis":         { "$ref": "#/types/direction" },
@@ -453,9 +410,10 @@
         "torus": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "torus" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
@@ -468,9 +426,10 @@
         "sphere": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "sphere" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
@@ -481,9 +440,10 @@
         "cylinder": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "cylinder" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
@@ -496,9 +456,10 @@
         "cone": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "cone" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "origin":       { "$ref": "#/types/position" },
@@ -512,9 +473,10 @@
         "mesh": {
             "type": "object",
             "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
                 "primitive":    { "enum": [ "mesh" ] },
                 "__repr__":     { "type": "string" },
-                "attributes":   {},
+                "attributes":   { "type":  "object" },
                 "units":        { "$ref": "#/types/units" },
 
                 "vertices":     {
@@ -534,68 +496,100 @@
             "required": [ "primitive", "vertices", "faces" ]
         }
     },
-    "instance": {
+    "scene":{
+        "instance": {
+                "type": "object",
+                "properties": {
+                    "attributes":   { "type":  "object" },
+                    "primitive":    { "enum": [ "instance" ] },
+                    "id":           { "$ref": "#/types/fluxid" },
+                    "matrix":       { "$ref": "#/types/matrix" },
+                    "bbox":         { "$ref": "#/types/boundingBox" },
+                    "label":        { "type": "string" },
+                    "entity":       { "$ref": "#/types/fluxid" }
+                },
+                    "required": [ "primitive", "id", "entity" ],
+                    "additionalProperties": false
+            },
+        "geometryList": {
+                "type": "object",
+                "properties": {
+                    "attributes":   { "type":  "object" },
+                    "primitive":    { "enum": [ "geometryList" ] },
+                    "id":           { "$ref": "#/types/fluxid" },
+                    "entity": {
+                        "anyOf": [
+                            { "type": "array"  },
+                            { "type": "object" }
+                        ]
+                    },
+                    "required": [ "primitive", "id", "entity" ],
+                    "additionalProperties": false
+                }
+            },
+        "group": {
             "type": "object",
             "properties": {
-                "attributes":   {},
-                "primitive":    { "enum": [ "instance" ] },
+                "attributes":   { "type":  "object" },
+                "primitive":    { "enum":[ "group" ] },
                 "id":           { "$ref": "#/types/fluxid" },
                 "matrix":       { "$ref": "#/types/matrix" },
                 "bbox":         { "$ref": "#/types/boundingBox" },
                 "label":        { "type": "string" },
-                "entity":       { "$ref": "#/types/fluxid" }
+                "children":     {
+                    "type":     "array",
+                    "items":    { "$ref": "#/types/fluxid" }
+                }
             },
-                "required": [ "primitive", "id", "entity" ],
-                "additionalProperties": false
+            "required": [ "primitive", "id", "children" ],
+            "additionalProperties": true
         },
-    "geometryList": {
+        "layer": {
             "type": "object",
             "properties": {
-                "attributes":   {},
-                "primitive":    { "enum": [ "geometryList" ] },
+                "attributes":   { "type":  "object" },
+                "primitive":    { "enum":[ "layer" ] },
                 "id":           { "$ref": "#/types/fluxid" },
-                "entity": {
-                    "anyOf": [
-                        { "type": "array"  },
-                        { "type": "object" }
-                    ]
-                },
-                "required": [ "primitive", "id", "entity" ],
-                "additionalProperties": false
-            }
+                "label":        { "type": "string" },
+                "color":        { "$ref": "#/types/color" },
+                "visible":      { "type": "boolean" },
+                "elements": {
+                    "type":     "array",
+                    "items":    { "$ref": "#/types/fluxid" }
+                }
+            },
+            "required": [ "primitive", "id", "elements" ],
+            "additionalProperties": false
         },
-    "group": {
-        "type": "object",
-        "properties": {
-            "attributes":   {},
-            "primitive":    { "enum":[ "group" ] },
-            "id":           { "$ref": "#/types/fluxid" },
-            "matrix":       { "$ref": "#/types/matrix" },
-            "bbox":         { "$ref": "#/types/boundingBox" },
-            "label":        { "type": "string" },
-            "children":     {
-                "type":     "array",
-                "items":    { "$ref": "#/types/fluxid" }
-            }
+        "camera": {
+            "type": "object",
+            "properties": {
+                "attributes":   { "type":  "object" },
+                "primitive":    { "enum":[ "camera" ] },
+                "id":           { "$ref": "#/types/fluxid" },
+                "type":         { "enum":[ "orthographic", "perspective" ]},
+                "units":        { "$ref": "#/types/units" },
+                "nearClip":     { "$ref": "#/types/distance" },
+                "farClip":      { "$ref": "#/types/distance" },
+                "focalLength":  { "$ref": "#/types/distance" }
+            },
+            "required": [ "id", "primitive", "type" ],
+            "additionalProperties": false
         },
-        "required": [ "primitive", "id", "children" ],
-        "additionalProperties": true
-    },
-    "layer": {
-        "type": "object",
-        "properties": {
-            "attributes":   {},
-            "primitive":    { "enum":[ "layer" ] },
-            "id":           { "$ref": "#/types/fluxid" },
-            "label":            { "type": "string" },
-            "color":            { "$ref": "#/types/color" },
-            "visible":      { "type": "boolean" },
-            "elements": {
-                "type":     "array",
-                "items":    { "$ref": "#/types/fluxid" }
-            }
-        },
-        "required": [ "primitive", "id", "elements" ],
-        "additionalProperties": false
+        "light": {
+            "type": "object",
+            "properties": {
+                "attributes":   { "type":  "object" },
+                "primitive":    { "enum":[ "light" ] },
+                "id":           { "$ref": "#/types/fluxid" },
+                "type":         { "enum": [ "point", "directional", "spot" ]},
+                "units":        { "$ref": "#/types/units" },
+                "color":        { "$ref": "#/types/color" },
+                "intensity":    { "type": "number" },
+                "coneAngle":    { "$ref": "#/types/angle" }
+            },
+            "required": [ "id", "primitive", "type" ],
+            "additionalProperties": false
+        }
     }
 }

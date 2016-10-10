@@ -42,21 +42,16 @@ describe("Schema test", function() {
     });
 
     it ("Should allow attributes on instances", function() {
-        var scene = {
-            "primitive": "scene",
-            "version":"0.0.1",
-            "elements":[ {
+        var inst = {
                     "id": "thing",
                     "attributes":{"label":"My thing"},
                     "primitive": "instance",
                     "entity": "ball",
                     "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
-                }
-            ]
-        };
-        var schemaId = "#/scene";
+                };
+        var schemaId = "#/scene/instance";
         var validate = ajv.compile({ $ref: "_" + schemaId });
-        var isValid = validate(scene);
+        var isValid = validate(inst);
 
         // Check the results
         expect(isValid).toEqual(true);

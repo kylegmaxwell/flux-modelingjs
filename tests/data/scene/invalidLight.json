@@ -1,0 +1,20 @@
+[
+    {
+        "id": "cameras",
+        "primitive": "layer",
+        "color": [0,1,0],
+        "elements": ["A"]
+    },
+    {
+        "id": "A",
+        "primitive": "instance",
+        "entity": "pointLight1",
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+    },
+    {
+        "id": "pointLight1",
+        "primitive": "light",
+        "type": "point",
+        "coneAngle": 10
+    }
+]
