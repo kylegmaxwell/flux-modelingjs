@@ -22,7 +22,6 @@ describe("Constructor utilities test", function() {
         expect(a).toEqual([8,9,0]);
     });
 
-
     // TODO(andrew): these tests currently fail, which is naively a somewhat
     // surprising result. This is because the Point and Vector class definitions
     // are coupled to various configuration parameters for the module (schema, ...)
@@ -37,5 +36,5 @@ describe("Constructor utilities test", function() {
         expect(a).toEqual([4,5,6]);
         a = units2.vecCoords(modeling2.geometry.vector([4,5,6]));
         expect(a).toEqual([4,5,6]);
-    })
+    });
 });

@@ -43,7 +43,11 @@ export var helpers = {
      * @return {Object}      Specification
      */
     Entity: function(name) {
-        return specification({ $ref: 'pbw#/entities/' + name}, name + " entity");
+        var prefix =  'entities';
+        if (flux.schema.pbw.geometry[name]) {
+            prefix = 'geometry';
+        }
+        return specification({ $ref: 'pbw#/'+prefix+'/' + name}, name + " entity");
     },
 
     /**
@@ -95,7 +99,7 @@ export var helpers = {
     ArrayOf: function(sub) {
         return specification({
             "type": "array",
-            "items": sub.schema,
+            "items": sub.schema
         },
         "array of "+sub.description+"(s)");
     }
@@ -167,8 +171,10 @@ function recurseToDimension(subSchema) {
  */
 export function lookupFieldDimensions(typeid) {
     var schema = flux.schema.pbw;
-    var subSchema = schema.entities[typeid];
-
+    var subSchema = schema.geometry[typeid];
+    if (!subSchema) {
+        subSchema = schema.entities[typeid];
+    }
     var results = {};
     for (var key in subSchema.properties) {
         var d = recurseToDimension(subSchema.properties[key]);

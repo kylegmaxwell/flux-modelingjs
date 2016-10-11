@@ -17,7 +17,7 @@
         },
         "revitMeshGeometry": {
             "type": "array",
-            "items": { "$ref": "fluxEntity#/entities/mesh"}
+            "items": { "$ref": "fluxEntity#/geometry/mesh"}
         },
         "revitMaterial": {
             "type": "object",
@@ -49,19 +49,19 @@
                 "minItems": 1,
                 "items": {
                     "anyOf": [
-                        { "$ref": "fluxEntity#/entities/line" },
-                        { "$ref": "fluxEntity#/entities/curve" },
-                        { "$ref": "fluxEntity#/entities/arc" },
-                        { "$ref": "fluxEntity#/entities/polyline"}
+                        { "$ref": "fluxEntity#/geometry/line" },
+                        { "$ref": "fluxEntity#/geometry/curve" },
+                        { "$ref": "fluxEntity#/geometry/arc" },
+                        { "$ref": "fluxEntity#/geometry/polyline"}
                     ]
                 }
         },
         "revitLocation": {
             "anyOf": [
-                    { "$ref": "fluxEntity#/entities/point" },
-                    { "$ref": "fluxEntity#/entities/line" },
-                    { "$ref": "fluxEntity#/entities/curve" },
-                    { "$ref": "fluxEntity#/entities/arc" }
+                    { "$ref": "fluxEntity#/geometry/point" },
+                    { "$ref": "fluxEntity#/geometry/line" },
+                    { "$ref": "fluxEntity#/geometry/curve" },
+                    { "$ref": "fluxEntity#/geometry/arc" }
                 ]
         },
         "revitCommon": {
@@ -113,7 +113,7 @@
                     "properties": {
                         "name": { "type": "string" },
                         "level": { "$ref": "#/revitTypes/revitLevel" },
-                        "uv": { "$ref": "fluxEntity#/entities/point" },
+                        "uv": { "$ref": "fluxEntity#/geometry/point" },
                         "phase": { "type": "string" },
                         "geometry": { "$ref": "#/revitTypes/revitMeshGeometry"}
                     },
@@ -137,10 +137,10 @@
                     "properties": {
                         "name": { "type": "string" },
                         "wallClosure": { "type": "boolean" },
-                        "bubbleEnd": { "$ref": "fluxEntity#/entities/point" },
-                        "freeEnd": { "$ref": "fluxEntity#/entities/point" },
-                        "thirdPoint": { "$ref": "fluxEntity#/entities/point" },
-                        "cutVector": { "$ref": "fluxEntity#/entities/vector" }
+                        "bubbleEnd": { "$ref": "fluxEntity#/geometry/point" },
+                        "freeEnd": { "$ref": "fluxEntity#/geometry/point" },
+                        "thirdPoint": { "$ref": "fluxEntity#/geometry/point" },
+                        "cutVector": { "$ref": "fluxEntity#/geometry/vector" }
                     },
                     "required": [
                         "name",
@@ -164,9 +164,9 @@
                     "properties": {
                         "curve": {
                             "anyOf": [
-                                { "$ref": "fluxEntity#/entities/line" },
-                                { "$ref": "fluxEntity#/entities/curve" },
-                                { "$ref": "fluxEntity#/entities/arc" }
+                                { "$ref": "fluxEntity#/geometry/line" },
+                                { "$ref": "fluxEntity#/geometry/curve" },
+                                { "$ref": "fluxEntity#/geometry/arc" }
                             ]
                         }
                     },
@@ -209,8 +209,8 @@
                         "name": { "type": "string" },
                         "curve": {
                             "anyOf": [
-                                { "$ref": "#/entities/line" },
-                                { "$ref": "#/entities/arc" }
+                                { "$ref": "#/geometry/line" },
+                                { "$ref": "#/geometry/arc" }
                             ]
                         }
                     },

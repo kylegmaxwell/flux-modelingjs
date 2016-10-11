@@ -69,7 +69,7 @@ function _listValidPrims ( ) {
 
     _validPrimsList =    constants.KNOWN_PRIMITIVES.concat(
         constants.NON_STANDARD_ENTITIES,
-        Object.keys(schema.entity.entities)
+        Object.keys(schema.entity.geometry)
         // Don't need to check for scene elements because a scene must also
         // have geometry entities to be renderable
     );

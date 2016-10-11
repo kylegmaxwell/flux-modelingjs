@@ -14,7 +14,7 @@ describe("Schema test", function() {
         var sphereEntity = modeling.geometry.sphere(origin,radius);
         var sphere = JSON.parse(JSON.stringify(sphereEntity));
 
-        var schemaId = "#/entities/circle";
+        var schemaId = "#/geometry/circle";
         var validate = ajv.compile({ $ref: "_" + schemaId });
         var isValid = validate(sphere);
 
@@ -22,7 +22,7 @@ describe("Schema test", function() {
         expect(isValid).toEqual(false);
         expect(validate.errors[0].dataPath).toEqual(".primitive");
 
-        schemaId = "#/entities/sphere";
+        schemaId = "#/geometry/sphere";
         validate = ajv.compile({ $ref: "_" + schemaId });
         isValid = validate(sphere);
 
@@ -31,9 +31,9 @@ describe("Schema test", function() {
 
 
     it ("Should allow additional properties", function() {
-        var sphere = {"origin":[0,0,0],"primitive":"sphere","radius":10,"bad":"stuff"}
+        var sphere = {"origin":[0,0,0],"primitive":"sphere","radius":10,"bad":"stuff"};
 
-        var schemaId = "#/entities/sphere";
+        var schemaId = "#/geometry/sphere";
         var validate = ajv.compile({ $ref: "_" + schemaId });
         var isValid = validate(sphere);
 
@@ -58,39 +58,33 @@ describe("Schema test", function() {
     });
 
     it ("Should manage units", function() {
-        var cone = {
+        var sphere = {
             "units":{
-                "height":"cm",
                 "ORIGIN":"m",
                 "radius":"in"
             },
-            "height":10,
             "origin":[0,0,0],
-            "primitive":"cone",
-            "radius":10,
-            "semiAngle":10
+            "primitive":"sphere",
+            "radius":10
         };
 
-        var schemaId = "#/entities/cone";
+        var schemaId = "#/geometry/sphere";
         var validate = ajv.compile({ $ref: "_" + schemaId });
-        var isValid = validate(cone);
+        var isValid = validate(sphere);
 
         // Check the results
         expect(isValid).toEqual(true);
 
         var badUnits = {
             "units":{
-                "height":123,
-                "ORIGIN":"m",
+                "ORIGIN":1,
                 "radius":"in"
             },
-            "height":10,
             "origin":[0,0,0],
-            "primitive":"cone",
-            "radius":10,
-            "semiAngle":10
+            "primitive":"sphere",
+            "radius":10
         };
-        var isValid = validate(badUnits);
+        isValid = validate(badUnits);
 
         // Check the results
         expect(isValid).toEqual(false);
