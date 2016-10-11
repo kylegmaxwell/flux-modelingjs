@@ -315,9 +315,7 @@ Validator.prototype.validateJSON = function (json)
             if (!res.getResult()) {
                 return res;
             }
-            if (obj.visible == null || obj.visible) {
-                layerCount++;
-            }
+            layerCount++;
         }
 
         // Check valid camera
@@ -337,7 +335,7 @@ Validator.prototype.validateJSON = function (json)
         }
     }
     if (layerCount < 1) {
-        return _error('Scene has no visible or valid layers');
+        return _error('Scene has no valid layers');
     }
     if (!_isAcyclic(groups)) {
         return _error('Cycle found in groups');
