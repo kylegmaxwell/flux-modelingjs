@@ -83,6 +83,14 @@ describe("Scene utils test", function() {
             "description": "Rectangle List",
             "value": [{"dimensions":[1,1],"origin":[0,0],"primitive":"rectangle"}],
             "geometry": true
+        },
+        {
+            "description": "DVP-style scene",
+            "value": [
+                {"entity": [{"origin": [3,0,0],"primitive": "sphere","radius": 3}],"id": "a","primitive": "geometryList"},
+                {"elements": ["a"],"id": "b","primitive": "layer","visible": false}
+            ],
+            "geometry": true
         }
     ];
 
