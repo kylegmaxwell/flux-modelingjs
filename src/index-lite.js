@@ -15,5 +15,5 @@ import * as _scene from './scene/index.js';
 export var scene = _scene;
 
 // schema sub module
-import * as _schema from './schema.js';
+import * as _schema from './schema/index.js';
 export var schema = _schema;

@@ -68,7 +68,7 @@ var nestedOperationsQuery = {
       ]
     }
   ]
-}
+};
 
 var multipleOpsSameObjectQuery = {
   "Entities": {
@@ -115,7 +115,7 @@ var multipleOpsSameObjectQuery = {
       ]
     }
   ]
-}
+};
 
 
 // Bounce an object to json, and rehydrated it. This is useful in testing
@@ -231,7 +231,7 @@ var cases = [
             var v = forceJSON(modeling.geometry.vector([0,0,1]));
             var s = Operation.extrude(c, v, 20);
             var o = Operation.evalMassProps(c);
-            q.add("extruded", s)
+            q.add("extruded", s);
             q.add("circleProps", o);
             return q;
         },

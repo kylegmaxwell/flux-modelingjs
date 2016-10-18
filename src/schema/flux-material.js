@@ -1,4 +1,4 @@
-{
+var material = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "materialProperties": {
         "type": "object",
@@ -17,4 +17,5 @@
         },
         "additionalProperties": true
     }
-}
+};
+export default material;

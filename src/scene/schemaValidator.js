@@ -4,7 +4,7 @@
 'use strict';
 
 import Ajv from 'ajv/dist/ajv.min.js';
-import * as schema from '../schema.js';
+import * as schema from '../schema/index.js';
 import * as constants from './constants.js';
 
 var entitiesJson = schema.entity;

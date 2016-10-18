@@ -1,4 +1,4 @@
-{
+var revit = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "flux revit schema",
     "description": "schema for revit elements in flux.",
@@ -333,4 +333,5 @@
             }
         ]
     }
-}
+};
+export default revit;

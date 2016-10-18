@@ -4,9 +4,13 @@ describe("Schema test", function() {
     var Ajv   = require('ajv');
     var modeling = require('../dist/index.js');
     var schema = modeling.schema.entity;
-
+    var schemaJson = require('../dist/schema/flux-entity.json');
     var ajv = Ajv({ allErrors: true });
     ajv.addSchema(schema, "_");
+
+    it ("Should load same schema from js or json", function() {
+        expect(schema).toEqual(schemaJson);
+    });
 
     it ("Sphere should work with the right schema", function() {
         var origin = [0,5,0];

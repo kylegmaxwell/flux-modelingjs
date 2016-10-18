@@ -4,12 +4,8 @@
 'use strict';
 
 import Ajv from 'ajv';
-import * as pbw from '../schema/flux-entity.json';
-var flux = {
-    schema: {
-        pbw: pbw
-    }
-};
+import entitySchema from './schema/flux-entity.js';
+var schemaPrefix = 'entity';
 
 /**
  * Helper function for assembling a specification struct, encapsulating a
@@ -44,10 +40,10 @@ export var helpers = {
      */
     Entity: function(name) {
         var prefix =  'entities';
-        if (flux.schema.pbw.geometry[name]) {
+        if (entitySchema.geometry[name]) {
             prefix = 'geometry';
         }
-        return specification({ $ref: 'pbw#/'+prefix+'/' + name}, name + " entity");
+        return specification({ $ref: schemaPrefix+'#/'+prefix+'/' + name}, name + " entity");
     },
 
     /**
@@ -58,7 +54,7 @@ export var helpers = {
      * @return {Object}     Specification
      */
     Type: function(name) {
-        return specification({ $ref: 'pbw#/types/' + name}, name);
+        return specification({ $ref: schemaPrefix+'#/types/' + name}, name);
     },
 
     /**
@@ -117,13 +113,13 @@ function parsePath(s) {
     return s.split("/");
 }
 
-/** From a path, retrieve the equivalent subschema from the pbw schema.
+/** From a path, retrieve the equivalent subschema from the entity schema.
  *  @param {string}     refPath path
  *  @return {object}    subschema
 */
 function getSubSchema(refPath) {
     var components = parsePath(refPath);
-    var s = flux.schema.pbw;
+    var s = entitySchema;
     for (var i = 0; i < components.length; i++) {
         var sub = s[components[i]];
         s = sub;
@@ -131,9 +127,9 @@ function getSubSchema(refPath) {
     return s;
 }
 
-/** Given a path inside of the pbw schema, walks the schema to determine that
+/** Given a path inside of the entity schema, walks the schema to determine that
  * path's dimension, if it has one.
- *  @param {string}  subSchema path to subschema inside pbw schema
+ *  @param {string}  subSchema path to subschema inside entity schema
  *  @return {string} dimension dimension for path, or undefined if dimensionless
 */
 function recurseToDimension(subSchema) {
@@ -163,14 +159,14 @@ function recurseToDimension(subSchema) {
  * This is a very limited implementation that only supports units scoped a
  * single-field deep, and does not support indexing into composite entities
  * (eg, polycurve and polysurface). It does work for the existing set of
- * entities as described in flux-entity.json, but extensions to that may require
+ * entities as described in flux-entity.js, but extensions to that may require
  * revisiting this implementation.
  *
  *  @param  {string}    typeid  name of entity type, value for 'primitive' property
  *  @return {object}            map from field to dimension
  */
 export function lookupFieldDimensions(typeid) {
-    var schema = flux.schema.pbw;
+    var schema = entitySchema;
     var subSchema = schema.geometry[typeid];
     if (!subSchema) {
         subSchema = schema.entities[typeid];
@@ -217,9 +213,7 @@ var checkerCache = {};
 
 var ajv = Ajv({ allErrors: true, jsonPointers: true });
 
-for (var name in flux.schema) {
-    ajv.addSchema(flux.schema[name], name);
-}
+ajv.addSchema(entitySchema, schemaPrefix);
 
 // Takes a json-schema snippet and returns a function that will validate
 // that it's input matches the given schema, returning null for valid objects,

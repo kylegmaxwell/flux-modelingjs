@@ -1,4 +1,4 @@
-{
+var entity = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "types": {
         "brep_format": {
@@ -27,6 +27,11 @@
         "fluxid": {
             "type": "string"
         },
+        // Note: Use of fluxDimension is expected to be limited to creation of entities and
+        // other applications where unitfulness must be known.
+        // Tools that parse json that conforms to this document should not need to
+        // consider fluxDimension because units should be embedded in the units property of
+        // the primitive, for both required parameters and optional attributes.
         "angle": {
             "type": "number",
             "fluxDimension": "angle"
@@ -415,37 +420,32 @@
     },
     "scene":{
         "instance": {
-                "type": "object",
-                "properties": {
-                    "attributes":   { "type":  "object" },
-                    "primitive":    { "enum": [ "instance" ] },
-                    "id":           { "$ref": "#/types/fluxid" },
-                    "units":        { "$ref": "#/types/units" },
-                    "matrix":       { "$ref": "#/types/matrix" },
-                    "bbox":         { "$ref": "#/types/boundingBox" },
-                    "label":        { "type": "string" },
-                    "material":       { "$ref": "#/types/fluxid" },
-                    "entity":       { "$ref": "#/types/fluxid" }
-                },
-                    "required": [ "primitive", "id", "entity" ],
-                    "additionalProperties": false
+            "type": "object",
+            "properties": {
+                "attributes":   { "type":  "object" },
+                "primitive":    { "enum": [ "instance" ] },
+                "id":           { "$ref": "#/types/fluxid" },
+                "units":        { "$ref": "#/types/units" },
+                "matrix":       { "$ref": "#/types/matrix" },
+                "bbox":         { "$ref": "#/types/boundingBox" },
+                "label":        { "type": "string" },
+                "material":       { "$ref": "#/types/fluxid" },
+                "entity":       { "$ref": "#/types/fluxid" }
             },
+                "required": [ "primitive", "id", "entity" ],
+                "additionalProperties": false
+        },
         "geometryList": {
-                "type": "object",
-                "properties": {
-                    "attributes":   { "type":  "object" },
-                    "primitive":    { "enum": [ "geometryList" ] },
-                    "id":           { "$ref": "#/types/fluxid" },
-                    "entities": {
-                        "anyOf": [
-                            { "type": "array"  },
-                            { "type": "object" }
-                        ]
-                    },
-                    "required": [ "primitive", "id", "entity" ],
-                    "additionalProperties": false
-                }
-            },
+            "type": "object",
+            "properties": {
+                "attributes":   { "type":  "object" },
+                "primitive":    { "enum": [ "geometryList" ] },
+                "id":           { "$ref": "#/types/fluxid" },
+                "entities":     { "type": "array" },
+                "required": [ "primitive", "id", "entities" ],
+                "additionalProperties": false
+            }
+        },
         "group": {
             "type": "object",
             "properties": {
@@ -534,4 +534,5 @@
             "additionalProperties": false
         }
     }
-}
+};
+export default entity;

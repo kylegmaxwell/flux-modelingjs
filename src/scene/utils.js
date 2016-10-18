@@ -1,6 +1,6 @@
 'use strict';
 
-import * as schema from '../schema.js';
+import * as schema from '../schema/index.js';
 import * as constants from './constants.js';
 
 /**
