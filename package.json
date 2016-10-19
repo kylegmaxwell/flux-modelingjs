@@ -29,7 +29,8 @@
   "homepage": "https://bitbucket.org/vannevartech/flux-modelingjs",
   "dependencies": {
     "ajv": "^4.7.0",
-    "json-pointer": "^0.5.0"
+    "json-pointer": "^0.5.0",
+    "gl-matrix": "^2.3.2"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",

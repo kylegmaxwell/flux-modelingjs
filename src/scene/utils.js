@@ -126,3 +126,29 @@ function _hasGeometry(data) {
 export function isGeometry (data) {
     return _recursiveReduce(data, _hasGeometry);
 }
+
+/**
+* Merge attributes of source object with attributes of target object.
+* If target object already has an attribute by the same name it would
+* be retained.
+* ORIGINAL OBJECTS ARE UNCHANGED.
+* @param  {object} source        Source entity
+* @param  {object} target        Target entity
+* @return {object}               Target entity with merged attributes
+*/
+export function mergeAttributes(source, target) {
+    var trgt = JSON.parse(JSON.stringify(target));
+    if (source.attributes != null) {
+        if (trgt.attributes != null) {
+            for(var attrib in source.attributes) {
+                if (trgt.attributes[attrib] == null) {
+                    trgt.attributes[attrib] = source.attributes[attrib];
+                }
+            }
+        } else {
+            trgt.attributes = source.attributes;
+        }
+    }
+
+    return trgt;
+}

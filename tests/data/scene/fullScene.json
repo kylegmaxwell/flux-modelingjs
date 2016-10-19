@@ -1,0 +1,700 @@
+[
+  {
+    "attributes": {
+      "backColor": "white",
+      "frontColor": "red",
+      "lineType": "solid",
+      "name": "layer-odd"
+    },
+    "elements": [
+      "inst1",
+      "inst3"
+    ],
+    "id": "layer-odd",
+    "primitive": "layer"
+  },
+  {
+    "attributes": {
+      "backColor": "black",
+      "frontColor": "blue",
+      "lineType": "lineType-10",
+      "name": "layer-even"
+    },
+    "elements": [
+      "inst2",
+      "inst8"
+    ],
+    "id": "layer-even",
+    "primitive": "layer"
+  },
+  {
+    "attributes": {
+      "backColor": "black",
+      "frontColor": "white",
+      "lineType": "lineType-25",
+      "name": "layer-Grp1"
+    },
+    "elements": [
+      "grp1"
+    ],
+    "id": "layer-Grp1",
+    "primitive": "layer"
+  },
+  {
+    "attributes": {
+      "backColor": "white",
+      "frontColor": "magenta",
+      "lineType": "lineType-35",
+      "name": "layer-Grp2"
+    },
+    "elements": [
+      "supergrp1"
+    ],
+    "id": "layer-Grp2",
+    "primitive": "layer"
+  },
+  {
+    "entity": "block1",
+    "id": "inst1",
+    "label": "Instance 1",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "instance"
+  },
+  {
+    "entity": "sphere1",
+    "id": "inst2",
+    "label": "Instance 2",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "instance"
+  },
+  {
+    "entity": "mesh1",
+    "id": "inst3",
+    "label": "Instance 3",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "instance"
+  },
+  {
+    "entity": "block1",
+    "id": "inst4",
+    "label": "Instance 4",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "instance"
+  },
+  {
+    "entity": "sphere1",
+    "id": "inst5",
+    "label": "Instance 5",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "instance"
+  },
+  {
+    "entity": "mesh1",
+    "id": "inst6",
+    "label": "Instance 6",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "instance"
+  },
+  {
+    "entity": "sphere1",
+    "id": "inst7",
+    "label": "Instance 7",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "instance"
+  },
+  {
+    "entity": "geometryList1",
+    "id": "inst8",
+    "label": "Instance 8",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "instance"
+  },
+  {
+    "attributes": {
+      "backColor": "black",
+      "frontColor": "white",
+      "lineType": "lineType-55",
+      "name": "Grp1",
+      "partType": "assembly"
+    },
+    "children": [
+      "inst4",
+      "inst5"
+    ],
+    "id": "grp1",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "group"
+  },
+  {
+    "attributes": {
+      "backColor": "black",
+      "frontColor": "white",
+      "lineType": "lineType-55",
+      "name": "Grp1",
+      "partType": "subAssembly"
+    },
+    "children": [
+      "inst6"
+    ],
+    "id": "subgrp1",
+    "matrix": [
+      2,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      2
+    ],
+    "primitive": "group"
+  },
+  {
+    "attributes": {
+      "backColor": "black",
+      "frontColor": "white",
+      "lineType": "lineType-55",
+      "name": "Grp1",
+      "partType": "superAssembly"
+    },
+    "children": [
+      "subgrp1",
+      "inst7"
+    ],
+    "id": "supergrp1",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "primitive": "group"
+  },
+  {
+    "entities": [
+      {
+        "dimensions": [
+          20,
+          20,
+          20
+        ],
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "primitive": "block2"
+      },
+      {
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "primitive": "sphere2",
+        "radius": 20
+      }
+    ],
+    "id": "geometryList1",
+    "primitive": "geometryList"
+  },
+  {
+    "dimensions": [
+      10,
+      10,
+      10
+    ],
+    "id": "block1",
+    "origin": [
+      0,
+      0,
+      0
+    ],
+    "primitive": "block"
+  },
+  {
+    "id": "sphere1",
+    "origin": [
+      0,
+      0,
+      0
+    ],
+    "primitive": "sphere",
+    "radius": 10
+  },
+  {
+    "faces": [
+      [
+        0,
+        1,
+        2
+      ],
+      [
+        3,
+        4,
+        5
+      ],
+      [
+        6,
+        7,
+        8
+      ],
+      [
+        9,
+        10,
+        11
+      ],
+      [
+        12,
+        13,
+        14
+      ],
+      [
+        15,
+        16,
+        17
+      ],
+      [
+        18,
+        19,
+        20
+      ],
+      [
+        21,
+        22,
+        23
+      ],
+      [
+        24,
+        25,
+        26
+      ],
+      [
+        27,
+        28,
+        29
+      ],
+      [
+        30,
+        31,
+        32
+      ],
+      [
+        33,
+        34,
+        35
+      ]
+    ],
+    "id": "mesh1",
+    "primitive": "mesh",
+    "units": {
+      "dimensions": "meters",
+      "origin": "meters",
+      "vertices": "meters"
+    },
+    "vertices": [
+      [
+        -5,
+        5,
+        5
+      ],
+      [
+        -5,
+        -5,
+        5
+      ],
+      [
+        5,
+        -5,
+        5
+      ],
+      [
+        5,
+        -5,
+        5
+      ],
+      [
+        5,
+        5,
+        5
+      ],
+      [
+        -5,
+        5,
+        5
+      ],
+      [
+        5,
+        -5,
+        5
+      ],
+      [
+        -5,
+        -5,
+        5
+      ],
+      [
+        -5,
+        -5,
+        -5
+      ],
+      [
+        -5,
+        -5,
+        -5
+      ],
+      [
+        5,
+        -5,
+        -5
+      ],
+      [
+        5,
+        -5,
+        5
+      ],
+      [
+        -5,
+        5,
+        -5
+      ],
+      [
+        -5,
+        -5,
+        -5
+      ],
+      [
+        -5,
+        -5,
+        5
+      ],
+      [
+        -5,
+        -5,
+        5
+      ],
+      [
+        -5,
+        5,
+        5
+      ],
+      [
+        -5,
+        5,
+        -5
+      ],
+      [
+        5,
+        5,
+        -5
+      ],
+      [
+        -5,
+        5,
+        -5
+      ],
+      [
+        -5,
+        5,
+        5
+      ],
+      [
+        -5,
+        5,
+        5
+      ],
+      [
+        5,
+        5,
+        5
+      ],
+      [
+        5,
+        5,
+        -5
+      ],
+      [
+        5,
+        5,
+        -5
+      ],
+      [
+        5,
+        -5,
+        -5
+      ],
+      [
+        -5,
+        -5,
+        -5
+      ],
+      [
+        -5,
+        -5,
+        -5
+      ],
+      [
+        -5,
+        5,
+        -5
+      ],
+      [
+        5,
+        5,
+        -5
+      ],
+      [
+        5,
+        5,
+        5
+      ],
+      [
+        5,
+        -5,
+        5
+      ],
+      [
+        5,
+        -5,
+        -5
+      ],
+      [
+        5,
+        -5,
+        -5
+      ],
+      [
+        5,
+        5,
+        -5
+      ],
+      [
+        5,
+        5,
+        5
+      ]
+    ]
+  },
+  {
+    "farClip": 200,
+    "id": "camera1",
+    "nearClip": 5,
+    "primitive": "camera",
+    "type": "orthographic"
+  },
+  {
+    "farClip": 200,
+    "focalLength": 50,
+    "id": "camera2",
+    "nearClip": 5,
+    "primitive": "camera",
+    "type": "perspective"
+  },
+  {
+    "color": [
+      0,
+      1,
+      1
+    ],
+    "id": "light1",
+    "intensity": 20,
+    "primitive": "light",
+    "type": "point"
+  },
+  {
+    "color": [
+      0,
+      1,
+      1
+    ],
+    "id": "light2",
+    "intensity": 20,
+    "primitive": "light",
+    "type": "directional"
+  },
+  {
+    "color": [
+      0,
+      1,
+      1
+    ],
+    "coneAngle": 10,
+    "id": "light3",
+    "intensity": 20,
+    "primitive": "light",
+    "type": "spot"
+  }
+]
