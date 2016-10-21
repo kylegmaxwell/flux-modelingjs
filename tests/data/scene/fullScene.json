@@ -10,6 +10,7 @@
       "inst1",
       "inst3"
     ],
+    "label": "Layer-Odd",
     "id": "layer-odd",
     "primitive": "layer"
   },
@@ -24,6 +25,7 @@
       "inst2",
       "inst8"
     ],
+    "label": "Layer-Even",
     "id": "layer-even",
     "primitive": "layer"
   },
@@ -37,6 +39,7 @@
     "elements": [
       "grp1"
     ],
+    "label": "Layer-Grp1",
     "id": "layer-Grp1",
     "primitive": "layer"
   },

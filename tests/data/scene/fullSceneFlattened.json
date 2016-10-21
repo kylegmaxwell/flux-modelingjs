@@ -4,6 +4,7 @@
       "attributes": {
         "backColor": "white",
         "frontColor": "red",
+        "label": "Layer-Odd",
         "lineType": "solid",
         "name": "layer-odd"
       },
@@ -24,6 +25,7 @@
       "attributes": {
         "backColor": "white",
         "frontColor": "red",
+        "label": "Layer-Odd",
         "lineType": "solid",
         "name": "layer-odd"
       },
@@ -283,6 +285,7 @@
       "attributes": {
         "backColor": "black",
         "frontColor": "blue",
+        "label": "Layer-Even",
         "lineType": "lineType-10",
         "name": "layer-even"
       },
@@ -299,6 +302,7 @@
       "attributes": {
         "backColor": "black",
         "frontColor": "blue",
+        "label": "Layer-Even",
         "lineType": "lineType-10",
         "name": "layer-even"
       },
@@ -333,6 +337,7 @@
       "attributes": {
         "backColor": "black",
         "frontColor": "white",
+        "label": "Layer-Grp1",
         "lineType": "lineType-55",
         "name": "Grp1",
         "partType": "assembly"
@@ -354,6 +359,7 @@
       "attributes": {
         "backColor": "black",
         "frontColor": "white",
+        "label": "Layer-Grp1",
         "lineType": "lineType-55",
         "name": "Grp1",
         "partType": "assembly"

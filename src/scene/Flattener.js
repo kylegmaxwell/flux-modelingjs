@@ -108,6 +108,35 @@ Flattener.prototype._flattenGroup = function(inGroup) {
 };
 
 /**
+* Copies layer properites as attribute on the element
+* @param {object} layer       Layer element
+* @param {object} element     Element on which layer's color is copied to
+* @return {object}            Element with layer properties copied
+*/
+function _copyLayerProperties(layer, element) {
+    element = utils.mergeAttributes(layer, element);
+
+    if (layer.color != null || layer.label != null) {
+        if (element.attributes == null) {
+            element.attributes = {};
+        }
+
+        if (layer.color != null) {
+            if (element.attributes.materialProperties == null) {
+                element.attributes.materialProperties = {};
+            }
+            element.attributes.materialProperties.color = layer.color;
+        }
+
+        if (layer.label != null) {
+            element.attributes.label = layer.label;
+        }
+    }
+
+    return element;
+}
+
+/**
 * Returns list of layered instances of the scene. Works on the scene member variable
 * of Flattener.
 * @return {Array}       List of instances from each layer of the scene
@@ -119,7 +148,7 @@ Flattener.prototype._getLayeredInstances = function() {
         if (obj.primitive === constants.SCENE_PRIMITIVES.layer) {
             for(var j = 0; j < obj.elements.length;  ++j) {
                 var node = this.scene[obj.elements[j]];
-                node = utils.mergeAttributes(obj, node);
+                node = _copyLayerProperties(obj, node);
                 if (node.primitive === constants.SCENE_PRIMITIVES.group) {
                     sceneInstances = sceneInstances.concat(this._flattenGroup(node));
                 } else {
