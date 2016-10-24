@@ -1,0 +1,63 @@
+[
+    {
+        "id":"ball",
+        "origin":[0,0,10],
+        "radius":10,
+        "primitive":"sphere"
+    },
+    {
+        "id": "bush1",
+        "primitive": "instance",
+        "entity": "ball",
+        "matrix": [1, 0, 0, -20, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+    },
+    {
+        "id": "bush2",
+        "primitive": "instance",
+        "entity": "ball",
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+    },
+    {
+        "id": "bush3",
+        "primitive": "instance",
+        "entity": "ball",
+        "matrix": [1, 0, 0, 20, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+    },
+    {
+        "id":"groundShape",
+        "origin": [0,0,0],
+        "dimensions": [80,80],
+        "materialProperties": {"color": [0.67,0.33,0.13]},
+        "primitive": "rectangle"
+    },
+    {
+        "id": "ground",
+        "primitive": "instance",
+        "entity": "groundShape"
+    },
+    {
+        "id":"buildingShape",
+        "origin":[-50,50,40],
+        "dimensions":[40,40,80],
+        "axis":[0,0,1],
+        "reference":[0,1,0],
+        "primitive":"block"
+    },
+    {
+        "id": "building",
+        "primitive": "instance",
+        "entity": "buildingShape"
+    },
+    {
+        "id": "plants",
+        "primitive": "layer",
+        "color": [0,1,0],
+        "elements": ["bush1", "bush2", "bush3"]
+    },
+    {
+        "id": "concrete",
+        "primitive": "layer",
+        "color": [1,0.8,0.8],
+        "elements": ["building", "ground"]
+    }
+]

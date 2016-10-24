@@ -30,7 +30,7 @@ var revitPrefix = "fluxRevit";
  */
 export function checkSchema(obj, primStatus) {
     if (obj != null && typeof obj === 'object') {
-        if (obj.primitive && typeof obj.primitive === 'string' && obj.primitive !== 'scene') {
+        if (obj.primitive && typeof obj.primitive === 'string') {
             if (!checkEntity(obj, primStatus)) {
                 return true;
             }

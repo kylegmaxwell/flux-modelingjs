@@ -432,8 +432,8 @@ var entity = {
                 "material":       { "$ref": "#/types/fluxid" },
                 "entity":       { "$ref": "#/types/fluxid" }
             },
-                "required": [ "primitive", "id", "entity" ],
-                "additionalProperties": false
+            "required": [ "primitive", "id", "entity" ],
+            "additionalProperties": false
         },
         "geometryList": {
             "type": "object",
@@ -441,10 +441,10 @@ var entity = {
                 "attributes":   { "type":  "object" },
                 "primitive":    { "enum": [ "geometryList" ] },
                 "id":           { "$ref": "#/types/fluxid" },
-                "entities":     { "type": "array" },
-                "required": [ "primitive", "id", "entities" ],
-                "additionalProperties": false
-            }
+                "entities":     { "type": "array" }
+            },
+            "required": [ "primitive", "id", "entities" ],
+            "additionalProperties": false
         },
         "group": {
             "type": "object",

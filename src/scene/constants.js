@@ -11,5 +11,8 @@ export var SCENE_PRIMITIVES = {
     layer: 'layer',
     group: 'group',
     instance: 'instance',
-    geometry: 'geometryList'
+    geometry: 'geometryList',
+    material: 'material',
+    camera: 'camera',
+    light: 'light'
 };

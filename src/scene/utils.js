@@ -96,7 +96,7 @@ var prims = _listValidPrims();
 
 /**
  * Helper function to check if the given element which
- * can have displayable geomtry actually has displayable
+ * can have displayable geometry actually has displayable
  * geometry. This is to prevent the viewport from switching
  * to 3D view mode if the element does not have
  * displayable geometry.

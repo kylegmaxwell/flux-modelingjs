@@ -33,7 +33,7 @@ export var helpers = {
         }, "a positive integer"),
 
     /** Convenience method for constructing a specification based on an entity
-     * sub-schema inside the parasolid worker geomtry entity schema.
+     * sub-schema inside the parasolid worker geometry entity schema.
      *
      * @param {String} name  Name of the entity, e.g, 'point'
      * @return {Object}      Specification
@@ -48,7 +48,7 @@ export var helpers = {
 
     /**
      * Convenience method for constructing a specification based on a type
-     * subschema inside the parasolid worker geomtry types schema.
+     * subschema inside the parasolid worker geometry types schema.
      *
      * @param {String} name Name of the type, e.g, 'position'
      * @return {Object}     Specification

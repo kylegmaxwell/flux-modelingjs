@@ -1,0 +1,46 @@
+[
+    {
+        "primitive":"revitElement",
+        "id":"Id-1",
+        "familyInfo":{"category":"Walls","family":"WallFamily-1",
+        "type":"WallType-1","placementType":"Invalid"},
+        "geometryParameters":{
+            "profile":[
+                {"units":{"end":"feet","start":"feet"},"end":[20.31,17.82,0],
+                "primitive":"line","start":[-63.18,17.82,0]}
+            ],
+            "level":"Level-1","structural":true,"flipped":true,
+            "geometry": [
+                {
+                    "faces": [[0,1,2]],
+                    "vertices": [
+                        [185.93365522966155,-48.9867499393609, 11.3234889800848443e-23],
+                        [185.93365522966155,-48.9867499393609,37.401574803149416],
+                        [185.93365522966155,-76.09632999185438,37.401574803149416]
+                    ],
+                    "primitive": "mesh",
+                    "units": {}
+                }
+            ]
+        },
+        "instanceParameters":{},"typeParameters":{},"customParameters":{}
+    },
+    {
+        "id": "inst",
+        "primitive": "instance",
+        "entity": "Id-1",
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+    },
+    {
+        "id": "grp",
+        "primitive": "group",
+        "children": ["inst"],
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+    },
+    {
+        "id": "lyr",
+        "primitive": "layer",
+        "color": [0,1,0],
+        "elements": ["grp"]
+    }
+]

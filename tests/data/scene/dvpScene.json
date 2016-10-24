@@ -1,0 +1,16 @@
+[
+    {
+        "entities": [{"origin": [3,0,0],"primitive": "sphere","radius": 3}],
+        "id": "a","primitive": "geometryList"
+    },
+    {
+        "id":"b",
+        "primitive":"instance",
+        "entity":"a"
+    },
+    {
+        "elements": ["b"],
+        "id": "c",
+        "primitive": "layer"
+    }
+]

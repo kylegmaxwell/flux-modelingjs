@@ -9,7 +9,7 @@ describe("Scene validator test", function() {
 
     var fixtures = [{
         scene: 'badLayerScene',
-        message: 'element'
+        message: 'primitive'
     },{
         scene: 'basicScene',
         message: ''
@@ -43,6 +43,15 @@ describe("Scene validator test", function() {
     },{
         scene: 'invalidLight',
         message: 'light'
+    },{
+        scene: 'scene',
+        message: ''
+    },{
+        scene: 'invalidRevit',
+        message: 'revitElement'
+    },{
+        scene: 'dvpScene',
+        message: ''
     }
     ];
 
@@ -85,7 +94,7 @@ describe("Scene utils test", function() {
             "geometry": true
         },
         {
-            "description": "DVP-style scene",
+            "description": "DVP-style scene (invalid but still geometry)",
             "value": [
                 {"entity": [{"origin": [3,0,0],"primitive": "sphere","radius": 3}],"id": "a","primitive": "geometryList"},
                 {"elements": ["a"],"id": "b","primitive": "layer","visible": false}
