@@ -10,3 +10,4 @@ export { default as Flattener } from './Flattener.js';
 export { default as StatusMap } from './StatusMap.js';
 export * from './utils.js';
 export * from './schemaValidator.js';
+export * from './constants.js';
