@@ -86,7 +86,7 @@ StatusMap.prototype.invalidKeySummary = function () {
 StatusMap.prototype.merge = function (other) {
     for (var key in other.errors) {
         if (this.errors[key] && this.errors[key].constructor === Array) {
-            this.errors[key].concat(other.errors[key]);
+            this.errors[key] = this.errors[key].concat(other.errors[key]);
         } else {
             this.errors[key] = other.errors[key];
         }
