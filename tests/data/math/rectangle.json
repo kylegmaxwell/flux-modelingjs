@@ -1,0 +1,6 @@
+{
+    "primitive":"rectangle",
+    "origin":[5,5,0],
+    "dimensions":[10,10],
+    "units":{"origin":"meters","dimensions":"meters"}
+}

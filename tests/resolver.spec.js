@@ -10,6 +10,7 @@ var simplePointQuery = {
         2
       ],
       "radius": 10,
+      "axis": [0,0,1],
       "units": {
         "origin": "meters",
         "radius": "meters"
@@ -37,6 +38,7 @@ var nestedOperationsQuery = {
         2
       ],
       "radius": 10,
+      "axis": [0,0,1],
       "units": {
         "origin": "meters",
         "radius": "meters"
@@ -80,6 +82,7 @@ var multipleOpsSameObjectQuery = {
         2
       ],
       "radius": 10,
+      "axis": [0,0,1],
       "units": {
         "origin": "meters",
         "radius": "meters"

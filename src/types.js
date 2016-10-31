@@ -181,6 +181,148 @@ export function lookupFieldDimensions(typeid) {
     return results;
 }
 
+/**
+*   Check if the given subSchema has a field of position type
+*
+*   @param  {string} subSchema      Path tot he subschema inside entity schema
+*   @returns {boolean}              True of subschema has position type, false otherwise
+*/
+function _isPositionField(subSchema) {
+    if (subSchema == null) {
+        return false;
+    }
+
+    if (subSchema.type === "array") {
+        return _isPositionField(subSchema.items);
+    }
+
+    if (subSchema.oneOf != null) {
+        return _isPositionField(subSchema.oneOf[0]);
+    }
+
+    if (subSchema.$ref != null) {
+        if (subSchema.$ref === "#/types/position") {
+            return true;
+        }
+        else {
+            return _isPositionField(getSubSchema(subSchema.$ref));
+        }
+    }
+
+    return false;
+}
+
+/** Get all fields with position type
+*   @param  {String} typeId   Type id as per entity schema
+*   @returns {Array}          All fields of the given type of while type is entity
+*                             position directly or indirectly.
+*/
+export function getPositionFields(typeId) {
+    var subSchema = entitySchema.geometry[typeId];
+    var vectorFields = [];
+    for(var key in subSchema.properties) {
+        if (_isPositionField(subSchema.properties[key])) {
+            vectorFields.push(key);
+        }
+    }
+    return vectorFields;
+}
+
+/**
+*   Check if the given subSchema has a field of direction type
+*
+*   @param  {string} subSchema      Path tot he subschema inside entity schema
+*   @returns {boolean}               True of subschema has direction type, false otherwise
+*/
+function _isDirectionField(subSchema) {
+    if (subSchema == null) {
+        return false;
+    }
+
+    if (subSchema.type === "array") {
+        return _isDirectionField(subSchema.items);
+    }
+
+    if (subSchema.oneOf != null) {
+        return _isDirectionField(subSchema.oneOf[0]);
+    }
+
+    if (subSchema.$ref != null) {
+        if (subSchema.$ref === "#/types/direction") {
+            return true;
+        }
+        else {
+            return _isDirectionField(getSubSchema(subSchema.$ref));
+        }
+    }
+
+    return false;
+}
+
+/** Get all fields with direction type
+*   @param  {String} typeId   Type id as per entity schema
+*   @returns {Array}           All fields of the given type of while type is entity
+*                             direction directly or indirectly.
+*/
+export function getDirectionFields(typeId) {
+    var subSchema = entitySchema.geometry[typeId];
+    var vectorFields = [];
+    for(var key in subSchema.properties) {
+        if (_isDirectionField(subSchema.properties[key])) {
+            vectorFields.push(key);
+        }
+    }
+    return vectorFields;
+}
+
+/**
+*   Check if the given subSchema has a field of dimension type
+*
+*   @param  {string} subSchema      Path tot he subschema inside entity schema
+*   @returns {boolean}               True of subschema has dimension type, false otherwise
+*/
+function _isDimField(subSchema) {
+    if (subSchema == null) {
+        return false;
+    }
+
+    if (subSchema.type === "array") {
+        return _isDimField(subSchema.items);
+    }
+
+    if (subSchema.oneOf != null) {
+        return _isDimField(subSchema.oneOf[0]);
+    }
+
+    if (subSchema.$ref != null) {
+        if (subSchema.$ref === "#/types/distance" || subSchema.$ref === "#/types/distanceNonzero") {
+            return true;
+        }
+        else {
+            return _isDimField(getSubSchema(subSchema.$ref));
+        }
+    }
+
+    return false;
+
+}
+
+/** Get all fields with dimension type
+*   @param  {String} typeId   Type id as per entity schema
+*   @returns {Array}          All fields of the given type of while type is entity
+*                             dimension directly or indirectly.
+*/
+export function getDimensionFields(typeId) {
+    var subSchema = entitySchema.geometry[typeId];
+    var sizeFields = [];
+    for(var key in subSchema.properties) {
+        if (_isDimField(subSchema.properties[key])) {
+            sizeFields.push(key);
+        }
+    }
+    return sizeFields;
+}
+
 // TODO(andrew): don't export this symbol; it's messy, and we want
 // to pass it in per-project, rather than having a single global.
 export var _defaultDimToUnits = {

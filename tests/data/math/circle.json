@@ -1,0 +1,6 @@
+{
+    "primitive":"circle",
+    "origin":[0,10,20],
+    "radius": 5,
+    "units":{"origin":"meters","radius":"meters"}
+}

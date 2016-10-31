@@ -1,0 +1,8 @@
+{
+    "primitive" : "circle",
+    "origin" : [ 10, 97.86518859863281, 11.0636568069458 ],
+    "radius" : 10,
+    "axis" : [ 0, 3.0184144973754883, -1.7846776247024536 ],
+    "reference": [1,0,0],
+    "units" : { "origin" : "meters", "radius" : "meters" }
+}

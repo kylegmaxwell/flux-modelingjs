@@ -17,3 +17,7 @@ export var scene = _scene;
 // schema sub module
 import * as _schema from './schema/index.js';
 export var schema = _schema;
+
+// 3D math library
+import * as _math from './math/transform.js';
+export var math = _math;

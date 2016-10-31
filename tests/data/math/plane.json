@@ -1,0 +1,6 @@
+{
+    "primitive":"plane",
+    "origin":[0,20,30],
+    "normal":[0,1,0],
+    "units":{"origin":"meters"}
+}

@@ -1,0 +1,5 @@
+{
+    "primitive":"vector",
+    "coords":[0,20,30],
+    "units":{"coords":"meters"}
+}

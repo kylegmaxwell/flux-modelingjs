@@ -1,0 +1,9 @@
+{
+    "primitive" : "ellipse",
+    "origin" : [ 10, 97.86518859863281, 11.0636568069458 ],
+    "majorRadius" : 40,
+    "minorRadius" : 20,
+    "reference" : [ 0, -1.7846776247024536, -3.0184144973754883 ],
+    "units" : { "origin" : "meters", "majorRadius" : "meters", "minorRadius" : "meters" },
+    "axis" : [ 0, 3.0184144973754883, -1.7846776247024536 ]
+}
