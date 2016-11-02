@@ -8,8 +8,7 @@
     {
         "id": "bush",
         "primitive": "instance",
-        "entity": "ball",
-        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+        "entity": "ball"
     },
     {
         "id": "E",

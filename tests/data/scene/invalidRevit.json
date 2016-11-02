@@ -28,14 +28,12 @@
     {
         "id": "inst",
         "primitive": "instance",
-        "entity": "Id-1",
-        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+        "entity": "Id-1"
     },
     {
         "id": "grp",
         "primitive": "group",
-        "children": ["inst"],
-        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+        "children": ["inst"]
     },
     {
         "id": "lyr",

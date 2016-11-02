@@ -9,13 +9,13 @@
         "id": "bush",
         "primitive": "instance",
         "entity": "ball",
-        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+        "matrix": [1, 0, 0, -20, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
     },
     {
         "id": "bushes",
         "primitive": "group",
         "children": ["bush"],
-        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+        "matrix": [1, 0, 0, -20, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
     },
     {
         "id": "plants",

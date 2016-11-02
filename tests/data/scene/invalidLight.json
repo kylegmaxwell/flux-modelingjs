@@ -8,8 +8,7 @@
     {
         "id": "A",
         "primitive": "instance",
-        "entity": "pointLight1",
-        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -20, 0, 0, 1]
+        "entity": "pointLight1"
     },
     {
         "id": "pointLight1",
