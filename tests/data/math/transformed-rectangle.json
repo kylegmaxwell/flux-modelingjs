@@ -1,0 +1,8 @@
+{
+    "primitive" : "rectangle",
+    "origin" : [ 20, 21.27954864501953, -16.497901916503906 ],
+    "dimensions" : [ 20, 29.999999033379257 ],
+    "units" : { "origin" : "meters", "dimensions" : "meters" },
+    "axis" : [ 0, 3.0184144973754883, -1.7846776247024536 ],
+    "reference" : [ 1, 0, 0 ]
+}

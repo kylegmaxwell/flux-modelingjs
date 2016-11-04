@@ -1,0 +1,6 @@
+{
+    "primitive":"line",
+    "start":[0,20,30],
+    "end":[20,30,40],
+    "units":{"start":"meters","end":"meters"}
+}

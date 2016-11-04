@@ -1,0 +1,7 @@
+{
+    "primitive":"arc",
+    "start":[0,0,0],
+    "middle":[5,5,0],
+    "end":[10,0,0],
+    "units":{"start":"meters","middle":"meters","end":"meters"}
+}

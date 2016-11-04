@@ -1,0 +1,20 @@
+{
+    "surfaces":[
+        {
+            "controlPoints":[[[-8,8,0],[8,8,0]],[[-8,-8,0],[8,-8,0]]],
+            "primitive":"surface",
+            "uDegree":1,
+            "uKnots":[0,0,1,1],
+            "vDegree":1,
+            "vKnots":[0,0,1,1]
+        },
+        {
+            "controlPoints":[[[-20,8,9],[-8,8,0]],[[-20,-8,9],[-8,-8,0]]],
+            "primitive":"surface",
+            "uDegree":1,
+            "uKnots":[0,0,1,1],
+            "vDegree":1,
+            "vKnots":[0,0,1,1]
+        }],
+    "primitive":"polysurface"
+}

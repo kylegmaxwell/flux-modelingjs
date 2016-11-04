@@ -1,0 +1,8 @@
+{
+    "primitive":"ellipse",
+    "origin":[0,10,20],
+    "majorRadius":20,
+    "minorRadius":10,
+    "reference":[0,1,0],
+    "units":{"origin":"meters","majorRadius":"meters","minorRadius":"meters"}
+}

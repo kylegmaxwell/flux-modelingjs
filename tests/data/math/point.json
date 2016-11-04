@@ -1,0 +1,5 @@
+{
+    "primitive":"point",
+    "point":[0,20,30],
+    "units":{"point":"meters"}
+}

@@ -181,6 +181,7 @@ export function circle(center, r, id) {
         origin:   coords(center),
         originId: center.id || genId(),
         radius:   r,
+        axis: vecCoords([0,0,1]),
         id:       id || genId()
     });
 }
@@ -200,14 +201,15 @@ export function ellipse(center, majorRadius, minorRadius, direction, id) {
         ["Center", s.AnyOf(s.Type("position"), s.Entity("point")), center],
         ["MajorRadius", s.Type("distance"), majorRadius],
         ["MinorRadius", s.Type("distance"), minorRadius],
-        ["Direction", s.AnyOf(s.Type("position"), s.Entity("vector")), direction],
+        ["Direction", s.AnyOf(s.Type("direction"), s.Entity("vector")), direction],
         ["Id", s.Maybe(s.String), id]);
     return primitive('ellipse', {
         origin:      coords(center),
         originId:    center.id || genId(),
         majorRadius: majorRadius,
         minorRadius: minorRadius,
-        direction:   (direction ? vecCoords(direction) : undefined),
+        reference:   vecCoords(direction),
+        axis:        vecCoords([0,0,1]),
         id:          id || genId()
     });
 }
@@ -227,7 +229,7 @@ export function rectangle(center, span) {
     if (c.length != 2) {
         throw new FluxModelingError("Expected rectangle dimensions to be 2-dimensional.");
     }
-    return primitive('rectangle', { origin: coords(center), dimensions: c });
+    return primitive('rectangle', { origin: coords(center), dimensions: c, axis: [0,0,1], reference: [1,0,0] });
 }
 
 /** Constructs rectangle entity
@@ -372,7 +374,7 @@ export function block(center, span) {
     types.checkAllAndThrow(
         ["Center", s.AnyOf(s.Type("position"), s.Entity("point")), center],
         ["Dimensions", s.AnyOf(s.Type("position"), s.Entity("vector")), span]);
-    return primitive('block', { origin: coords(center), dimensions: vecCoords(span) });
+    return primitive('block', { origin: coords(center), dimensions: vecCoords(span), axis: [0,0,1], reference:[1,0,0] });
 }
 
 /** Constructs sphere
