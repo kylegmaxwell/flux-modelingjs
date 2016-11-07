@@ -19,5 +19,5 @@ import * as _schema from './schema/index.js';
 export var schema = _schema;
 
 // 3D math library
-import * as _math from './math/transform.js';
+import * as _math from './math/index.js';
 export var math = _math;

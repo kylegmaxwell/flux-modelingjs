@@ -121,12 +121,12 @@ function _scaleDimensions(inputVal, matrix) {
 }
 
 /** Transform given entity by given affine transform
-*   @param {Object} entity      Value flux geometry entity (except Brep)
-*   @param {Array}  matrix      Affine transform matrix
-*   @returns {Object}             Transformed entity
+*   @param {Object} entity  Value flux geometry entity (except Brep)
+*   @param {Object} xform   Affine transform
+*   @returns {Object}       Transformed entity
 */
-export function transform(entity, matrix) {
-    if (entity == null || matrix == null) {
+export default function transform(entity, xform) {
+    if (entity == null || xform == null) {
         throw new FluxModelingError("Invalid entity or matrix provided for transform");
     }
 
@@ -139,7 +139,7 @@ export function transform(entity, matrix) {
     // Transfrom each curve inside a polycurve
     if (entity.primitive === "polycurve") {
         for(var i = 0; i < entity.curves.length; ++i) {
-            entity.curves[i] = transform(entity.curves[i], matrix);
+            entity.curves[i] = transform(entity.curves[i], xform);
         }
         return entity;
     }
@@ -147,7 +147,7 @@ export function transform(entity, matrix) {
     // Transform each surface inside a polysurface
     if (entity.primitive === "polysurface") {
         for(i = 0; i < entity.surfaces.length; ++i) {
-            entity.surfaces[i] = transform(entity.surfaces[i], matrix);
+            entity.surfaces[i] = transform(entity.surfaces[i], xform);
         }
         return entity;
     }
@@ -164,7 +164,7 @@ export function transform(entity, matrix) {
         }
     }
 
-    if (matrix.constructor !== Array || matrix.length !== 16) {
+    if (xform.primitive != "affineTransform") {
         throw new FluxModelingError("Invalid transform");
     }
 
@@ -176,21 +176,21 @@ export function transform(entity, matrix) {
     for(i = 0; i < positionFields.length; ++i) {
         var field = positionFields[i];
         var fieldVal = entity[field];
-        entity[field] = _transformPosition(fieldVal, matrix);
+        entity[field] = _transformPosition(fieldVal, xform.mat);
     }
 
     // Transform direction Fields
     for(var j = 0; j < directionFields.length; ++j) {
         field = directionFields[j];
         fieldVal = entity[field];
-        entity[field] = _transformDirection(fieldVal, matrix);
+        entity[field] = _transformDirection(fieldVal, xform.mat);
     }
 
     // Apply scaling to analytical geometry dimensions...
     for (var k = 0; k < dimensionFields.length; ++k) {
         field = dimensionFields[k];
         fieldVal = entity[field];
-        entity[field] = _scaleDimensions(fieldVal, matrix);
+        entity[field] = _scaleDimensions(fieldVal, xform.mat);
     }
 
     return entity;

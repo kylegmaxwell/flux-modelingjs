@@ -49,7 +49,7 @@ describe("Transform Tests", function() {
             it("Transform " + testData, function() {
               var geom = require("./data/math/" + testData + ".json");
               var expectedResult = require("./data/math/transformed-" + testData + ".json");
-              var transformedGeom = modeling.math.transform(geom, transf.mat);
+              var transformedGeom = modeling.math.transform(geom, transf);
               expect(transformedGeom).toEqual(expectedResult);
             });
       });
