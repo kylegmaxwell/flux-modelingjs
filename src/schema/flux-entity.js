@@ -80,12 +80,6 @@ var entity = {
                 ".*" : {"type": "string" }
             }
         },
-        "boundingBox":{
-            "type": "array",
-            "items":{ "$ref": "#/types/position" },
-            "minItems": 2,
-            "maxItems": 2
-        },
         "matrix":{
             "type": "array",
             "items": { "type": "number" },
@@ -427,7 +421,6 @@ var entity = {
                 "id":           { "$ref": "#/types/fluxid" },
                 "units":        { "$ref": "#/types/units" },
                 "matrix":       { "$ref": "#/types/matrix" },
-                "bbox":         { "$ref": "#/types/boundingBox" },
                 "label":        { "type": "string" },
                 "material":       { "$ref": "#/types/fluxid" },
                 "entity":       { "$ref": "#/types/fluxid" }
@@ -454,7 +447,6 @@ var entity = {
                 "id":           { "$ref": "#/types/fluxid" },
                 "units":        { "$ref": "#/types/units" },
                 "matrix":       { "$ref": "#/types/matrix" },
-                "bbox":         { "$ref": "#/types/boundingBox" },
                 "label":        { "type": "string" },
                 "material":       { "$ref": "#/types/fluxid" },
                 "children":     {
