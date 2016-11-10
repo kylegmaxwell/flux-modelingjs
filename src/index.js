@@ -15,3 +15,8 @@ export var revit = _revit;
 
 import * as _measure from './measure.js';
 export var measure = _measure;
+
+// 3D math library
+import * as _math from './math/index.js';
+export var math = _math;
+

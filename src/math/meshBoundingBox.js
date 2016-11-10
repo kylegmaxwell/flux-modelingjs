@@ -3,6 +3,40 @@
 import FluxModelingError from '../FluxModelingError.js';
 import * as entities from '../geometry/entity.js';
 
+
+/** Creates an axis aligned bounding box as a
+* block from given two input points (geometry/Point);
+* @param {Object} min      Min point of the bounding box.
+* @param {Object} max      Max point of the bounding box.
+* @returns {Object}        Block as axis aligned bounding box.
+*/
+export function convertToBlock(min, max) {
+    var center = [
+            0.5 * (max.point[0] + min.point[0]),
+            0.5 * (max.point[1] + min.point[1]),
+            0.5 * (max.point[2] + min.point[2])
+        ];
+
+    var dims = [
+            Math.abs(max.point[0] - min.point[0]),
+            Math.abs(max.point[1] - min.point[1]),
+            Math.abs(max.point[2] - min.point[2])
+        ];
+
+    var blockAsBoundingBox = entities.block(center, dims);
+
+    if (min.units.point != max.units.point) {
+        throw new FluxModelingError("Failed to create block. Input points have different units.");
+    }
+
+    if (min.units.point != null) {
+        blockAsBoundingBox.units.origin = min.units.point;
+        blockAsBoundingBox.units.dimensions = min.units.point;
+    }
+
+    return blockAsBoundingBox;
+}
+
 /** Calculate axis aligned bounding box of a given mesh
 *   @param {Object} inputMesh   Input mesh entity
 *   @returns {Object}           Axis aligned bounding box of the mesh.
@@ -37,19 +71,16 @@ export default function getMeshBoundingBox(inputMesh) {
         }
     }
 
-    var center = [
-            0.5 * (bBox[0][0] + bBox[1][0]),
-            0.5 * (bBox[0][1] + bBox[1][1]),
-            0.5 * (bBox[0][2] + bBox[1][2])
-        ];
+    var minPoint = entities.point(bBox[0]);
+    var maxPoint = entities.point(bBox[1]);
 
-    var dims = [
-            Math.abs(bBox[1][0] - bBox[0][0]),
-            Math.abs(bBox[1][1] - bBox[0][1]),
-            Math.abs(bBox[1][2] - bBox[0][2])
-        ];
+    var blockAsBoundingBox = convertToBlock(minPoint, maxPoint);
 
-    var blockAsBoundingBox = entities.block(center, dims);
+    // Assign units
+    if (inputMesh.units != null) {
+        blockAsBoundingBox.units.origin = inputMesh.units.vertices;
+        blockAsBoundingBox.units.dimensions = inputMesh.units.vertices;
+    }
 
     return blockAsBoundingBox;
 }
