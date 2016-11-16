@@ -434,6 +434,7 @@ var entity = {
                 "attributes":   { "type":  "object" },
                 "primitive":    { "enum": [ "geometryList" ] },
                 "id":           { "$ref": "#/types/fluxid" },
+                "units":        { "$ref": "#/types/units" },
                 "entities":     { "type": "array" }
             },
             "required": [ "primitive", "id", "entities" ],

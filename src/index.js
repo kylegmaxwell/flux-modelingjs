@@ -19,4 +19,3 @@ export var measure = _measure;
 // 3D math library
 import * as _math from './math/index.js';
 export var math = _math;
-
