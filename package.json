@@ -1,6 +1,6 @@
 {
   "name": "flux-modelingjs",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "Modeling entity constructors, measurement unit handlers, JSON schema validators etc.",
   "main": "dist/index.js",
   "jsnext:main": "src/index-lite.js",
@@ -13,7 +13,7 @@
     "tests": "npm run clean && npm run unit-tests && npm run integration-tests",
     "clean": "rm -f ./{build,dist}/*.{js,map,json}; rm -f ./{build,dist}/*/*.{js,map,json}",
     "unit-tests": "npm run build-common && npm run run-unit-tests",
-    "build-common": "babel src -d dist -s; node ./scripts/buildSchema.js",
+    "build-common": "babel src -d dist -s && node ./scripts/buildSchema.js",
     "run-unit-tests": "PATH=$(npm bin):$PATH jasmine-node --verbose --captureExceptions ./tests/",
     "integration-tests": "npm run build-test && npm run run-integration-tests",
     "build-test": "rollup -c rollup-test.config.js -f=cjs -o=./build/rollup-test.common.js;",
