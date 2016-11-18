@@ -264,7 +264,7 @@ export function rectangleByCorners(lo, hi) {
  */
 export function polycurve(curves) {
     types.checkAllAndThrow(
-        ["Curves", s.ArrayOf(s.Entity("curve")), curves]);
+        ["Curves", s.ArrayOf(s.AnyOf(s.Entity("curve"), s.Entity("line"), s.Entity("arc"), s.Entity("polyline"))), curves]);
     return primitive('polycurve', { curves: curves });
 }
 
@@ -278,7 +278,7 @@ export function polycurve(curves) {
  *  @param  {number}  uDegree NURBS degree along U parameter
  *  @param  {number}  vDegree NURBS degree along V parameter
  *  @param  {Array.Array.<number>}  controlPoints NURBS control points
- *  @param  {Array.<number>}  uKnots NURBS knots along V parameter
+ *  @param  {Array.<number>}  uKnots NURBS knots along U parameter
  *  @param  {Array.<number>}  vKnots NURBS knots along V parameter
  *  @param  {Array.Array.<number>}  weights NURBS weights
  *  @return {Surface}           NURBS surface entity
@@ -291,7 +291,7 @@ export function surface(uDegree, vDegree, controlPoints, uKnots, vKnots, weights
             s.ArrayOf(s.AnyOf(s.Entity("point"), s.Type("position")))), controlPoints],
         ["UKnots", s.ArrayOf(s.Number), uKnots],
         ["VKnots", s.ArrayOf(s.Number), vKnots],
-        ["Weights", s.Maybe(s.ArrayOf(s.ArrayOf(s.Number))), weights]);
+        ["Weights", s.Maybe(s.ArrayOf(s.Number)), weights]);
     var M = controlPoints.length;
     var N = controlPoints[0].length;
 

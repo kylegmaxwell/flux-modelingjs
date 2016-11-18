@@ -127,7 +127,11 @@ Operation.raw = function() {
  *  @param  {boolean} [is_base64]     encode content data stream as base-64 or not, default true
  *  @return {Entity}  BREP
  */
-Operation.repr = op('repr', 4);
+Operation.repr = function() {
+    var r = new Operation('repr');
+    r.args = [ arguments[0], arguments[1], arguments[2] || false, arguments[3] || true ];
+    return r;
+};
 
 /**
  * Convert a given body to a sheet or solid body
@@ -369,10 +373,9 @@ Operation.offsetWire = op('offsetWire', 3);
  *  Creates a wire or sheet body from a set of wires
  *  @function
  *  @param  {Wire[]}     profiles
- *  @param  {number}     sheetFlag 0 for wire result, otherwise sheet
  *  @return {Wire|Sheet}             cannot be exported, only usable as input for other operations
  */
-Operation.createProfiles = op('createProfiles', 2);
+Operation.createProfiles = op('createProfiles', 1);
 
 /** 'createResilientProfiles' operation
  *  Creates profiles which inner loops are removed
