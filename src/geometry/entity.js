@@ -12,10 +12,6 @@ var coords = units.coords;
 var vecCoords = units.vecCoords;
 var mapCoords = units.mapCoords;
 
-// Legacy function to add uuid
-// TODO(Kyle): this can be removed at some point
-var genId = function () { return undefined; };
-
 /**
  * Entity constructors
  */
@@ -52,8 +48,7 @@ export function point(point, id) {
         ["Point", s.AnyOf(s.Type("position"), s.Entity("point")), point],
         ["Id", s.Maybe(s.String), id]);
     return primitive('point', {
-        point: coords(point),
-        id: id || genId()
+        point: coords(point)
     });
 }
 
@@ -76,10 +71,7 @@ export function line(start, end, id) {
         ["Id", s.Maybe(s.String), id ]);
     return primitive('line', {
         start:   coords(start),
-        end:     coords(end),
-        startId: start.id || genId(),
-        endId:   end.id || genId(),
-        id:      id || genId()
+        end:     coords(end)
     });
 }
 
@@ -116,11 +108,7 @@ export function arc(start, middle, end, id) {
     return primitive('arc', {
         start:    coords(start),
         middle:   coords(middle),
-        end:      coords(end),
-        startId:  start.id || genId(),
-        endId:    end.id || genId(),
-        originId: genId(),
-        id:       id || genId()
+        end:      coords(end)
     });
 }
 
@@ -159,8 +147,7 @@ export function curve(degree, controlPoints, knots, weights, id) {
         degree: degree,
         knots: knots,
         controlPoints: mapCoords(controlPoints),
-        weights: weights,
-        id: id || genId()
+        weights: weights
     });
 }
 
@@ -179,10 +166,8 @@ export function circle(center, r, id) {
         ["Id", s.Maybe(s.String), id]);
     return primitive('circle', {
         origin:   coords(center),
-        originId: center.id || genId(),
         radius:   r,
-        axis: vecCoords([0,0,1]),
-        id:       id || genId()
+        axis: vecCoords([0,0,1])
     });
 }
 
@@ -205,12 +190,10 @@ export function ellipse(center, majorRadius, minorRadius, direction, id) {
         ["Id", s.Maybe(s.String), id]);
     return primitive('ellipse', {
         origin:      coords(center),
-        originId:    center.id || genId(),
         majorRadius: majorRadius,
         minorRadius: minorRadius,
         reference:   vecCoords(direction),
-        axis:        vecCoords([0,0,1]),
-        id:          id || genId()
+        axis:        vecCoords([0,0,1])
     });
 }
 
