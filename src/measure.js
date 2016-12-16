@@ -1,9 +1,24 @@
 'use strict';
-import UoM from '../lib/measure_inner.js';
+
+// Defer pulling in measure_inner.js until someone needs it.
+// We do this because in GoBE we are using v8 heap snapshots in order
+// to speed up block loading time, and currently emscripten modules
+// don't work in v8 snapshots because they use JS typed arrays. So
+// by waiting to load this module until someone needs it, we are
+// able to take a snapshot that doesn't include measure_inner.js.
+var _UoM;
+function getUoM() {
+    if (!_UoM) {
+        // It would be nice to use ES6 import syntax here but it
+        // doesn't seem possible to lazy-load things that way.
+        _UoM = require('../lib/measure_inner.js');
+    }
+    return _UoM;
+}
 
 // Helper functions
 function toMapStringInt(components) {
-    var ret = new UoM.MapStringInt();
+    var ret = new (getUoM().MapStringInt)();
     try {
         for(var key in components) {
             ret.set(key, components[key]);
@@ -40,17 +55,17 @@ function dimensionComponentsToDictionary(components) {
 // different sets of units. Registry has predefined
 // set of standard units and conversions.
 export function Registry() {
-    this.impl = UoM.NewStandardRegistry();
+    this.impl = getUoM().NewStandardRegistry();
 }
 
 // Clear should be called to properly destroy Registry inner resources
 Registry.prototype.Clear = function() {
-    UoM.DeleteRegistry(this.impl);
+    getUoM().DeleteRegistry(this.impl);
 };
 
 // AddConcreteDimension defines a new primitive dimension.
 Registry.prototype.AddConcreteDimension = function(dimension) {
-    var err = UoM.AddConcreteDimension(this.impl, dimension);
+    var err = getUoM().AddConcreteDimension(this.impl, dimension);
     if(err.ok != true)
         throw new Error(err.err);
 };
@@ -60,7 +75,7 @@ Registry.prototype.AddConcreteDimension = function(dimension) {
 Registry.prototype.AddCompositeDimension = function(dim, components) {
     var comps = toMapStringInt(components);
     try {
-        var err = UoM.AddCompositeDimension(this.impl, dim, comps);
+        var err = getUoM().AddCompositeDimension(this.impl, dim, comps);
         if(err.ok != true)
             throw new Error(err.err);
     }
@@ -71,12 +86,12 @@ Registry.prototype.AddCompositeDimension = function(dim, components) {
 
 // AddUnit defines a unit and provides it's dimension.
 Registry.prototype.AddUnit = function(unit, dim, aliases) {
-    var als = new UoM.VectorString();
+    var als = new getUoM().VectorString();
     try {
         for(var i = 0; i < aliases.length; ++i) {
             als.push_back(aliases[i]);
         }
-        var err = UoM.AddUnit(this.impl, unit, dim, als);
+        var err = getUoM().AddUnit(this.impl, unit, dim, als);
         if(err.ok != true)
             throw new Error(err.err);
     }
@@ -86,13 +101,13 @@ Registry.prototype.AddUnit = function(unit, dim, aliases) {
 };
 
 Registry.prototype.AddScaledRelationship = function(fromUnit, toUnit, scale) {
-    var err = UoM.AddScaledRelationship(this.impl, fromUnit, toUnit, scale);
+    var err = getUoM().AddScaledRelationship(this.impl, fromUnit, toUnit, scale);
     if(err.ok != true)
         throw new Error(err.err);
 };
 
 Registry.prototype.AddAffineRelationship = function(fromUnit, toUnit, scale, offset) {
-    var err = UoM.AddAffineRelationship(this.impl, fromUnit, toUnit, scale, offset);
+    var err = getUoM().AddAffineRelationship(this.impl, fromUnit, toUnit, scale, offset);
     if(err.ok != true)
         throw new Error(err.err);
 };
@@ -101,7 +116,7 @@ Registry.prototype.AddAffineRelationship = function(fromUnit, toUnit, scale, off
 Registry.prototype.Handles = function(components) {
     var comps = toMapStringInt(components);
     try {
-        var err = UoM.Handles(this.impl, comps);
+        var err = getUoM().Handles(this.impl, comps);
         if(err.ok != true)
             throw new Error(err.err);
     }
@@ -119,7 +134,7 @@ Registry.prototype.DimensionsMatch = function(left, right) {
     try {
         var rComps = toMapStringInt(right);
         try {
-            var bt = UoM.DimensionsMatch(this.impl, lComps, rComps);
+            var bt = getUoM().DimensionsMatch(this.impl, lComps, rComps);
             if(bt.ok != true)
                 throw new Error(bt.err);
             match = bt.value;
@@ -140,7 +155,7 @@ Registry.prototype.ToCanonical = function(units) {
     var ret = {};
     var comps = toMapStringInt(units);
     try {
-        var result = UoM.ToCanonical(this.impl, comps);
+        var result = getUoM().ToCanonical(this.impl, comps);
         try {
             if(result.ok != true)
                 throw new Error(result.err);
@@ -163,7 +178,7 @@ Registry.prototype.ToDimension = function(units) {
     var ret = {};
     var comps = toMapStringInt(units);
     try {
-        var result = UoM.ToDimension(this.impl, comps);
+        var result = getUoM().ToDimension(this.impl, comps);
         try {
             if(result.ok != true)
                 throw new Error(result.err);
@@ -182,21 +197,21 @@ Registry.prototype.ToDimension = function(units) {
 };
 
 Registry.prototype.DefinesUnit = function(unit) {
-    var bt = UoM.DefinesUnit(this.impl, unit);
+    var bt = getUoM().DefinesUnit(this.impl, unit);
     if(bt.ok != true)
         throw new Error(bt.err);
     return bt.value;
 };
 
 Registry.prototype.DefinesDimension = function(dim) {
-    var bt = UoM.DefinesDimension(this.impl, dim);
+    var bt = getUoM().DefinesDimension(this.impl, dim);
     if(bt.ok != true)
         throw new Error(bt.err);
     return bt.value;
 };
 
 Registry.prototype.IsCompositeDimension = function(dim) {
-    var bt = UoM.IsCompositeDimension(this.impl, dim);
+    var bt = getUoM().IsCompositeDimension(this.impl, dim);
     if(bt.ok != true)
         throw new Error(bt.err);
     return bt.value;
@@ -209,7 +224,7 @@ Registry.prototype.Convert = function(fromUnits, toUnits, value) {
     try {
         var to = toMapStringInt(toUnits);
         try {
-            var result = UoM.Convert(this.impl, from, to, value);
+            var result = getUoM().Convert(this.impl, from, to, value);
             if(result.ok != true)
                 throw new Error(result.err);
             ret = result.value;
@@ -243,7 +258,7 @@ Registry.prototype.Convert = function(fromUnits, toUnits, value) {
 Registry.prototype.ConvertUnits = function(jsonData, dimToUnitsJson) {
     var data = (typeof(jsonData) == "object") ? JSON.stringify(jsonData) : jsonData;
     var dimToUnits = (typeof(dimToUnitsJson) == "object") ? JSON.stringify(dimToUnitsJson) : dimToUnitsJson;
-    var result = UoM.ConvertUnits(data, dimToUnits, this.impl);
+    var result = getUoM().ConvertUnits(data, dimToUnits, this.impl);
     if(result.ok != true)
         throw new Error(result.err);
     return JSON.parse(result.str);
@@ -251,7 +266,7 @@ Registry.prototype.ConvertUnits = function(jsonData, dimToUnitsJson) {
 
 // Parses a string that of the format 'u1*u2*u3/u4'
 export function ParseUnits(units) {
-    var comps = UoM.ParseUnits(units);
+    var comps = getUoM().ParseUnits(units);
     try {
         if(comps.ok != true)
             throw new Error(comps.err);

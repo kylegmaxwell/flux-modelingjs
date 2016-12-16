@@ -7,17 +7,26 @@ import FluxModelingError from './FluxModelingError.js';
 import * as utilities from './utilities.js';
 
 var registry; // singleton
-var convertUnits = (function () {
-    if (!registry) {
-        registry = new measure.Registry();
+var convertUnitsFunc; // singleton
+var convertUnits = function (obj, dimToUnitsJson) {
+    // Lazily-instantiate this so that we don't pull in measure_inner.js
+    // unless we need to. See the comments at the top of measure.js for more
+    // information about why we're doing this.
+    if (!convertUnitsFunc) {
+        convertUnitsFunc = function() {
+            if (!registry) {
+                registry = new measure.Registry();
+            }
+            if (registry) {
+                return registry.ConvertUnits.bind(registry);
+            } else {
+                print.warn('Unable to create a new registry');
+                return function (obj) { return obj; };
+            }
+        }();
     }
-    if (registry) {
-        return registry.ConvertUnits.bind(registry);
-    } else {
-        print.warn('Unable to create a new registry');
-        return function (obj) { return obj; };
-    }
-})();
+    return convertUnitsFunc(obj, dimToUnitsJson);
+};
 
 /** Helper function to extract point coordinates
     @private
