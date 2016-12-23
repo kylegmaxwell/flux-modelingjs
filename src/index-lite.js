@@ -9,6 +9,7 @@
 // core modeling functionality
 export { default as Query } from './Query.js';
 export { default as Operation } from './Operation.js';
+export { default as FluxModelingError } from './FluxModelingError.js';
 
 // scene sub module
 import * as _scene from './scene/index.js';

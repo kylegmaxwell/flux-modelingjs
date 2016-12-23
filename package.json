@@ -1,6 +1,6 @@
 {
   "name": "flux-modelingjs",
-  "version": "0.6.8",
+  "version": "0.7.0",
   "description": "Modeling entity constructors, measurement unit handlers, JSON schema validators etc.",
   "main": "dist/index.js",
   "jsnext:main": "src/index-lite.js",
@@ -10,12 +10,13 @@
   "scripts": {
     "test": "npm run lint && npm run tests",
     "lint": "eslint src/**;",
-    "tests": "npm run clean && npm run unit-tests && npm run integration-tests",
+    "tests": "npm run clean && npm run unit-tests && npm run integration-tests && npm run tape-tests",
     "clean": "rm -f ./{build,dist}/*.{js,map,json}; rm -f ./{build,dist}/*/*.{js,map,json}",
     "unit-tests": "npm run build-common && npm run run-unit-tests",
     "build-common": "babel src -d dist -s && node ./scripts/buildSchema.js",
     "run-unit-tests": "PATH=$(npm bin):$PATH jasmine-node --verbose --captureExceptions ./tests/",
     "integration-tests": "npm run build-test && npm run run-integration-tests",
+    "tape-tests": "colortape ./tests-tape/tests.js",
     "build-test": "rollup -c rollup-test.config.js -f=cjs -o=./build/rollup-test.common.js;",
     "run-integration-tests": "PATH=$(npm bin):$PATH jasmine-node --verbose --captureExceptions ./testsIntegration/",
     "prepublish": "npm run build-common"
@@ -38,6 +39,7 @@
     "babel-loader": "^6.2.4",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
     "babel-preset-es2015": "^6.14.0",
+    "colortape": "^0.1.2",
     "eslint": "^3.5.0",
     "jasmine-node": "^1.14.1",
     "rollup": "^0.35.10",
@@ -46,6 +48,8 @@
     "rollup-plugin-node-builtins": "^1.0.8",
     "rollup-plugin-node-globals": "^1.0.7",
     "rollup-plugin-node-resolve": "^2.0.0",
-    "rollup-plugin-replace": "^1.1.1"
+    "rollup-plugin-replace": "^1.1.1",
+    "tape": "^4.6.3",
+    "tape-catch": "^1.0.6"
   }
 }

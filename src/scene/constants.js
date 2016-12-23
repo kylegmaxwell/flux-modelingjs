@@ -16,3 +16,18 @@ export var SCENE_PRIMITIVES = {
     camera: 'camera',
     light: 'light'
 };
+
+// These properties were renamed, and the old names are the complement (1 - new value)
+export var LEGACY_INVERSE_PROPERTIES = {
+    opacity: 'transparency',
+    roughness: 'glossiness'
+};
+
+// Container primitives contain other entities
+export var CONTAINER_PRIM_MAP = {
+    polycurve: 'curves',
+    polysurface: 'surfaces'
+};
+export var CONTAINER_PRIMS = Object.keys(CONTAINER_PRIM_MAP);
+
+export var DEFAULT_UNITS = 'meters';

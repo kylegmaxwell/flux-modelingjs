@@ -16,7 +16,6 @@ describe("Mesh BoundingBox Tests", function() {
     it("Mesh", function() {
         var geom = require("./data/math/mesh.json");
         var actual = modeling.math.meshBoundingBox(geom);
-        console.log(actual);
         expect(actual).toEqual(boundingBox);
     });
 
@@ -26,8 +25,7 @@ describe("Mesh BoundingBox Tests", function() {
         var errorMessage = "Input is not a valid mesh.";
         var actualName, actualMessage;
         try {
-            var boundingBox = modeling.math.meshBoundingBox(geom);
-
+            modeling.math.meshBoundingBox(geom);
         } catch(error) {
             actualName = error.name;
             actualMessage = error.message;
