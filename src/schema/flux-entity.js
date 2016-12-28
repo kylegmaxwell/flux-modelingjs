@@ -142,18 +142,6 @@ var entity = {
                 "format":       { "$ref": "#/types/brep_format" },
                 "isCompressed": { "type": "boolean" },
                 "isBase64":     { "type": "boolean" },
-                "vertices":     {
-                    "type":     "array",
-                    "items":    { "$ref": "#/types/position" }
-                },
-                "faces":        {
-                    "type":     "array",
-                    "items":    {
-                        "type":     "array",
-                        "items":    { "$ref": "#/types/index" },
-                        "minItems": 3
-                    }
-                },
                 "attributes":   { "type":  "object" }
             },
             "required": [ "primitive", "content", "format" ]
