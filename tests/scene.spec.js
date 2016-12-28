@@ -110,3 +110,15 @@ describe("Scene utils test", function() {
         });
     });
 });
+
+/**
+* Test date and results are stored in external files.
+*/
+describe("Scene color", function() {
+
+    it("Function colorToArray is exposed and works", function() {
+        var color = 'red';
+        var result = scene.colorToArray(color);
+        expect(result).toEqual([1,0,0]);
+    });
+});
