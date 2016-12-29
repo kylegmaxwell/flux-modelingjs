@@ -24,31 +24,28 @@ var revitPrefix = "fluxRevit";
 /**
  * Check whether all primitives in a JSON object match their schema.
  * Removes entities that are invalid.
- * @param  {Object} obj        Flux JSON to check and modify
+ * Precondition: obj is an array of JSON entities
+ * @param  {Array.<Object>} objs        Flux JSON to check and modify
  * @param  {type} primStatus Container for error messages
- * @return {Boolean}            Returns true when the property needs to be removed
+ * @returns {Boolean} True if there were failures and the array has been modified
  */
-export function checkSchema(obj, primStatus) {
-    if (obj != null && typeof obj === 'object') {
-        if (obj.primitive && typeof obj.primitive === 'string') {
-            if (!checkEntity(obj, primStatus)) {
-                return true;
-            }
-        } else {
-            for (var key in obj) {
-                if (checkSchema(obj[key], primStatus)) {
-                    obj[key] = null;
-                }
-            }
+export function checkSchema(objs, primStatus) {
+    var changed = false;
+    for (var i=0;i<objs.length;i++) {
+        if (objs[i] === null) continue;
+        if (!checkEntity(objs[i], primStatus)) {
+            objs[i] = null;
+            changed = true;
         }
     }
+    return changed;
 }
 
 /**
  * Check if the entities match the parasolid entity schema
  * @param {Array} entity Array of arrays or entities
  * @param {StatusMap} statusMap Container for errors
- * @returns {boolean} True if the schema checked out
+ * @returns {Boolean} True if the schema checked out ok
  * @private
  */
 export function checkEntity (entity, statusMap) {

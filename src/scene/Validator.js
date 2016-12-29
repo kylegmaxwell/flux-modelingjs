@@ -39,6 +39,25 @@ function _validateContainedNode(node, parentID, allowedPrimitives){
 
 // singleton list of valid geometry primitive strings
 var entities = Object.keys(schema.entity.geometry).concat(prims.geometry);
+entities.push(prims.texture);
+
+
+/**
+ * Check if a parent references the right kind of child by id
+ * @param  {Object} parent                          Flux JSON entity
+ * @param  {String} prop                            Name of the property that is an id reference
+ * @param  {Array.<String>} allowedChildEntities    List of valid entity names for the given parent
+ * @return {SceneValidatorResults}                  Error message or undefined
+ */
+Validator.prototype._validateReference = function (parent, prop, allowedChildEntities) {
+    var child = this._idMap[parent[prop]];
+    if (!child) return _invalidId(parent[prop]);
+    if (!child.primitive) return _primitiveError();
+    var result = _validateContainedNode(child, parent.id, allowedChildEntities);
+    if (result) {
+        return _error(result);
+    }
+};
 
 /**
  * Determine if the instance is used properly in the scene
@@ -46,15 +65,33 @@ var entities = Object.keys(schema.entity.geometry).concat(prims.geometry);
  * @return {ValidatorResults}  The results
  */
 Validator.prototype._validateInstance = function (instance) {
-    var node = this._idMap[instance.entity];
-    if (!node) return _invalidId(instance.entity);
-    if (!node.primitive) return _primitiveError();
-
-    var result = _validateContainedNode(node, instance.id, entities);
+    var result = this._validateReference(instance, 'entity', entities);
     if (result) {
-        return _error(result);
+        return result;
     }
 
+    if (instance.material) {
+        result = this._validateReference(instance, 'material', [prims.material]);
+        if (result) {
+            return result;
+        }
+    }
+
+    return _ok();
+};
+
+/**
+ * Determine if the material is linked properly in the scene
+ * @param  {Object} material        Flux element JSON
+ * @return {ValidatorResults}  The results
+ */
+Validator.prototype._validateMaterial = function (material) {
+    if (material.colorMap) {
+        var result = this._validateReference(material, 'colorMap', [prims.instance, prims.texture]);
+        if (result) {
+            return result;
+        }
+    }
     return _ok();
 };
 
@@ -335,6 +372,14 @@ Validator.prototype.validateJSON = function (json)
         // Check valid light
         else if (obj.primitive === prims.light){
             res = _validateLight(obj);
+            if (!res.getResult()) {
+                return res;
+            }
+        }
+
+        // check material reference only instance or texture
+        if (obj.primitive === prims.material){
+            res = this._validateMaterial(obj);
             if (!res.getResult()) {
                 return res;
             }

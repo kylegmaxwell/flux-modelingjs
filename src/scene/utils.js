@@ -152,3 +152,37 @@ export function mergeAttributes(source, target) {
 
     return trgt;
 }
+
+/**
+ * Flatten a nested array into a simple list
+ * @param  {Array} arr    Source data
+ * @return {Array}        Return the result again for convenience
+ */
+export function flattenArray(arr) {
+    if (arr == null) return [];
+    if (arr.constructor !== Array) {
+        return [arr];
+    }
+    return _flattenArrayHelper(arr, []);
+
+}
+
+/**
+ * Flatten a nested array into a simple list
+ * This function is recursive.
+ * @param  {Array} arr    Source data
+ * @param  {Array} result Empty array to store elements
+ * @return {Array}        Return the result again for convenience
+ */
+function _flattenArrayHelper(arr, result) {
+    if (arr == null) return result;
+
+    if (arr.constructor === Array) {
+        for (var i=0;i<arr.length;i++) {
+            _flattenArrayHelper(arr[i], result);
+        }
+    } else {
+        result.push(arr);
+    }
+    return result;
+}

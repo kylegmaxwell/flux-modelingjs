@@ -1,0 +1,44 @@
+[
+  {
+    "vertices": [ [-1,1,2], [1,1,2], [1,-1,2], [-1,-1,2]],
+    "faces": [[0,2,1],[0,3,2]],
+    "uv": [ [[0,0],[1,1],[1,0]], [[0,0],[0,1],[1,1]] ],
+    "primitive":"mesh",
+    "id": "3DF1D7DC-61C7-43D1-857D-F6CA76E5862A"
+  },
+  {
+    "primitive": "instance",
+    "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+    "entity": "img",
+    "id": "tex-instance"
+  },
+  {
+    "primitive": "texture",
+    "id": "img",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AweFQE3FO2JWgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAFklEQVQI12P4z8DAxvCfQe4/w////wEg3gYf0IANvAAAAABJRU5ErkJggg=="
+  },
+  {
+    "primitive": "material",
+    "color": [1,1,1],
+    "colorMap":"tex-instance",
+    "reflectivity": 0,
+    "glossiness": 0,
+    "id": "d2b7d2e0-967e-4511-96b9-66945f4767d9"
+  },
+  {
+    "primitive": "instance",
+    "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+    "entity": "3DF1D7DC-61C7-43D1-857D-F6CA76E5862A",
+    "material": "d2b7d2e0-967e-4511-96b9-66945f4767d9",
+    "id": "49F0ED1B-20F0-4A09-A7D6-8F80D54961C5"
+  },
+  {
+    "primitive": "layer",
+    "label": "0",
+    "visible": true,
+    "elements": [
+      "49F0ED1B-20F0-4A09-A7D6-8F80D54961C5"
+    ],
+    "id": "1E3FCEAD-B576-4432-B154-97BED5D74638"
+  }
+]

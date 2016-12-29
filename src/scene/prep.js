@@ -9,6 +9,7 @@ import * as constants from './constants.js';
 import * as revitUtils from './revitUtils.js';
 import * as schema from './schemaValidator.js';
 import * as utils from './utils.js';
+import FluxModelingError from '../FluxModelingError.js';
 
 /**
  * Modify an object and then return a copy of it with no null properties
@@ -129,6 +130,84 @@ function _convertColors(obj) {
     }
 }
 
+
+/**
+ * Replace the given attribute in an entity with lists of size no more than 3
+ * @param  {Object} entity Flux JSON entitiy
+ * @param  {String} attr   Name of the attribute to replace
+ */
+function _triangulateAttr(entity, attr) {
+    var  a, i, j, len;
+    if (entity[attr].length !== entity.faces.length) {
+        throw new FluxModelingError('Mesh '+attr+' must be specified per face vertex.');
+    }
+    var as = [];
+    for ( i = 0, len = entity[attr].length ; i < len ; i++ ) {
+        a = entity[attr][i];
+        if ( a.length === 3 ) {
+            as.push(a);
+        } else if ( a.length > 3 ) {
+            // Triangulation assumes each face is convex and planar
+            for ( j=0; j+2<a.length; j++) {
+                as.push([a[0],a[j+1],a[j+2]]);
+            }
+        }
+    }
+    entity[attr] = as;
+}
+
+
+/**
+ * Triangulate all the important attributes in an entity
+ * Applied to face vertex attributes they will be converted from
+ * an array containing children of arbitrary length, to an array
+ * of children of length three.
+ * @param  {Object} entity Flux JSON entity
+ */
+function _triangulateMesh(entity) {
+    var face, i, j, len;
+
+    // Triangulate uv if necessary
+    if (entity.uv) {
+        _triangulateAttr(entity, 'uv');
+    }
+
+    // Triangulate normals if necessary
+    if (entity.normal) {
+        _triangulateAttr(entity, 'normal');
+    }
+
+    // Flattened and triangulated list of faces
+    var triangles = [];
+    for ( i = 0, len = entity.faces.length ; i < len ; i++ ) {
+        face = entity.faces[i];
+        if ( face.length === 3 ) {
+            triangles.push(face);
+        } else if ( face.length > 3 ) {
+            // Triangulation assumes each face is convex and planar
+            for ( j=0; j+2<face.length; j++) {
+                triangles.push([face[0],face[j+1],face[j+2]]);
+            }
+        }
+    }
+    entity.faces = triangles;
+}
+
+
+/**
+ *  Triangulate any mesh entities in the list
+ * @param  {Array.<Object>} entities List of Flux JSON entities
+ */
+function _triangulateMeshes(entities) {
+    for (var i=0;i<entities.length;i++) {
+        var entity = entities[i];
+        if (!entity || !entity.primitive) continue;
+        if (entity.primitive === 'mesh') {
+            _triangulateMesh(entity);
+        }
+    }
+}
+
 /**
  * Check whether the materialProperties objects are valid
  * Replaces invalid material properties with empty ones
@@ -160,26 +239,6 @@ function _checkMaterials(obj, primStatus, changed) {
         }
     }
     return isChanged;
-}
-
-/**
- * Flatten a nested array into a simple list
- * This function is recursive.
- * @param  {Array} arr    Source data
- * @param  {Array} result Empty array to store elements
- * @return {Array}        Return the result again for convenience
- */
-function _flattenArray(arr, result) {
-    if (arr == null) return result;
-
-    if (arr.constructor === Array) {
-        for (var i=0;i<arr.length;i++) {
-            _flattenArray(arr[i], result);
-        }
-    } else {
-        result.push(arr);
-    }
-    return result;
 }
 
 // TODO(Kyle) Move these constructors to modelingjs for LIB3D-778
@@ -253,13 +312,16 @@ function _replaceElement(entities, element, children, primStatus) {
         entities.push(child);
     }
 }
+
 /**
  * Get rid of container entities and replace them with equivalent content.
  * @param  {Object} entities Array of Flux JSON
  * @param  {StatusMap} primStatus Map to track errors per primitive
+ * @returns {Boolean} True if undefined values are set and need to be cleaned
  */
 function _flattenElements(entities, primStatus) {
     var i;
+    var needsClone = false; // True when undefined values are set, which can be cleared by cloning
     var isScene = utils.isScene(entities);
     var convertedIds = [];
     for (i=0;i<entities.length;i++) {
@@ -276,6 +338,17 @@ function _flattenElements(entities, primStatus) {
                 entities[i] = null;
                 _replaceElement(entities, entity, children, primStatus);
             }
+        } else if (entity.primitive === constants.SCENE_PRIMITIVES.geometry) {
+            // Make sure the geometry list contains valid prims
+            // Warning: This is recursive
+            entity.entities = prep(entity.entities);
+            // Remove ids from elements in the geometryList since they can not be part of the scene
+            for (var j=0;j<entity.entities.length;j++) {
+                if (entity.entities[j].id) {
+                    needsClone = true;
+                    entity.entities[j].id = undefined;
+                }
+            }
         }
     }
     // Convert parent instances to groups since instances can not point to groups
@@ -287,6 +360,7 @@ function _flattenElements(entities, primStatus) {
             entity.children = [entity.entity];
         }
     }
+    return needsClone;
 }
 
 /**
@@ -339,25 +413,31 @@ export default function prep(entity, primStatus) {
     var entityClone = JSON.parse(JSON.stringify(entity));
 
     // Guarantee that the data is an array and it is flat
-    entityClone = _flattenArray([entity], []);
+    entityClone = utils.flattenArray(entityClone);
 
     var changed = _cleanLayerColors(entityClone);
 
     _explodeRevit(entityClone);
 
-    _flattenElements(entityClone, primStatus);
+    changed = changed || _flattenElements(entityClone, primStatus);
 
     _convertColors(entityClone);
 
     changed = _checkMaterials(entityClone, primStatus, changed);
 
+    // Special removal of nulls before schema check since "units": null is sent by legacy
+    // plugins and is invalid, but must be allowed to pass. Validator allows undefined but not null
+    changed = changed || _unsetNulls(entityClone);
+
+    // check for errors and replace errored primitives with null
+    changed = changed || schema.checkSchema(entityClone, primStatus);
+
+    // This step requires a valid schema, so it must come after
+    _triangulateMeshes(entityClone);
+
     // Get rid of invalid properties commonly sent by plugins on elements
     // If they remain these properties will fail schema validation.
     entityClone = _removeNulls(entityClone, changed);
-
-    if (schema.checkSchema(entityClone, primStatus)) {
-        return null;
-    }
 
     _convertUnits(entityClone, primStatus);
 

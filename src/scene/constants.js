@@ -13,6 +13,7 @@ export var SCENE_PRIMITIVES = {
     instance: 'instance',
     geometry: 'geometryList',
     material: 'material',
+    texture: 'texture',
     camera: 'camera',
     light: 'light'
 };

@@ -45,7 +45,7 @@ module.exports.revit = {
             "customParameters":{}
         }
     }],
-    "succeed":true
+    "errors":''
 };
 
 // Should flatten nested listes into simple arrays
@@ -56,7 +56,7 @@ module.exports.nesting = {
     "end": [{"origin":[0,0,0],"primitive":"sphere","radius":10},
         {"origin":[0,0,0],"dimensions":[1,2,3],"axis":[0,0,1],"reference":[0,1,0],
         "primitive":"block"}],
-    "succeed":true
+    "errors":''
 };
 
 // Should flatten container elments into simple arrays
@@ -69,7 +69,7 @@ module.exports.containers = {
         "knots":[0,0,0,1,2,3,3,3],"primitive":"curve"},{"degree":3,"knots":[0,0,0,0,14.1,14.1,14.1,14.1],
         "controlPoints":[[0,0,0],[-3.3,-3.3,0],[-6.6,-6.6,0],[-10,-10,0]],"primitive":"curve"},
         {"start":[1,0,0],"middle":[0,1,0],"end":[-1,0,0],"primitive":"arc"}],
-    "succeed":true
+    "errors":''
 };
 
 // Should convert color strings to rgb array
@@ -82,21 +82,72 @@ module.exports.colors = {
         [[-1,0,0],[0,1,2],[1,0,0],[0,-1,2]],"faces":[[0,3,1],[1,3,2]],"primitive":"mesh"},
         {"attributes":{"materialProperties":{"color":[0,0,1]}},"vertices": [[-1,0,0],
         [0,1,0],[1,0,0],[0,-1,0]],"faces":[[0,3,1],[1,3,2]],"primitive":"mesh"}],
-    "succeed":true
+    "errors":''
 };
 
 // Should convert legacy material properties to current standard
-module.exports.colors = {
+module.exports.legacyMaterial = {
     "start": {"attributes":{"materialProperties":{"opacity":1,"roughness":0.4}},"vertices":
         [[-1,0,0],[0,1,2],[1,0,0],[0,-1,2]],"faces":[[0,3,1],[1,3,2]],"primitive":"mesh"},
     "end": [{"attributes":{"materialProperties":{"transparency":0,"glossiness":0.6}},"vertices":
         [[-1,0,0],[0,1,2],[1,0,0],[0,-1,2]],"faces":[[0,3,1],[1,3,2]],"primitive":"mesh"}],
-    "succeed":true
+    "errors":''
 };
 
 // Should remove null values from the list
 module.exports.empty = {
     "start": [null,{"origin":[0,0,0],"primitive":"sphere","radius":10},null,undefined],
     "end": [{"origin":[0,0,0],"primitive":"sphere","radius":10}],
-    "succeed":true
+    "errors":''
+};
+
+// Should triangulate convex polygons and associated attributes
+module.exports.triangulate = {
+    "start": [{
+        "vertices": [ [-1,1,2], [1,1,2], [1,-1,2], [-1,-1,2]],
+        "faces": [[0,3,2,1]],
+        "uv": [ [[0,0],[0,1],[1,1],[1,0]] ],
+        "primitive":"mesh",
+        "id": "3DF1D7DC-61C7-43D1-857D-F6CA76E5862A"
+      }],
+    "end": [{
+        "vertices": [ [-1,1,2], [1,1,2], [1,-1,2], [-1,-1,2]],
+        "faces": [[0,3,2],[0,2,1]],
+        "uv": [ [[0,0],[0,1],[1,1]], [[0,0],[1,1],[1,0]] ],
+        "primitive":"mesh",
+        "id": "3DF1D7DC-61C7-43D1-857D-F6CA76E5862A"
+      }],
+    "errors":''
+};
+
+// Some elements fail schema
+module.exports.schemaPartial = {
+    "start": [{"origin":[0,0,0],"primitive":"sphere","radius":10},
+        {"xorigin":[0,0,0],"primitive":"sphere","radius":10}],
+    "end": [{"origin":[0,0,0],"primitive":"sphere","radius":10}],
+    "errors":'origin'
+};
+
+// Can not allow id in geometryList since it could conflict with scene
+module.exports.geometryListIds = {
+    "start": [{"entities":[
+        {"id":"ball","origin":[0,0,10],"primitive":"sphere","radius":10},
+        {"id":"ball","origin":[0,0,-10],"primitive":"sphere","radius":10}],"id":"dataKey0","primitive":"geometryList"},
+        {"entity":"dataKey0","id":"stuff","matrix":[1,0,0,-20,0,1,0,0,0,0,1,0,0,0,0,1],"primitive":"instance"},
+        {"color":[0.8,0.5,0.3],"elements":["stuff"],"id":"myLayer","primitive":"layer"}],
+    "end": [{"entities":[
+        {"origin":[0,0,10],"primitive":"sphere","radius":10},
+        {"origin":[0,0,-10],"primitive":"sphere","radius":10}],"id":"dataKey0","primitive":"geometryList"},
+        {"entity":"dataKey0","id":"stuff","matrix":[1,0,0,-20,0,1,0,0,0,0,1,0,0,0,0,1],"primitive":"instance"},
+        {"color":[0.8,0.5,0.3],"elements":["stuff"],"id":"myLayer","primitive":"layer"}],
+    "errors":''
+};
+
+// Some elements fail schema, but should not error during prep
+module.exports.invalidSchema = {
+    "start": {"colorx":[[0,1,0],[1,1,1],[0,0,1],[1,0,0]],"facesx":[[0,1,2,3]],"id":"3DF1D7DC",
+        "normalx":[[[1,1,1],[1,1,1],[1,1,1],[1,1,1]]],"primitive":"mesh",
+        "verticexs":[[-1,1,2],[1,1,2],[1,-1,2],[-1,-1,2]]},
+    "end": [],
+    "errors":'required property'
 };

@@ -91,6 +91,12 @@ var entity = {
             "items": {"type": "number"},
             "minItems": 3,
             "maxItems": 3
+        },
+        "uv":{
+            "type": "array",
+            "items": {"type": "number"},
+            "minItems": 2,
+            "maxItems": 2
         }
     },
     "entities": {
@@ -395,6 +401,27 @@ var entity = {
                         "minItems": 3
                     }
                 },
+                // per vertex
+                "color":     {
+                    "type":     "array",
+                    "items":    { "$ref": "#/types/color" }
+                },
+                // per face vertex
+                "normal":        {
+                    "type":     "array",
+                    "items":    {
+                        "type":     "array",
+                        "items":    { "$ref": "#/types/direction" },
+                    }
+                },
+                // per face vertex
+                "uv":        {
+                    "type":     "array",
+                    "items":    {
+                        "type":     "array",
+                        "items":    { "$ref": "#/types/uv" },
+                    }
+                },
                 "isSolid": { "type": "boolean" }
             },
             "required": [ "primitive", "vertices", "faces" ]
@@ -501,6 +528,7 @@ var entity = {
                 "primitive":    { "enum":[ "material" ] },
                 "id":           { "$ref": "#/types/fluxid" },
                 "color":            { "$ref": "fluxEntity#/types/color" },
+                "colorMap":         { "$ref": "#/types/fluxid" },
                 "reflectivity":     { "$ref": "fluxEntity#/types/unitNumber" },
                 "glossiness":       { "$ref": "fluxEntity#/types/unitNumber" },
                 "transparency":     { "$ref": "fluxEntity#/types/unitNumber" },
@@ -510,7 +538,19 @@ var entity = {
                 },
                 "emissionColor":    { "$ref": "fluxEntity#/types/color" },
                 "transparencyColor":{ "$ref": "fluxEntity#/types/color" },
-                "reflectivityColor":{ "$ref": "fluxEntity#/types/color" }
+                "reflectivityColor":{ "$ref": "fluxEntity#/types/color" },
+                "required": [ "id", "primitive" ]
+            },
+            "additionalProperties": false
+        },
+        "texture": {
+            "type": "object",
+            "properties": {
+                "attributes":   { "type":  "object" },
+                "primitive":    { "enum":[ "texture" ] },
+                "id":           { "$ref": "#/types/fluxid" },
+                "image":        { "type": "string" },
+                "required":     [ "id", "primitive", "image" ]
             },
             "additionalProperties": false
         }

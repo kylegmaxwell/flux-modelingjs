@@ -52,6 +52,18 @@ describe("Scene validator test", function() {
     },{
         scene: 'dvpScene',
         message: ''
+    },{
+        scene: 'materialNesting',
+        message: ''
+    },{
+        scene: 'invalidMaterialScene',
+        message: 'No element found'
+    },{
+        scene: 'textureMeshScene',
+        message: ''
+    },{
+        scene: 'invalidMaterialReferenceScene',
+        message: 'No element found'
     }
     ];
 

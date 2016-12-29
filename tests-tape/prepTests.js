@@ -9,15 +9,13 @@ test('Prep scene data', function (t) {
         var data = fixtures[key];
         var primStatus = new modeling.scene.StatusMap();
         var entity = modeling.scene.prep(data.start, primStatus);
-        var succeedStr = data.succeed ? 'pass' : 'fail';
-        var hasException = false;
-        try {
-            t.deepEqual(entity, data.end, 'Prep '+key+' has expected result.');
-        } catch (err) {
-            hasException = true;
-            t.equal(err.constructor, modeling.FluxModelingError);
+        t.deepEqual(entity, data.end, 'Prep '+key+' has expected result.');
+        var errors = primStatus.invalidKeySummary();
+        if (data.errors) {
+            t.ok(errors.indexOf(data.errors) !== -1, 'Scene prep should error for '+key+'.');
+        } else {
+            t.equal(errors, '', 'Scene prep should pass for '+key+'.');
         }
-        t.equal(!hasException, data.succeed, 'Scene prep should '+succeedStr+' for '+key+'.');
     });
     t.end();
 });

@@ -1,0 +1,25 @@
+[
+  {
+    "vertices": [ [-1,1,2], [1,1,2], [1,-1,2], [-1,-1,2]],
+    "faces": [[0,2,1],[0,3,2]],
+    "uv": [ [[0,0],[1,1],[1,0]], [[0,0],[0,1],[1,1]] ],
+    "primitive":"mesh",
+    "id": "3DF1D7DC-61C7-43D1-857D-F6CA76E5862A"
+  },
+  {
+    "primitive": "instance",
+    "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+    "entity": "3DF1D7DC-61C7-43D1-857D-F6CA76E5862A",
+    "material": "asdf",
+    "id": "49F0ED1B-20F0-4A09-A7D6-8F80D54961C5"
+  },
+  {
+    "primitive": "layer",
+    "label": "0",
+    "visible": true,
+    "elements": [
+      "49F0ED1B-20F0-4A09-A7D6-8F80D54961C5"
+    ],
+    "id": "1E3FCEAD-B576-4432-B154-97BED5D74638"
+  }
+]

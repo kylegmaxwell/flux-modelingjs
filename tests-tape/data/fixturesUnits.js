@@ -354,6 +354,7 @@ module.exports.nonLengthUnits = {
     "succeed":true
 };
 
+// Null units is allowed for legacy due to the first implementation in the plugins
 module.exports.nullUnits = {
     "start": {
         "units":null,
@@ -414,7 +415,7 @@ module.exports.zeroValues = {
         }
       },
       {
-        // Color is removed due to GI-4404 / LIB3D-1002 (see entityPrep.js: _cleanLayerColors)
+        // Color is removed due to GI-4404 / LIB3D-1002 (see src/scene/prep.js: _cleanLayerColors)
         "elements": ["344767b3-0898-47b8-b4ea-4f5d607b6fd3"],
         "id": "63aba75c-b9e4-475a-b9c3-9c0131b95a9f",
         "label": "0",

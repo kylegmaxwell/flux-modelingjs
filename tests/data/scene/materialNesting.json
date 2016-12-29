@@ -1,0 +1,78 @@
+[
+    {
+        "id":"ball",
+        "origin":[0,0,10],
+        "radius":10,
+        "primitive":"sphere"
+    },
+    {
+      "curves": [
+        {
+          "controlPoints": [[0,0,0],[1,0,0],[1,1,0],[0,1,0]],
+          "degree": 3,
+          "knots": [0,0,0,1,2,3,3,3],
+          "primitive": "curve"
+        },
+        {
+          "end": [-1,0,0],
+          "middle": [0,1,0],
+          "primitive": "arc",
+          "start": [1,0,0
+          ]
+        }
+      ],
+      "id": "3DF1D7DC-61C7-43D1-857D-F6CA76E5862A",
+      "primitive": "polycurve"
+    },
+    {
+      "entity": "3DF1D7DC-61C7-43D1-857D-F6CA76E5862A",
+      "id": "49F0ED1B-20F0-4A09-A7D6-8F80D54961C5",
+      "material": "d2b7d2e0-967e-4511-96b9-66945f4767d9",
+      "matrix": [
+        15,0,0,0,0,15,0,0,0,0,15,0,0,0,0,1
+      ],
+      "primitive": "instance"
+    },
+    {
+      "color": [
+        1,0,1
+      ],
+      "id": "d2b7d2e0-967e-4511-96b9-66945f4767d9",
+      "primitive": "material"
+    },
+    {
+        "id": "bush1",
+        "primitive": "instance",
+        "entity": "ball",
+        "matrix": [1, 0, 0, -20, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+    },
+    {
+        "id": "bush2",
+        "primitive": "instance",
+        "entity": "ball",
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+    },
+    {
+        "id": "bush3",
+        "primitive": "instance",
+        "entity": "ball",
+        "matrix": [1, 0, 0, 20, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+    },
+    {
+        "id": "plants",
+        "primitive": "layer",
+        "elements": ["bushes"]
+    },
+    {
+        "id": "bushes",
+        "primitive": "group",
+        "children": ["bush1", "bush2", "bush3", "49F0ED1B-20F0-4A09-A7D6-8F80D54961C5"],
+        "material": "green",
+        "matrix": [1, 0, 0, -20, 0, 1, 0, 0, 0, 0, 1, 10, 0, 0, 0, 1]
+    },
+    {
+      "primitive": "material",
+      "color": [0,1,0],
+      "id": "green"
+    }
+]
