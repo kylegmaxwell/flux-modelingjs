@@ -9,7 +9,6 @@ import * as constants from './constants.js';
 import * as revitUtils from './revitUtils.js';
 import * as schema from './schemaValidator.js';
 import * as utils from './utils.js';
-import FluxModelingError from '../FluxModelingError.js';
 
 /**
  * Modify an object and then return a copy of it with no null properties
@@ -130,33 +129,6 @@ function _convertColors(obj) {
     }
 }
 
-
-/**
- * Replace the given attribute in an entity with lists of size no more than 3
- * @param  {Object} entity Flux JSON entitiy
- * @param  {String} attr   Name of the attribute to replace
- */
-function _triangulateAttr(entity, attr) {
-    var  a, i, j, len;
-    if (entity[attr].length !== entity.faces.length) {
-        throw new FluxModelingError('Mesh '+attr+' must be specified per face vertex.');
-    }
-    var as = [];
-    for ( i = 0, len = entity[attr].length ; i < len ; i++ ) {
-        a = entity[attr][i];
-        if ( a.length === 3 ) {
-            as.push(a);
-        } else if ( a.length > 3 ) {
-            // Triangulation assumes each face is convex and planar
-            for ( j=0; j+2<a.length; j++) {
-                as.push([a[0],a[j+1],a[j+2]]);
-            }
-        }
-    }
-    entity[attr] = as;
-}
-
-
 /**
  * Triangulate all the important attributes in an entity
  * Applied to face vertex attributes they will be converted from
@@ -166,16 +138,6 @@ function _triangulateAttr(entity, attr) {
  */
 function _triangulateMesh(entity) {
     var face, i, j, len;
-
-    // Triangulate uv if necessary
-    if (entity.uv) {
-        _triangulateAttr(entity, 'uv');
-    }
-
-    // Triangulate normals if necessary
-    if (entity.normal) {
-        _triangulateAttr(entity, 'normal');
-    }
 
     // Flattened and triangulated list of faces
     var triangles = [];

@@ -406,21 +406,15 @@ var entity = {
                     "type":     "array",
                     "items":    { "$ref": "#/types/color" }
                 },
-                // per face vertex
+                // per vertex
                 "normal":        {
                     "type":     "array",
-                    "items":    {
-                        "type":     "array",
-                        "items":    { "$ref": "#/types/direction" },
-                    }
+                    "items":    { "$ref": "#/types/direction" }
                 },
-                // per face vertex
+                // per vertex
                 "uv":        {
                     "type":     "array",
-                    "items":    {
-                        "type":     "array",
-                        "items":    { "$ref": "#/types/uv" },
-                    }
+                    "items":    { "$ref": "#/types/uv" }
                 },
                 "isSolid": { "type": "boolean" }
             },
