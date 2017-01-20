@@ -381,7 +381,8 @@ export default function prep(entity, primStatus) {
 
     _explodeRevit(entityClone);
 
-    changed = changed || _flattenElements(entityClone, primStatus);
+    // Evaluate flatten elements first, then combine result with changed to prevent short circuit or
+    changed = _flattenElements(entityClone, primStatus) || changed;
 
     _convertColors(entityClone);
 
@@ -389,10 +390,10 @@ export default function prep(entity, primStatus) {
 
     // Special removal of nulls before schema check since "units": null is sent by legacy
     // plugins and is invalid, but must be allowed to pass. Validator allows undefined but not null
-    changed = changed || _unsetNulls(entityClone);
+    changed = _unsetNulls(entityClone) || changed;
 
     // check for errors and replace errored primitives with null
-    changed = changed || schema.checkSchema(entityClone, primStatus);
+    changed = schema.checkSchema(entityClone, primStatus) || changed;
 
     // This step requires a valid schema, so it must come after
     _triangulateMeshes(entityClone);

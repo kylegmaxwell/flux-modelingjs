@@ -151,3 +151,64 @@ module.exports.invalidSchema = {
     "end": [],
     "errors":'required property'
 };
+
+// Geometry list with units
+module.exports.geometryListUnits = {
+    "start": [
+      {
+        "entities": [
+          {
+            "id": "cda7e0bf-c6cb-4827-9ade-34a94cb6955c",
+            "origin": [-1,-2,0],
+            "primitive": "circle",
+            "radius": 1,
+            "units": {"origin": "cm","radius": "cm"}
+          }
+        ],
+        "id": "76ebd857-0706-44ff-a6e4-1b612877f1b5",
+        "primitive": "geometryList"
+      },
+      {
+        "entity": "76ebd857-0706-44ff-a6e4-1b612877f1b5",
+        "id": "81e4fe14-260a-4767-b9a7-dfc7b0657b0b",
+        "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+        "primitive": "instance"
+      },
+      {
+        "color": [1,1,1],
+        "elements": ["81e4fe14-260a-4767-b9a7-dfc7b0657b0b"],
+        "id": "aad1b5ef-7b53-4f13-b3d2-988b4f75bc2c",
+        "label": "0",
+        "primitive": "layer",
+        "visible": true
+      }
+    ],
+    "end": [
+      {
+        "entities": [
+          {
+            "origin": [-0.01,-0.02,0],
+            "primitive": "circle",
+            "radius": 0.01,
+            "units": {"origin": "meters","radius": "meters"}
+          }
+        ],
+        "id": "76ebd857-0706-44ff-a6e4-1b612877f1b5",
+        "primitive": "geometryList"
+      },
+      {
+        "entity": "76ebd857-0706-44ff-a6e4-1b612877f1b5",
+        "id": "81e4fe14-260a-4767-b9a7-dfc7b0657b0b",
+        "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+        "primitive": "instance"
+      },
+      {
+        "elements": ["81e4fe14-260a-4767-b9a7-dfc7b0657b0b"],
+        "id": "aad1b5ef-7b53-4f13-b3d2-988b4f75bc2c",
+        "label": "0",
+        "primitive": "layer",
+        "visible": true
+      }
+    ],
+    "errors":''
+};
