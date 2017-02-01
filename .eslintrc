@@ -21,7 +21,8 @@
         "valid-jsdoc": [2, {
             "requireReturn": false
         }],
-        dot-notation: 2,
-        semi: [2, "always"]
+        "no-tabs": 2,
+        "dot-notation": 2,
+        "semi": [2, "always"]
     }
 }

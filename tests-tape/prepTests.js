@@ -15,6 +15,11 @@ test('Prep scene data', function (t) {
             t.ok(errors.indexOf(data.errors) !== -1, 'Scene prep should error for '+key+'.');
         } else {
             t.equal(errors, '', 'Scene prep should pass for '+key+'.');
+            if (modeling.scene.isScene(data.start)) {
+                var sceneValidator = new modeling.scene.Validator();
+                var sceneValid = sceneValidator.validateJSON(entity);
+                t.equal(sceneValid.getMessage(), '', 'No errors from validator');
+            }
         }
     });
     t.end();

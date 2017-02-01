@@ -37,11 +37,6 @@ function _validateContainedNode(node, parentID, allowedPrimitives){
     return null;
 }
 
-// singleton list of valid geometry primitive strings
-var entities = Object.keys(schema.entity.geometry).concat(prims.geometry);
-entities.push(prims.texture);
-
-
 /**
  * Check if a parent references the right kind of child by id
  * @param  {Object} parent                          Flux JSON entity
@@ -58,6 +53,12 @@ Validator.prototype._validateReference = function (parent, prop, allowedChildEnt
         return _error(result);
     }
 };
+
+// singleton list of things that can be instanced
+var entities = Object.keys(schema.entity.geometry).concat(prims.geometry);
+entities.push(prims.texture);
+entities.push(prims.camera);
+entities.push(prims.light);
 
 /**
  * Determine if the instance is used properly in the scene
