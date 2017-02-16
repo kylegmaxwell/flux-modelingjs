@@ -21,18 +21,19 @@ export default function Validator() {
  * checks node.id is not equal to parent.id
  * checks node.primitive is in the list of allowed primitives
  * @param  {Object} node                        Scene element JSON object
- * @param  {String} parentID                    ID of node's parent in scene
+ * @param  {Object} parent                      JSON of node's parent in scene
  * @param  {Array.<String>} [allowedPrimitives] List of primitives that node must match
  * @return {String}                             Error message or null
  */
-function _validateContainedNode(node, parentID, allowedPrimitives){
-    if (node.id === parentID) {
+function _validateContainedNode(node, parent, allowedPrimitives){
+    if (node.id === parent.id) {
         return 'Node ' + node.id +' has ID equal to parent ID';
     }
     var searchRes = allowedPrimitives.indexOf(node.primitive);
     if (searchRes === -1) {
         return 'Node ' + node.id +
-        ' has a primitive type ('+node.primitive+') that is not allowed with its current parent.';
+        ' has a primitive type ('+node.primitive+') that is not allowed with its current parent type ('+
+            parent.primitive+').';
     }
     return null;
 }
@@ -48,7 +49,7 @@ Validator.prototype._validateReference = function (parent, prop, allowedChildEnt
     var child = this._idMap[parent[prop]];
     if (!child) return _invalidId(parent[prop]);
     if (!child.primitive) return _primitiveError();
-    var result = _validateContainedNode(child, parent.id, allowedChildEntities);
+    var result = _validateContainedNode(child, parent, allowedChildEntities);
     if (result) {
         return _error(result);
     }
@@ -113,7 +114,7 @@ Validator.prototype._validateGroup = function(group){
         if (!node) return _invalidId(nodeID);
         if (!node.primitive) return _primitiveError();
 
-        var result = _validateContainedNode(node, group.id, [prims.group, prims.instance]);
+        var result = _validateContainedNode(node, group, [prims.group, prims.instance]);
         if (result) {
             return _error(result);
         }
@@ -182,7 +183,7 @@ Validator.prototype._validateLayer = function(layer) {
         if (!node) return _invalidId(nodeKey);
         if (!node.primitive) return _primitiveError();
         // Layers can contain any entity except scenes and layers
-        var result = _validateContainedNode(node, layer.id, [prims.group, prims.instance]);
+        var result = _validateContainedNode(node, layer, [prims.group, prims.instance]);
         if (result) {
             return _error(result);
         }

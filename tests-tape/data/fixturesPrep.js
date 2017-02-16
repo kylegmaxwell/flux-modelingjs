@@ -323,3 +323,96 @@ module.exports.cameraLightBox = {
     ],
     "errors":''
 };
+
+module.exports.missingInstance = {
+    "start": [{"entities":[
+        {"origin":[0,0,10],"primitive":"sphere","radius":10},
+        {"origin":[0,0,-10],"primitive":"sphere","radius":10}],"id":"dataKey0","primitive":"geometryList"},
+        {"color":[0.8,0.5,0.3],"elements":["dataKey0"],"id":"myLayer","primitive":"layer"}],
+    "end": [{"entities":[
+        {"origin":[0,0,10],"primitive":"sphere","radius":10},
+        {"origin":[0,0,-10],"primitive":"sphere","radius":10}],"id":"dataKey0","primitive":"geometryList"},
+        {"color":[0.8,0.5,0.3],"elements":["dataKey0"],"id":"myLayer","primitive":"layer"}],
+    "errors":'layer'
+};
+
+module.exports.partiallyValidGeometryList = {
+    "start": [
+      {
+        "entities": [
+          {
+            "id": "c2405953-5310-4a43-9924-1723688b9aef",
+            "primitive": "surface",
+            "XcontrolPoints": [
+            [[28.0668287970977,-30.1625453044418,0],[19.3554058744491,-20.9840136909839,0]],
+            [[30.7470643599625,-38.1194702001336,0],[18.8618445477825,-37.6057972549732,0]]],
+            "uDegree": 1,
+            "uKnots": [0,0,12.6544194618517,12.6544194618517],
+            "units": {"controlPoints": "millimeters"
+            },
+            "vDegree": 1,
+            "vKnots": [0,0,16.6291097666497,16.6291097666497]
+          },
+          {
+            "axis": [0,0,1],
+            "id": "42f1b69b-040e-4d2e-b861-6ec38e7d3dff",
+            "origin": [-23.0786724264965,10.4469321498074,0],
+            "primitive": "circle",
+            "radius": 7.16724179452539,
+            "units": {"origin": "millimeters","radius": "millimeters"}
+          }
+        ],
+        "id": "81f14551-fe8c-436f-932b-f9d471208b78",
+        "primitive": "geometryList",
+        "units": {"entities": "millimeters"}
+      },
+      {
+        "entity": "81f14551-fe8c-436f-932b-f9d471208b78",
+        "id": "9d840ce1-2e3e-48d0-bf51-5ef3b742f9a3",
+        "label": null,
+        "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+        "primitive": "instance",
+        "units": {"matrix/11": "millimeters","matrix/3": "millimeters","matrix/7": "millimeters"}
+      },
+      {
+        "color": [0,0,0],
+        "elements": ["9d840ce1-2e3e-48d0-bf51-5ef3b742f9a3"],
+        "id": "ed1ed8d8-e17b-4bad-bcb3-3e241a1f84d5",
+        "label": "Default",
+        "primitive": "layer",
+        "visible": true
+      }
+    ],
+    "end": [
+      {
+        "entities": [
+          {
+            "axis": [0,0,1],
+            "origin": [-0.0230786724264965,0.010446932149807402,0],
+            "primitive": "circle",
+            "radius": 0.00716724179452539,
+            "units": {"origin": "meters","radius": "meters"}
+          }
+        ],
+        "id": "81f14551-fe8c-436f-932b-f9d471208b78",
+        "primitive": "geometryList",
+        "units": {"entities": "meters"}
+      },
+      {
+        "entity": "81f14551-fe8c-436f-932b-f9d471208b78",
+        "id": "9d840ce1-2e3e-48d0-bf51-5ef3b742f9a3",
+        "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+        "primitive": "instance",
+        "units": {"matrix/11": "meters","matrix/3": "meters","matrix/7": "meters"}
+      },
+      {
+        "color": [0,0,0],
+        "elements": ["9d840ce1-2e3e-48d0-bf51-5ef3b742f9a3"],
+        "id": "ed1ed8d8-e17b-4bad-bcb3-3e241a1f84d5",
+        "label": "Default",
+        "primitive": "layer",
+        "visible": true
+      }
+    ],
+    "errors":'controlPoints'
+};

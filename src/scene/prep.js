@@ -303,7 +303,7 @@ function _flattenElements(entities, primStatus) {
         } else if (entity.primitive === constants.SCENE_PRIMITIVES.geometry) {
             // Make sure the geometry list contains valid prims
             // Warning: This is recursive
-            entity.entities = prep(entity.entities);
+            entity.entities = prep(entity.entities, primStatus);
             // Remove ids from elements in the geometryList since they can not be part of the scene
             for (var j=0;j<entity.entities.length;j++) {
                 if (entity.entities[j].id) {
