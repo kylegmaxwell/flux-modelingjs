@@ -4,8 +4,8 @@
 # flux-modelingjs
 Module used to create Flux JSON entities and modeling operations to send to the
 Parasolid Block Worker (PBW). There are two main variants of the library.
-index.js - compiled by babel into the dist directory - npm run build-common
-index-lite.js - referenced by jsnext:main for external modules that build with rollup-test
+dist/index.js - compiled by babel into the dist directory - npm run build-common
+dist/index-lite.js - referenced by jsnext:main for external modules that build with rollup-test
                 Also, this version does not include the units of measure emscripten compiled module
 
 ### Measure
