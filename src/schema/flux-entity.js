@@ -2,7 +2,7 @@ var entity = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "types": {
         "brep_format": {
-            "enum": [ "x_b", "x_t", "iges", "step", "sat", "sab", "stl" ]
+            "enum": [ "x_b", "x_t", "iges", "step", "sat", "sab", "stl", "3dm"]
         },
         "index": {
             "type":    "integer",
