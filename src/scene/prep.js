@@ -9,6 +9,7 @@ import * as constants from './constants.js';
 import * as revitUtils from './revitUtils.js';
 import * as schema from './schemaValidator.js';
 import * as utils from './utils.js';
+import * as createElement from './element.js';
 
 /**
  * Modify an object and then return a copy of it with no null properties
@@ -203,63 +204,30 @@ function _checkMaterials(obj, primStatus, changed) {
     return isChanged;
 }
 
-// TODO(Kyle) Move these constructors to modelingjs for LIB3D-778
-
-/**
- * Create a group primitive
- * @param  {String} id                  Unique id
- * @param  {Array.<String>} children    Array of ids
- * @return {Object}                     Group JSON
- */
-function createGroup(id, children) {
-    return {
-        primitive: constants.SCENE_PRIMITIVES.group,
-        id: id,
-        children: children
-    };
-}
-
-
-/**
- * Create an instance primitive
- * @param  {String} id      Unique identifier
- * @param  {String} child   Id of child object
- * @return {Object}         Flux JSON for instance
- */
-function createInstance(id, child) {
-    return {
-        primitive: constants.SCENE_PRIMITIVES.instance,
-        id: id,
-        entity: child
-    };
-}
-
-
 /**
  * Replace a container element in the scene with a group
- * @param  {Array} scene       Array of Flux JSON
- * @param  {Object} element     Container element to be replaced
+ * @param  {Array} scene        Array of Flux JSON
  * @param  {Array} children     Array of child entities
  * @return {Object}             New group JSON
  */
-function _replaceElementScene(scene, element, children) {
-        var ids = [];
-        for (var c=0;c<children.length;c++) {
-            var child = children[c];
-            // Assign an id to the child (previously could not be referenced)
-            child.id = element.id+'-child-'+c;
-            var instance = createInstance(element.id+'-instance-'+c, child.id);
-            scene.push(child);
-            scene.push(instance);
-            ids.push(instance.id);
-        }
-        var group = createGroup(element.id, ids);
-        return group;
+function _replaceElementScene(scene, children) {
+    var ids = [];
+    for (var c=0;c<children.length;c++) {
+        var child = children[c];
+        // Assign an id to the child (previously could not be referenced)
+        child.id = utils.generateUUID();
+        var instance = createElement.instance(child.id, 'Auto Instance '+c);
+        scene.push(child);
+        scene.push(instance);
+        ids.push(instance.id);
+    }
+    var group = createElement.group(ids);
+    return group;
 }
 
 /**
  * Flatten a container element and use its children instead
- * @param  {Array} entities Array of Flux JSON
+ * @param  {Array} entities     Array of Flux JSON
  * @param  {Object} element     Container element to be replaced
  * @param  {Array} children     Array of child entities
  * @param  {StatusMap} primStatus Map to track errors per primitive

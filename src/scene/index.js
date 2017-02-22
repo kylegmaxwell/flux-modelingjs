@@ -10,4 +10,7 @@ export { default as Flattener } from './Flattener.js';
 export { default as StatusMap } from './StatusMap.js';
 export { default as prep } from './prep.js';
 export * from './utils.js';
+export * from './build.js';
 export { SCENE_PRIMITIVES } from './constants.js';
+import * as _element from './element.js';
+export var element = _element;

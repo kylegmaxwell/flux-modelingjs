@@ -186,3 +186,15 @@ function _flattenArrayHelper(arr, result) {
     }
     return result;
 }
+
+/**
+ * Create a random string that has a very low likelihood of repeating
+ * Based on: http://derpturkey.com/generating-a-uuid-in-javascript/
+ * @return {String}  UUID
+ */
+export function generateUUID() {
+  return 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replace(/x/g, function() {
+    var r = Math.random()*16|0;
+    return r.toString(16);
+  });
+}

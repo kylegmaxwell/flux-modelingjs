@@ -5,3 +5,4 @@ require('./globals.js');
 
 require('./unitsTests.js');
 require('./prepTests.js');
+require('./elementTests.js');

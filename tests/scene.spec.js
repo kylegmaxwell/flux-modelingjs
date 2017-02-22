@@ -134,3 +134,45 @@ describe("Scene color", function() {
         expect(result).toEqual([1,0,0]);
     });
 });
+
+var basicScene = require('./data/scene/basicScene.json');
+var sceneData = require('./data/scene/scene.json');
+var textureMeshScene = require('./data/scene/textureMeshScene.json');
+var revitElement = require('./data/scene/revitElement.json');
+
+describe("Scene merge", function() {
+    var statusMap = new scene.StatusMap();
+    it("Merge with conflicting ids has no errors", function() {
+        var newScene = scene.mergeScenes([basicScene, sceneData], statusMap);
+        expect(statusMap.invalidKeySummary()).toEqual('');
+        var primCount = {};
+        var hasBall = false;
+        for (var i=0; i<newScene.length; i++) {
+            var prim = newScene[i].primitive;
+            if (primCount[prim]) {
+                primCount[prim]++;
+            } else {
+                primCount[prim] = 1;
+            }
+            if (newScene[i].id === 'ball') {
+                hasBall = true;
+            }
+        }
+        expect(basicScene[0].id).toEqual('ball');
+        expect(hasBall).toEqual(false);
+        expect(primCount.layer).toEqual(3);
+    });
+
+    it("Merge with textures has no errors", function() {
+        var newScene = scene.mergeScenes([textureMeshScene, sceneData], statusMap);
+        expect(statusMap.invalidKeySummary()).toEqual('');
+        expect(newScene.length).toEqual(textureMeshScene.length+sceneData.length);
+    });
+
+    it("Merge with revit has no errors", function() {
+        var revitScene = scene.makeListScene(revitElement);
+        var newScene = scene.mergeScenes([revitScene, sceneData], statusMap);
+        expect(statusMap.invalidKeySummary()).toEqual('');
+        expect(newScene.length).toEqual(revitScene.length+sceneData.length);
+    });
+});
