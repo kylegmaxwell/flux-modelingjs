@@ -207,10 +207,11 @@ function _checkMaterials(obj, primStatus, changed) {
 /**
  * Replace a container element in the scene with a group
  * @param  {Array} scene        Array of Flux JSON
+ * @param  {Object} element     Container element to be replaced
  * @param  {Array} children     Array of child entities
  * @return {Object}             New group JSON
  */
-function _replaceElementScene(scene, children) {
+function _replaceElementScene(scene, element, children) {
     var ids = [];
     for (var c=0;c<children.length;c++) {
         var child = children[c];
@@ -222,6 +223,7 @@ function _replaceElementScene(scene, children) {
         ids.push(instance.id);
     }
     var group = createElement.group(ids);
+    group.id = element.id;
     return group;
 }
 
