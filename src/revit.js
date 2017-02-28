@@ -535,6 +535,46 @@ export function createOneLevelHostedFamilyInstance(fluxId, category, family, typ
     return familyInstance;
 }
 
+/**
+* Function to create a revit directShape element.
+*
+* @param {string} [fluxId] Flux Id for the family instance.
+* @param {string} [category] Category of the family instance.
+* @param {array} [meshGeom] Geometry of directshape element as array of mesh objects.
+* @param {object} [customParams] Custom parameters to be assigned to this element.
+* @returns {{Out: revitTwoLevelFamilyInstance}} The created revit family instance.
+*/
+export function createDirectShapeElement(fluxId, category, meshGeom, customParams) {
+    var familyInfo = {
+        category: category,
+        family: "DirectShape",
+        type: "",
+        placementType: "Invalid"
+    };
+
+    var missingParams = checkForKeys(familyInfo, ["category", "family", "type"]);
+    if (missingParams) {
+        return {Error: "Family Instance could not be created: Missing required familyinfo parameters " + missingParams.join(", ")};
+    }
+
+    var check = checkValidGeometry(meshGeom);
+    if (!check.valid) {
+        return {Error: check.msg };
+    }
+
+    var geomParams = {
+        geometry: meshGeom
+    };
+
+    var directShapeElement = createElement(fluxId, familyInfo, geomParams, undefined, undefined, customParams);
+
+    if (directShapeElement.Error) {
+        return {Error: "Element " + directShapeElement.Error};
+    }
+
+    return directShapeElement;
+}
+
  /**
 * Function to get a valid Structural type. Valid structural types are Beam, Column,
 * Brace, Footing and NonStructural. If invalid structural type is provided, NonStructural
@@ -855,6 +895,28 @@ function checkValidPlacementType(info) {
     }
 
     return {valid: false};
+}
+
+// Revit geometry is required to be an array of
+// mesh objects.
+// Check valid revit geometry
+function checkValidGeometry(geom) {
+    if (geom == null) {
+        return {valid: false, msg: "Geometry must be an array of mesh objects."};
+    }
+
+    if (geom.constructor !== Array) {
+        return {valid: false, msg: "Geometry must be an array of mesh objects."};
+    }
+
+    for(var i = 0; i < geom.length; ++i) {
+        var geomMeshObj = geom[i];
+        if (geomMeshObj.primitive === null || geomMeshObj.primitive != "mesh") {
+            return {valid: false, msg: "Geometry must be an array of mesh objects."};
+        }
+    }
+
+    return {valid: true};
 }
 
 function checkForKeys(obj, keys) {

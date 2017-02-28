@@ -681,6 +681,46 @@ describe("revit test", function () {
         });
     });
 
+    describe("createDirectShapeElement", function() {
+        var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};
+        var geomMesh = [{primitive: "mesh"}];
+        it("should return error if required parameters are not provided.", function() {
+            var el = revit.createDirectShapeElement();
+            expect(el.Error).toBeDefined();
+            el = revit.createDirectShapeElement("Id-1", undefined, geomMesh, customParamMap);
+            expect(el.Error).toBeDefined();
+            el = revit.createDirectShapeElement("Id-1", "Walls", undefined, customParamMap);
+            expect(el.Error).toBeDefined();
+        });
+
+        it("should work", function() {
+            var el = revit.createDirectShapeElement("Id-1", "Walls", geomMesh, customParamMap);
+            expect(forceJSON(el)).toEqual(forceJSON({
+                Out: {
+                    primitive: "revitElement",
+                    fluxId: "Id-1",
+                    familyInfo: {
+                        category: "Walls",
+                        family: "DirectShape",
+                        type: "",
+                        placementType: "Invalid"
+                    },
+                    geometryParameters: {
+                        geometry: geomMesh
+                    },
+                    instanceParameters: {
+                    },
+                    typeParameters: {
+                    },
+                    customParameters: {
+                        c1:"CustomParam 1",
+                        c2:"CustomParam 2"
+                    }
+                }
+            }));
+        });
+    });
+
     describe("selectParameter", function() {
         var el;
         beforeEach(function() {
