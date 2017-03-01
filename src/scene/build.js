@@ -14,10 +14,10 @@ import prep from './prep.js';
  * @return {String}             Id of the instance that is created
  */
 function addInstance(arr, data, label) {
-  let id = utils.generateUUID();
+  var id = utils.generateUUID();
   data.id = id;
   arr.push(data);
-  let inst = element.instance(id, label);
+  var inst = element.instance(id, label);
   arr.push(inst);
   return inst.id;
 }
@@ -31,17 +31,18 @@ function addInstance(arr, data, label) {
  * @return {Array.<Object>}       The scene
  */
 export function makeLayerScene(geometry, layerName, elementPrefix) {
-  let data = prep(geometry);
-  let elements = [];
-  let scene = [element.layer(elements, [1,1,1], layerName, true)];
-  let prefix = (elementPrefix ? String(prefix) : "MyElement" );
+  var data = prep(geometry);
+  var elements = [];
+  var scene = [element.layer(elements, [1,1,1], layerName, true)];
+  var prefix = (elementPrefix ? String(prefix) : "MyElement" );
+  var instId;
   if (data.constructor === Array) {
-    for (let i=0;i<data.length;i++) {
-      let instId = addInstance(scene, data[i], prefix+i);
+    for (var i=0;i<data.length;i++) {
+      instId = addInstance(scene, data[i], prefix+i);
       elements.push(instId);
     }
   } else {
-    let instId = addInstance(scene, data, prefix);
+    instId = addInstance(scene, data, prefix);
     elements.push(instId);
   }
   return scene;
@@ -56,12 +57,12 @@ export function makeLayerScene(geometry, layerName, elementPrefix) {
  * @return {Array.<Object>}       Scene containing the geometry
  */
 export function makeListScene(geometry, layerName, elementPrefix) {
-    let data = prep(geometry);
-    let elements = [];
-    let scene = [element.layer(elements, [1,1,1], layerName, true)];
-    let prefix = (elementPrefix ? String(prefix) : "MyElement" );
-    let list = element.geometryList(data);
-    let inst = element.instance(list.id, prefix);
+    var data = prep(geometry);
+    var elements = [];
+    var scene = [element.layer(elements, [1,1,1], layerName, true)];
+    var prefix = (elementPrefix ? String(prefix) : "MyElement" );
+    var list = element.geometryList(data);
+    var inst = element.instance(list.id, prefix);
     elements.push(inst.id);
     scene.push(inst);
     scene.push(list);
@@ -76,13 +77,13 @@ export function makeListScene(geometry, layerName, elementPrefix) {
  * @param  {Object} idMap  Map from old id string to new id string
  */
 function _uniqueifyObject(object, idMap) {
-    for (let key in object) {
-        let value = object[key];
+    for (var key in object) {
+        var value = object[key];
         if (value == null) continue;
         if (typeof value === 'object') {
             _uniqueifyObject(value, idMap);
         } else {
-            let newId = idMap[value];
+            var newId = idMap[value];
             if (newId) {
                 object[key] = newId;
             }
@@ -96,12 +97,12 @@ function _uniqueifyObject(object, idMap) {
  * @param  {Array.<Object>} scene The scene to modify
  */
 function _uniqueifyScene(scene) {
-    let id = utils.generateUUID();
-    let idMap = {};
-    for (let i=0; i<scene.length; i++) {
-        let element = scene[i];
+    var id = utils.generateUUID();
+    var idMap = {};
+    for (var i=0; i<scene.length; i++) {
+        var element = scene[i];
         if (element.id) {
-            let newId = id + element.id;
+            var newId = id + element.id;
             idMap[element.id] = newId;
             element.id = newId;
         }
@@ -116,10 +117,10 @@ function _uniqueifyScene(scene) {
  * @return {Array.<Object>}           The combined scene
  */
 export function mergeScenes(scenes, statusMap) {
-    let finalScene = [];
-    for (let s=0; s<scenes.length; s++) {
+    var finalScene = [];
+    for (var s=0; s<scenes.length; s++) {
         if (scenes[s]==null) continue;
-        let sceneCopy = prep(scenes[s], statusMap);
+        var sceneCopy = prep(scenes[s], statusMap);
         // TODO(Kyle): only do this on scenes that have id collisions
         _uniqueifyScene(sceneCopy);
         finalScene = finalScene.concat(sceneCopy);

@@ -1,6 +1,6 @@
 {
   "name": "flux-modelingjs",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Modeling entity constructors, measurement unit handlers, JSON schema validators etc.",
   "main": "dist/index.js",
   "jsnext:main": "src/index-lite.js",
