@@ -10,6 +10,7 @@ import * as revitUtils from './revitUtils.js';
 import * as schema from './schemaValidator.js';
 import * as utils from './utils.js';
 import * as createElement from './element.js';
+import FluxModelingError from '../FluxModelingError.js';
 
 /**
  * Modify an object and then return a copy of it with no null properties
@@ -338,6 +339,10 @@ function _explodeRevit(entities) {
  * @return {Object}        New JSON object representation
  */
 export default function prep(entity, primStatus) {
+    // Forgetting the second argument is dangerous since it only fails when there is an error
+    if (primStatus == null) {
+        throw new FluxModelingError('Prep function requires a second argument.');
+    }
     // Create a clone so that we can modify the properties in place
     // TODO(Kyle) This is slow for very large objects. The only reason we need a clone is for
     // the functions removeNulls and unitConverter, if we change those functions to return a new

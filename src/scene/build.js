@@ -26,15 +26,16 @@ function addInstance(arr, data, label) {
  * Create a scene with a layer that contains the specified geometry
  * Note: this is used by the CreateLayer block
  * @param  {Object} geometry      Any object that matches the Flux JSON spec
+ * @param  {StatusMap} statusMap  Container for per primitive errors
  * @param  {String} layerName     User friendly label on the layer
  * @param  {String} elementPrefix Name for the elements in the layer
  * @return {Array.<Object>}       The scene
  */
-export function makeLayerScene(geometry, layerName, elementPrefix) {
-  var data = prep(geometry);
+export function makeLayerScene(geometry, statusMap, layerName, elementPrefix) {
+  var data = prep(geometry, statusMap);
   var elements = [];
   var scene = [element.layer(elements, [1,1,1], layerName, true)];
-  var prefix = (elementPrefix ? String(prefix) : "MyElement" );
+  var prefix = (elementPrefix ? String(elementPrefix) : "MyElement" );
   var instId;
   if (data.constructor === Array) {
     for (var i=0;i<data.length;i++) {
@@ -50,14 +51,15 @@ export function makeLayerScene(geometry, layerName, elementPrefix) {
 
 /**
  * Create a scene containing the given geometry inside a geometryList
- * Note: this is used by the data view page to encapulate data key contents into a scene
+ * Note: this is used by the data view page to encapsulate data key contents into a scene
  * @param  {Object} geometry      Any object conforming to the Flux JSON spec
+ * @param  {StatusMap} statusMap  Container for per primitive errors
  * @param  {String} layerName     Descriptive label for the layer containing the geometry
  * @param  {type}   elementPrefix Descriptive label for the instance containing the geometry
  * @return {Array.<Object>}       Scene containing the geometry
  */
-export function makeListScene(geometry, layerName, elementPrefix) {
-    var data = prep(geometry);
+export function makeListScene(geometry, statusMap, layerName, elementPrefix) {
+    var data = prep(geometry, statusMap);
     var elements = [];
     var scene = [element.layer(elements, [1,1,1], layerName, true)];
     var prefix = (elementPrefix ? String(prefix) : "MyElement" );

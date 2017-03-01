@@ -141,8 +141,8 @@ var textureMeshScene = require('./data/scene/textureMeshScene.json');
 var revitElement = require('./data/scene/revitElement.json');
 
 describe("Scene merge", function() {
-    var statusMap = new scene.StatusMap();
     it("Merge with conflicting ids has no errors", function() {
+        var statusMap = new scene.StatusMap();
         var newScene = scene.mergeScenes([basicScene, sceneData], statusMap);
         expect(statusMap.invalidKeySummary()).toEqual('');
         var primCount = {};
@@ -164,15 +164,30 @@ describe("Scene merge", function() {
     });
 
     it("Merge with textures has no errors", function() {
+        var statusMap = new scene.StatusMap();
         var newScene = scene.mergeScenes([textureMeshScene, sceneData], statusMap);
         expect(statusMap.invalidKeySummary()).toEqual('');
         expect(newScene.length).toEqual(textureMeshScene.length+sceneData.length);
     });
 
     it("Merge with revit has no errors", function() {
-        var revitScene = scene.makeListScene(revitElement);
+        var statusMap = new scene.StatusMap();
+        var revitScene = scene.makeListScene(revitElement, statusMap);
         var newScene = scene.mergeScenes([revitScene, sceneData], statusMap);
         expect(statusMap.invalidKeySummary()).toEqual('');
         expect(newScene.length).toEqual(revitScene.length+sceneData.length);
+    });
+
+    it("Make layer has no errors", function() {
+        var statusMap = new scene.StatusMap();
+        var revitScene = scene.makeLayerScene(revitElement, statusMap);
+        expect(statusMap.invalidKeySummary()).toEqual('');
+        var layerCount = 0;
+        for (var i=0;i<revitScene.length;i++) {
+            if (revitScene[i].primitive === scene.SCENE_PRIMITIVES.layer) {
+                layerCount++;
+            }
+        }
+        expect(layerCount).toEqual(1);
     });
 });
