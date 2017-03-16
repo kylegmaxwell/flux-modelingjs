@@ -7,5 +7,5 @@
     @return {bool}             Entity or any other type specified by OptCtor
 */
 export function isEntity(obj) {
-    return obj.primitive != null;
+    return obj != null && obj.primitive != null;
 }

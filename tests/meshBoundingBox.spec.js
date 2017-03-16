@@ -7,8 +7,6 @@ var boundingBox =
         "primitive" : "block",
         "origin" : [ 5, 10, 10],
         "dimensions" : [ 10, 10, 20 ],
-        "axis" : [ 0, 0, 1 ],
-        "reference" : [ 1, 0, 0 ],
         "units" : { "origin" : 'meters', "dimensions" : 'meters' }
     };
 
