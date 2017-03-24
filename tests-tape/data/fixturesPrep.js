@@ -1,7 +1,7 @@
 'use strict';
 
 // Should convert revit elements into geometry with attributes
-module.exports.revit = {
+module.exports.revitGeometry = {
     "start": {"primitive":"revitElement","fluxId":"Id-1",
         "familyInfo":{"category":"Walls","family":"WallFamily-1",
         "type":"WallType-1","placementType":"Invalid"},
@@ -45,6 +45,75 @@ module.exports.revit = {
             "customParameters":{}
         }
     }],
+    "errors":''
+};
+
+
+module.exports.revitCurve = {
+    "start": {
+        "primitive": "revitElement",
+        "fluxId": "42bbaba2-21d4-40bc-be05-754added2ffb-0004f052",
+        "familyInfo": {
+          "category": "Lines",
+          "family": "ModelCurve",
+          "type": "",
+          "placementType": "Invalid"
+        },
+        "geometryParameters": {
+          "curve": {"primitive": "line","start": [-119.11329176361,-57.3972379236386,0],
+          "end": [-155.11329176361,-57.3972379236386,0],"units": {"start": "feet","end": "feet"}
+          },
+          "geometry": []
+        },
+        "instanceParameters": {
+          "UniqueId": "42bbaba2-21d4-40bc-be05-754added2ffb-0004f052",
+          "ElementId": 323666,
+          "Detail Line": false,
+          "Work Plane": "Level : Level 1",
+          "Length": 36,
+          "Phase Created": "New Construction",
+          "Moves With Nearby Elements": false,
+          "Line Style": "Lines",
+          "Phase Demolished": null
+        },
+        "typeParameters": {},
+        "customParameters": {},
+        "materialInfo": [],
+        "units": {
+          "instanceParameters/Length": "feet"
+        }
+      },
+    "end":
+    [{
+        "primitive": "line",
+        "start": [ -36.30573132954833, -17.494678119125044, 0 ],
+        "end": [ -47.27853132954833, -17.494678119125044, 0 ],
+        "units": { "end": "meters", "start": "meters" },
+        "id":"42bbaba2-21d4-40bc-be05-754added2ffb-0004f052",
+        "attributes": {
+            "primitive": "revitElement",
+            "fluxId":"42bbaba2-21d4-40bc-be05-754added2ffb-0004f052",
+            "familyInfo": {
+              "category": "Lines",
+              "family": "ModelCurve",
+              "type": "",
+              "placementType": "Invalid"
+            },
+            "instanceParameters": {
+              "UniqueId": "42bbaba2-21d4-40bc-be05-754added2ffb-0004f052",
+              "ElementId": 323666,
+              "Detail Line": false,
+              "Work Plane": "Level : Level 1",
+              "Length": 36,
+              "Phase Created": "New Construction",
+              "Moves With Nearby Elements": false,
+              "Line Style": "Lines"
+            },
+            "typeParameters": {},
+            "customParameters": {},
+            "materialInfo": []
+        }
+      }],
     "errors":''
 };
 

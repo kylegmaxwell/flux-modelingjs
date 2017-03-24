@@ -2,6 +2,7 @@
 
 import * as schema from '../schema/index.js';
 import * as constants from './constants.js';
+import * as revitUtils from './revitUtils.js';
 
 /**
  * Recursively search nested arrays for layer objects
@@ -76,21 +77,6 @@ function _listValidPrims ( ) {
     return _validPrimsList;
 }
 
-/**
-* Helper function to check if a revit element has
-* displayable (mesh) geometry
-* from a revitElement object.
-*
-* @function hasGeometry
-*
-* @param { object } data The revitElement.
-*
-* @return { Boolean } True of element has geometry.
-*/
-export function _hasRevitGeometry (data) {
-    return data && data.geometryParameters && data.geometryParameters.geometry;
-}
-
 // Singleton is computed from static schema and constants
 var prims = _listValidPrims();
 
@@ -109,7 +95,7 @@ var prims = _listValidPrims();
 */
 function _hasGeometry(data) {
     if (data.primitive === 'revitElement') {
-        return _hasRevitGeometry(data);
+        return revitUtils.hasRevitGeometry(data);
     }
 
     return data && data.primitive && (prims.indexOf(data.primitive) !== -1);
