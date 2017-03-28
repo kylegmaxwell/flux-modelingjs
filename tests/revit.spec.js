@@ -428,7 +428,14 @@ describe("revit test", function () {
     describe("createFloor", function() {
         var instanceParamMap = {i1: "InstanceParam 1", i2: "InstanceParam 2"};
         var customParamMap = {c1:"CustomParam 1", c2:"CustomParam 2"};
-        var profile = {};
+        var profile = [{
+          "curves": [{
+            "primitive":"line",
+            "start":[0,20,30],
+            "end":[20,30,40]
+          }],
+          "primitive": "polycurve"
+        }];
 
         it("should return error if required parameters are not provided.", function () {
             var el = revit.createFloor();
@@ -452,7 +459,7 @@ describe("revit test", function () {
                         placementType: "Invalid"
                     },
                     geometryParameters: {
-                        profile: {},
+                        profile: profile,
                         level: "Level-1",
                         structural: true
                     },

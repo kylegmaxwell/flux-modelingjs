@@ -327,14 +327,13 @@ describe("fluxRevit schema test", function() {
         var validate = ajv.compile({ $ref: schemaId });
         it ("Valid revitFloor should validate", function() {
             var profile = [{
-              "units": {
-                    "end": "feet",
-                    "start": "feet"
-                },
-              "end": [ 20.31, 17.82, 0 ],
-              "primitive": "line",
-              "start": [ -63.18, 17.82, 0 ]
-            }]
+              "curves": [{
+                "primitive":"line",
+                "start":[0,20,30],
+                "end":[20,30,40]
+              }],
+              "primitive": "polycurve"
+            }];
             var validFloor = revit.createFloor("Id-1", "FloorType-1", profile, "Level-1", true,
                 {i1: "InstanceParam 1", i2: "InstanceParam 2"}, {c1:"CustomParam 1", c2:"CustomParam 2"});
             var isValid = validate(validFloor.Out);

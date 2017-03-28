@@ -8,13 +8,12 @@
      "placementType": "Invalid" },
     "geometryParameters": {
         "profile": [{
-          "units": {
-                "end": "feet",
-                "start": "feet"
-            },
-          "end": [ 20.31, 17.82, 0 ],
-          "primitive": "line",
-          "start": [ -63.18, 17.82, 0 ]
+          "curves": [{
+            "primitive":"line",
+            "start":[0,20,30],
+            "end":[20,30,40]
+          }],
+          "primitive": "polycurve"
         }],
         "level": "Level-1",
         "structural": true

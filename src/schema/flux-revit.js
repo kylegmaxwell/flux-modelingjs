@@ -52,7 +52,8 @@ var revit = {
                         { "$ref": "fluxEntity#/geometry/line" },
                         { "$ref": "fluxEntity#/geometry/curve" },
                         { "$ref": "fluxEntity#/geometry/arc" },
-                        { "$ref": "fluxEntity#/geometry/polyline"}
+                        { "$ref": "fluxEntity#/geometry/polyline"},
+                        { "$ref": "fluxEntity#/geometry/polycurve"}
                     ]
                 }
         },

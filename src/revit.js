@@ -343,6 +343,11 @@ export function createFloor(fluxId, type, profile, level, structural, instancePa
         structural: !!structural
     };
 
+    var check = checkValidProfile(profile);
+    if (!check.valid) {
+        return {Error: check.msg};
+    }
+
     var missingParams = checkForKeys(familyInfo, ["category", "family", "type"]);
     if (missingParams) {
         return {Error: "Level element could not be created: Missing required familyinfo parameters " + missingParams.join(", ")};
@@ -913,6 +918,21 @@ function checkValidGeometry(geom) {
         var geomMeshObj = geom[i];
         if (geomMeshObj.primitive === null || geomMeshObj.primitive != "mesh") {
             return {valid: false, msg: "Geometry must be an array of mesh objects."};
+        }
+    }
+
+    return {valid: true};
+}
+
+function checkValidProfile(profile) {
+    if (profile == null || !Array.isArray(profile)) {
+        return {valid: false, msg: "Profile must be a list of polycurves."};
+    }
+
+    for(var i = 0; i < profile.length; ++i) {
+        var polycurve = profile[i];
+        if (polycurve.primitive == null || polycurve.primitive !== "polycurve") {
+            return {valid: false, msg: "Profile must be a list of polycurves."};
         }
     }
 
