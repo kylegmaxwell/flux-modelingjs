@@ -1,0 +1,12 @@
+{
+    "guid": "58506757-1884-4A7C-A62E-F4046001BE31",
+    "topicType": "issue",
+    "topicStatus": "open",
+    "title": "My Very Important Issue",
+    "description": "Bacon ipsum dolor amet chuck sausage beef ribs, fatback doner filet mignon.",
+    "creationDate":    "Tue Apr 25 2017 14:51:11 GMT-0700 (PDT)",
+    "creationAuthor":  "bimManager@flux.io",
+    "modifiedDate":    "Tue Apr 25 2017 14:51:11 GMT-0700 (PDT)",
+    "modifiedAuthor":  "structuralEngineer@flux.io",
+    "bimSnippet": { "reference": [ "file1.rvt", "file2.rvt" ] }
+}

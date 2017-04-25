@@ -1,0 +1,9 @@
+{
+    "guid": "674256CF-EE50-472C-BEF7-2E3D05F344EB",
+    "perspectiveCamera": {
+        "cameraViewPoint": { "x": 100, "y": 200, "z":150 },
+        "cameraDirection": { "x": 0, "y": 1, "z": 0 },
+        "cameraUpVector": { "x": 0, "y": 0, "z": 1 },
+        "fieldOfView": 120
+    }
+}
