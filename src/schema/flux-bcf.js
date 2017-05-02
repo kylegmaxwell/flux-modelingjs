@@ -29,6 +29,7 @@ var fluxBCF = {
         "point": { "$ref": "#/viewDefinitions/xyzTuple" },
         "direction": { "$ref": "#/viewDefinitions/xyzTuple" },
         "location": { "$ref": "#/viewDefinitions/xyzTuple" },
+
         "clippingPlane": {
             "type": "object",
             "properties": {
@@ -36,6 +37,7 @@ var fluxBCF = {
                 "direction": { "$ref": "#/viewDefinitions/direction" }
             },
         },
+
         "line": {
             "type": "object",
             "properties": {
@@ -54,6 +56,7 @@ var fluxBCF = {
             },
             "required": [ "cameraViewPoint", "cameraDirection", "cameraUpVector", "viewToWorldScale" ]
         },
+
         "perspectiveCamera": {
             "type": "object",
             "properties": {
@@ -68,7 +71,8 @@ var fluxBCF = {
             "required": [ "cameraViewPoint", "cameraDirection", "cameraUpVector", "fieldOfView" ]
         },
 
-        "imageType": { "type": "string", "enum": [ "jpg", "png" ] },
+        "imageType": { "enum": [ "jpg", "png" ] },
+
         "bitmap": {
             "type": "object",
             "properties": {
@@ -78,6 +82,14 @@ var fluxBCF = {
                 "normal": { "$ref": "#/viewDefinitions/direction" },
                 "up": { "$ref": "#/viewDefinitions/direction" },
                 "height": { "type": "number" }
+            }
+        },
+
+        "snapshot": {
+            "type": [ "object", "null" ],
+            "properties": {
+                "snapshotType": { "$ref": "#/viewDefinitions/imageType" },
+                "snapshotData": { "type": "string" }
             }
         }
     },
@@ -97,10 +109,7 @@ var fluxBCF = {
             "index": { "type": [ "integer", "null" ] },
             "lines": { "type": [ "array", "null" ], "items": { "$ref": "#/viewDefinitions/line" } },
             "bitmaps": { "type": [ "array", "null" ], "items": { "$ref": "#/viewDefinitions/bitmap" } },
-            "snapshot": {
-                "type": [ "object", "null" ],
-                "properties": { "snapshotType": { "$ref": "#/viewDefinitions/imageType" } }
-            }
+            "snapshot": { "$ref": "#/viewDefinitions/snapshot" }
         },
         "required": [ "guid" ]
     },
