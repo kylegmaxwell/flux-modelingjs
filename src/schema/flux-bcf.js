@@ -36,6 +36,7 @@ var fluxBCF = {
                 "location": { "$ref": "#/viewDefinitions/location" },
                 "direction": { "$ref": "#/viewDefinitions/direction" }
             },
+            "required": ["location", "direction"]
         },
 
         "line": {
@@ -43,7 +44,8 @@ var fluxBCF = {
             "properties": {
                 "startPoint": { "$ref": "#/viewDefinitions/point" },
                 "endPoint": { "$ref": "#/viewDefinitions/point" }
-            }
+            },
+            "required": ["startPoint", "endPoint"]
         },
 
         "orthogonalCamera": {
@@ -78,11 +80,13 @@ var fluxBCF = {
             "properties": {
                 "guid": { "type": "string" },
                 "bitmapType": { "$ref": "#/viewDefinitions/imageType" },
+                "bitmapData": { "type": "string" },
                 "location": { "$ref": "#/viewDefinitions/location" },
                 "normal": { "$ref": "#/viewDefinitions/direction" },
                 "up": { "$ref": "#/viewDefinitions/direction" },
                 "height": { "type": "number" }
-            }
+            },
+            "required": [ "guid", "bitmapType", "bitmapData", "location", "normal", "up", "height" ]
         },
 
         "snapshot": {
@@ -90,7 +94,8 @@ var fluxBCF = {
             "properties": {
                 "snapshotType": { "$ref": "#/viewDefinitions/imageType" },
                 "snapshotData": { "type": "string" }
-            }
+            },
+            "required": ["snapshotType","snapshotData"]
         }
     },
 
@@ -151,7 +156,7 @@ var fluxBCF = {
 
 
         },
-        "required": [ "guid", "title", "creationDate", "creationAuthor" ]
+        "required": [ "guid", "title"]
     }
 };
 

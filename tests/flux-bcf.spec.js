@@ -46,26 +46,24 @@ describe("flux-bcf", function() {
             expect(isValid).toEqual(false);
         });
 
-        it("Topic should require a creation date", function() {
+        it("Topic should not require a creation date", function() {
             var malformedTopic = {
                 "guid": "58506757-1884-4A7C-A62E-F4046001BE31",
-                "title": "My Very Important Issue",
-                "creationAuthor":  "bimManager@flux.io"
+                "title": "My Very Important Issue"
             };
 
             var isValid = validate(malformedTopic);
-            expect(isValid).toEqual(false);
+            expect(isValid).toEqual(true);
         });
 
-        it("Topic should require a creation author", function() {
+        it("Topic should not require a creation author", function() {
             var malformedTopic = {
                 "guid": "58506757-1884-4A7C-A62E-F4046001BE31",
-                "title": "My Very Important Issue",
-                "creationDate":    "Tue Apr 25 2017 14:51:11 GMT-0700 (PDT)"
+                "title": "My Very Important Issue"
             };
 
             var isValid = validate(malformedTopic);
-            expect(isValid).toEqual(false);
+            expect(isValid).toEqual(true);
         });
 
         it("Topic should not validate with malformed data", function() {
