@@ -28,8 +28,7 @@ export var helpers = {
     Number: specification({"type": "number"}, "a number"),
     PositiveInteger: specification({
             "type":    "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
+            "exclusiveMinimum": 0
         }, "a positive integer"),
 
     /** Convenience method for constructing a specification based on an entity

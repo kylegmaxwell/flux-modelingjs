@@ -1,5 +1,5 @@
 var material = {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-06/schema#",
     "materialProperties": {
         "type": "object",
         "properties": {

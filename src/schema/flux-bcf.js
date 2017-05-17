@@ -1,6 +1,6 @@
 var fluxBCF = {
 
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-06/schema#",
 
     "definitions": {
         "topicType": { "enum": [ "issue", "request", "comment", "solution" ] },

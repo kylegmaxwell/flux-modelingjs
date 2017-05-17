@@ -1,5 +1,5 @@
 var entity = {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-06/schema#",
     "types": {
         "null": {"type": "null"},
         "brep_format": {
@@ -11,8 +11,7 @@ var entity = {
         },
         "indexNonzero": {
             "type":    "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
+            "exclusiveMinimum": 0
         },
         "direction": {
             "type": "array",
@@ -58,8 +57,7 @@ var entity = {
         },
         "distanceNonzero": {
             "type":     "number",
-            "minimum":  0,
-            "exclusiveMinimum": true,
+            "exclusiveMinimum":  0,
             "fluxDimension": "length"
         },
         "position": {
