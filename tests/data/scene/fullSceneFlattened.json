@@ -299,39 +299,40 @@
       "radius": 10
     },
     {
-      "attributes": {
-        "backColor": "black",
-        "frontColor": "blue",
-        "label": "Layer-Even",
-        "lineType": "lineType-10",
-        "name": "layer-even"
-      },
-      "entities": [
-        {
-          "dimensions": [
+        "attributes": {
+            "backColor": "black",
+            "frontColor": "blue",
+            "label": "Layer-Even",
+            "lineType": "lineType-10",
+            "name": "layer-even"
+        },
+        "dimensions": [
             20,
             20,
             20
-          ],
-          "origin": [
+        ],
+        "origin": [
             0,
             0,
             0
-          ],
-          "primitive": "block2"
+        ],
+        "primitive": "block"
+    },
+    {
+        "attributes": {
+            "backColor": "black",
+            "frontColor": "blue",
+            "label": "Layer-Even",
+            "lineType": "lineType-10",
+            "name": "layer-even"
         },
-        {
-          "origin": [
+        "origin": [
             0,
             0,
             0
-          ],
-          "primitive": "sphere2",
-          "radius": 20
-        }
-      ],
-      "id": "geometryList1",
-      "primitive": "geometryList"
+        ],
+        "primitive": "sphere",
+        "radius": 20
     },
     {
       "attributes": {
@@ -652,6 +653,24 @@
     }
   ],
   "transforms": [
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
     [
       1,
       0,

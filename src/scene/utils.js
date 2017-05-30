@@ -131,12 +131,14 @@ export function isGeometry (data) {
 * Merge attributes of source object with attributes of target object.
 * If target object already has an attribute by the same name it would
 * be retained.
-* ORIGINAL OBJECTS ARE UNCHANGED.
+* ORIGINAL OBJECTS ARE UNCHANGED. This prevents cross contamination of
+* attributes when multiple instances reference the same geometry.
 * @param  {object} source        Source entity
 * @param  {object} target        Target entity
 * @return {object}               Target entity with merged attributes
 */
 export function mergeAttributes(source, target) {
+    if (target == null) return target;
     var trgt = JSON.parse(JSON.stringify(target));
     if (source.attributes != null) {
         if (trgt.attributes != null) {

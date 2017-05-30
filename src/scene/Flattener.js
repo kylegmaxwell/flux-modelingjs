@@ -5,6 +5,8 @@ import * as utils from './utils.js';
 import FluxModelingError from '../FluxModelingError.js';
 import { mat4 } from 'gl-matrix';
 import * as constants from './constants.js';
+import StatusMap from './StatusMap.js';
+import prep from './prep.js';
 
 /**
 * Class implementing flatten operation on a scene.
@@ -20,26 +22,49 @@ export default function Flattener(sceneJson) {
 * Operation to perform flatten operation on a valid scene.
 * Returns a list of instances such that entities are fully
 * baked into the instance and attributes are merged.
-* Tranformation matrix is not yet applied to the entity.
+* Transformation matrix is not yet applied to the entity.
 * @return {Array}       List of instances of a flattened scene
 */
 Flattener.prototype.flatten = function() {
+    var primStatus = new StatusMap();
+    var data = prep(this.sceneJson, primStatus);
+    var errors = primStatus.invalidKeySummary();
     var sceneValidator = new SceneValidator();
-    var result = sceneValidator.validateJSON(this.sceneJson);
-
-    if (result.getResult() !== true) {
-        throw new FluxModelingError(result.getMessage());
+    if (utils.isScene(data)) {
+        var sceneValid = sceneValidator.validateJSON(data);
+        errors += sceneValid.getMessage();
+    } else {
+        throw new FluxModelingError("Flatten: Not a scene");
+    }
+    if (errors) {
+        throw new FluxModelingError(errors);
     }
 
     // Create Scene Map
-    for(var i = 0; i < this.sceneJson.length; ++i) {
-        this.scene[this.sceneJson[i].id] = this.sceneJson[i];
+    for(var i = 0; i < data.length; ++i) {
+        this.scene[data[i].id] = data[i];
     }
 
     var layeredInstances = this._getLayeredInstances();
     var flattenedScene = this._flattenInstances(layeredInstances);
 
     return flattenedScene;
+};
+
+/**
+ * Add an object, transform pair to the scene results
+ * @param  {Object} flattenedScene Container for results
+ * @param  {Object} inst           The instance containing the object
+ * @param  {Object} item           The geometry object
+ */
+Flattener.prototype._addPair = function(flattenedScene, inst, item) {
+    item = utils.mergeAttributes(inst, item);
+    flattenedScene.entities.push(item);
+    if (inst.matrix == null) {
+        flattenedScene.transforms.push(null);
+    } else {
+        flattenedScene.transforms.push(inst.matrix);
+    }
 };
 
 /**
@@ -53,13 +78,16 @@ Flattener.prototype._flattenInstances = function(instances) {
     var flattenedScene = {entities:[], transforms:[]};
     for (var i = 0; i < instances.length; ++i) {
         var inst = instances[i];
-        inst.entity = this.scene[inst.entity];
-        inst.entity = utils.mergeAttributes(inst, inst.entity);
-        flattenedScene.entities.push(inst.entity);
-        if (inst.matrix == null) {
-            flattenedScene.transforms.push(null);
+        var entity = this.scene[inst.entity];
+        if (entity.primitive === constants.SCENE_PRIMITIVES.geometry) {
+            var list = entity.entities;
+            for (var j=0;j<list.length;j++) {
+                var item = list[j];
+                item = utils.mergeAttributes(entity, item);
+                item = this._addPair(flattenedScene, inst, item);
+            }
         } else {
-            flattenedScene.transforms.push(inst.matrix);
+            this._addPair(flattenedScene, inst, entity);
         }
     }
 
@@ -103,7 +131,6 @@ Flattener.prototype._flattenGroup = function(inGroup) {
             groupInstances.push(node);
         }
     }
-
     return groupInstances;
 };
 
@@ -157,6 +184,5 @@ Flattener.prototype._getLayeredInstances = function() {
             }
         }
     }
-
     return sceneInstances;
 };

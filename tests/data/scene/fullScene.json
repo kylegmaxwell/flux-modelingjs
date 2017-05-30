@@ -359,7 +359,7 @@
           0,
           0
         ],
-        "primitive": "block2"
+        "primitive": "block"
       },
       {
         "origin": [
@@ -367,7 +367,7 @@
           0,
           0
         ],
-        "primitive": "sphere2",
+        "primitive": "sphere",
         "radius": 20
       }
     ],
