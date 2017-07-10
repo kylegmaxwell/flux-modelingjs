@@ -418,6 +418,24 @@ var entity = {
                 "isSolid": { "type": "boolean" }
             },
             "required": [ "primitive", "vertices", "faces" ]
+        },
+        // Un-official primitive supported by viewport and some plugins
+        // Will be standardized in scene 0.0.5 with breaking changes
+        "text": {
+            "type": "object",
+            "properties": {
+                "id":           { "$ref": "#/types/fluxid" },
+                "primitive":    { "enum": [ "text" ] },
+                "attributes":   { "type":  "object" },
+                "units":        { "$ref": "#/types/units" },
+                "align":        { "$ref": "#/types/position"  },
+                "origin":       { "$ref": "#/types/position"  },
+                "direction":    { "$ref": "#/types/direction" },
+                "size":         { "type": "number" },
+                "color":        { "type": "color" },
+                "text":         { "type": "string" }
+            },
+            "required": [ "primitive", "size", "text" ]
         }
     },
     "scene":{
